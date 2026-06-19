@@ -6,10 +6,6 @@ Company workspace — ChainLayer infrastructure and operations.
 
 - `chainlayer-squad-deepseek/` — ChainLayer Squad DeepSeek (issue lifecycle agents)
 
-## Cross-squad agents (`_shared/`)
-
-Agents not tied to a single squad (monitoring, shared infra, etc.).
-
 ## Updating agents
 
 See [CONTRIBUTING.md](../../CONTRIBUTING.md) (TODO) for the MR workflow.

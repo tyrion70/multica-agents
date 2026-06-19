@@ -11,9 +11,6 @@ multica-agents/
       squad.json              # optional squad-level config
       <agent-slug>/           # e.g. "tech-lead"
         agent.json            # agent definition (JSON Schema: schemas/agent.json)
-    _shared/                  # cross-squad agents (not tied to any one squad)
-      <agent-slug>/
-        agent.json
   schemas/
     agent.json                # JSON Schema for agent config
     squad.json                # JSON Schema for squad config (optional)
@@ -44,7 +41,7 @@ Example:
 
 ### Adding a new agent
 
-1. Create the folder: `<workspace>/<squad-or-_shared>/<agent-slug>/`
+1. Create the folder: `<workspace>/<squad>/<agent-slug>/`
 2. Add `agent.json` conforming to `schemas/agent.json`
 3. Open a PR to this repo
 4. Merge triggers the sync autopilot (or run `scripts/sync.sh` manually)
