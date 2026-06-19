@@ -56,28 +56,35 @@
       }
     },
     "mcp_config": {
-      "type": "object",
       "description": "MCP server configuration (e.g. {\"mcpServers\": {...}}). Secret material — use {{VAULT:...}} and {{SECRET:...}} placeholders for API tokens and credentials. Never commit plaintext secrets.",
-      "properties": {
-        "mcpServers": {
+      "oneOf": [
+        {
           "type": "object",
-          "additionalProperties": {
-            "type": "object",
-            "properties": {
-              "command": { "type": "string" },
-              "args": {
-                "type": "array",
-                "items": { "type": "string" }
-              },
-              "env": {
+          "properties": {
+            "mcpServers": {
+              "type": "object",
+              "additionalProperties": {
                 "type": "object",
-                "additionalProperties": { "type": "string" }
+                "properties": {
+                  "command": { "type": "string" },
+                  "args": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "env": {
+                    "type": "object",
+                    "additionalProperties": { "type": "string" }
+                  }
+                },
+                "required": ["command"]
               }
-            },
-            "required": ["command"]
+            }
           }
+        },
+        {
+          "type": "string"
         }
-      }
+      ]
     },
     "visibility": {
       "type": "string",
