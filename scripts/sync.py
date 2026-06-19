@@ -134,6 +134,75 @@ def agent_differs(
     return False
 
 
+VAULT_FOLDER_IDS = {
+    "company": "fa7ec305-d8c0-4603-bcb4-248cf5be04ae",
+    "shared": "263e645f-08b4-4b6b-b5d9-3d6fe994b415",
+    "private": "d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5",
+}
+
+_VAULT_CACHE: Dict[str, Dict[str, str]] = {}
+
+
+def _resolve_vault_value(placeholder: str) -> str:
+    import re
+
+    m = re.fullmatch(r"\{\{VAULT:(\w+)/(.+?):(\w+)\}\}", placeholder)
+    if not m:
+        return placeholder
+
+    folder_name = m.group(1)
+    item_name = m.group(2)
+    field_name = m.group(3)
+
+    folder_id = VAULT_FOLDER_IDS.get(folder_name)
+    if not folder_id:
+        print(f"      WARNING: unknown vault folder '{folder_name}'", file=sys.stderr)
+        return placeholder
+
+    bw_env = os.environ.get("BW_SESSION", "")
+    if not bw_env:
+        print(f"      WARNING: BW_SESSION not set — cannot resolve {placeholder}", file=sys.stderr)
+        return placeholder
+
+    cache_key = f"{folder_name}/{item_name}"
+    if cache_key not in _VAULT_CACHE:
+        env = os.environ.copy()
+        env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0"
+        try:
+            result = subprocess.run(
+                ["bw", "get", "item", item_name, "--session", bw_env],
+                capture_output=True, text=True, env=env, timeout=15,
+            )
+            if result.returncode != 0:
+                stderr_first = result.stderr.strip().split("\n")[0] if result.stderr else "unknown error"
+                print(f"      WARNING: bw get item failed for '{item_name}': {stderr_first}", file=sys.stderr)
+                return placeholder
+            item = json.loads(result.stdout)
+            fields = {f["name"]: f.get("value", "") for f in item.get("fields", [])}
+            _VAULT_CACHE[cache_key] = fields
+        except Exception as e:
+            print(f"      WARNING: vault resolution failed: {e}", file=sys.stderr)
+            return placeholder
+
+    fields = _VAULT_CACHE[cache_key]
+    if field_name in fields:
+        return fields[field_name]
+    print(f"      WARNING: field '{field_name}' not found in item '{item_name}'", file=sys.stderr)
+    return placeholder
+
+
+def _resolve_placeholders(obj: Any) -> Any:
+    if isinstance(obj, str):
+        if obj.startswith("{{VAULT:") and obj.endswith("}}"):
+            return _resolve_vault_value(obj)
+        return obj
+    elif isinstance(obj, dict):
+        return {k: _resolve_placeholders(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [_resolve_placeholders(i) for i in obj]
+    return obj
+
+
 def apply_mcp_config(
     agent_id: str,
     agent_data: Dict[str, Any],
@@ -141,6 +210,9 @@ def apply_mcp_config(
     tmpdir: pathlib.Path,
 ) -> bool:
     """Apply mcp_config from agent.json to the agent via --mcp-config-file.
+
+    Resolves {{VAULT:folder/item:field}} placeholders at runtime using the
+    Bitwarden CLI (requires BW_SESSION in environment).
 
     Returns True if MCP config was applied (or would have been).
     Skips if mcp_config is missing, None, or a placeholder string.
@@ -155,6 +227,8 @@ def apply_mcp_config(
         print(f"      [DRY-RUN] would apply mcp_config to {agent_id}", file=sys.stderr)
         return True
 
+    resolved = _resolve_placeholders(mcp)
+
     fd, tmp_path = tempfile.mkstemp(
         suffix=".json",
         prefix="mcp-",
@@ -162,7 +236,7 @@ def apply_mcp_config(
     )
     try:
         with os.fdopen(fd, "w") as f:
-            json.dump(mcp, f)
+            json.dump(resolved, f)
         _multica(
             ["agent", "update", agent_id, "--mcp-config-file", tmp_path],
             dry_run=False,

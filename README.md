@@ -24,15 +24,27 @@ Secrets must **never** be committed in plaintext. Use these placeholders, which 
 
 | Placeholder | Source |
 |---|---|
-| `{{VAULT:folder/item-name}}` | Bitwarden / Vaultwarden secret |
+| `{{VAULT:company/Item Name:FIELD_NAME}}` | Bitwarden company folder field |
+| `{{VAULT:shared/Item Name:FIELD_NAME}}` | Bitwarden shared folder field |
+| `{{VAULT:private/Item Name:FIELD_NAME}}` | Bitwarden private folder field |
 | `{{SECRET:name}}` | Generic secret reference |
+
+The sync script resolves `{{VAULT:...}}` placeholders at runtime using the Bitwarden CLI (requires `BW_SESSION` in the environment). Field values are extracted from the named custom field on SecureNote items.
 
 Example:
 
 ```json
 {
-  "custom_env": {
-    "GITHUB_TOKEN": "{{VAULT:shared/github-token}}"
+  "mcp_config": {
+    "mcpServers": {
+      "linear": {
+        "headers": {
+          "Authorization": "Bearer {{VAULT:company/ChainLayer · Linear — API key:LINEAR_API_KEY}}"
+        },
+        "type": "http",
+        "url": "https://mcp.linear.app/mcp"
+      }
+    }
   }
 }
 ```

@@ -21,14 +21,14 @@
     "mcpServers": {
       "incidentio": {
         "headers": {
-          "Authorization": "Bearer #ChainLayer · incident.io — API key / INCIDENT_IO_API_KEY#"
+          "Authorization": "Bearer {{VAULT:company/ChainLayer · incident.io — API key:INCIDENT_IO_API_KEY}}"
         },
         "type": "http",
         "url": "https://mcp.incident.io/mcp"
       },
       "linear": {
         "headers": {
-          "Authorization": "Bearer #ChainLayer · Linear — API key / LINEAR_API_KEY#"
+          "Authorization": "Bearer {{VAULT:company/ChainLayer · Linear — API key:LINEAR_API_KEY}}"
         },
         "type": "http",
         "url": "https://mcp.linear.app/mcp"
@@ -43,7 +43,7 @@
         "env": {
           "SLACK_MCP_ADD_MESSAGE_TOOL": "true",
           "SLACK_MCP_REACTION_TOOL": "true",
-          "SLACK_MCP_XOXP_TOKEN": "#ChainLayer · Slack — personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#"
+          "SLACK_MCP_XOXP_TOKEN": "{{VAULT:company/Slack — Multica MCP user token (xoxp, tyrion70/ChainLayer):SLACK_MCP_XOXP_TOKEN}}"
         }
       }
     }
