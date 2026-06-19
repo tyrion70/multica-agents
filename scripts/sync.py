@@ -134,10 +134,53 @@ def agent_differs(
     return False
 
 
+def apply_mcp_config(
+    agent_id: str,
+    agent_data: Dict[str, Any],
+    dry_run: bool,
+    tmpdir: pathlib.Path,
+) -> bool:
+    """Apply mcp_config from agent.json to the agent via --mcp-config-file.
+
+    Returns True if MCP config was applied (or would have been).
+    Skips if mcp_config is missing, None, or a placeholder string.
+    """
+    import tempfile
+
+    mcp = agent_data.get("mcp_config")
+    if not isinstance(mcp, dict):
+        return False
+
+    if dry_run:
+        print(f"      [DRY-RUN] would apply mcp_config to {agent_id}", file=sys.stderr)
+        return True
+
+    fd, tmp_path = tempfile.mkstemp(
+        suffix=".json",
+        prefix="mcp-",
+        dir=str(tmpdir),
+    )
+    try:
+        with os.fdopen(fd, "w") as f:
+            json.dump(mcp, f)
+        _multica(
+            ["agent", "update", agent_id, "--mcp-config-file", tmp_path],
+            dry_run=False,
+        )
+        print(f"      ✓ mcp_config applied", file=sys.stderr)
+        return True
+    finally:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+
+
 def build_create_args(agent_data: Dict[str, Any]) -> List[str]:
     """Build multica agent create CLI argument list from agent.json fields.
 
-    custom_env and mcp_config are intentionally excluded.
+    custom_env is intentionally excluded. mcp_config is applied separately
+    via apply_mcp_config() after create.
     """
     args: List[str] = []
     args += ["--name", agent_data["name"]]
@@ -173,7 +216,8 @@ def build_update_args(agent_id: str, agent_data: Dict[str, Any]) -> List[str]:
     """Build multica agent update CLI argument list.
 
     Only the agent ID and changed fields are included.
-    custom_env and mcp_config are intentionally excluded.
+    custom_env is intentionally excluded. mcp_config is applied separately
+    via apply_mcp_config() after update.
     """
     args: List[str] = [agent_id]
 
@@ -237,6 +281,7 @@ def sync_workspace(
     live_agents: Dict[str, Dict[str, Any]],
     skill_map: Dict[str, str],
     dry_run: bool,
+    tmpdir: pathlib.Path,
 ) -> Dict[str, int]:
     """Sync all agents under one workspace directory.
 
@@ -281,10 +326,17 @@ def sync_workspace(
             if agent_name in live_agents:
                 existing = live_agents[agent_name]
                 if not agent_differs(agent_data, existing):
+                    agent_id = existing["id"]
+                    try:
+                        apply_mcp_config(agent_id, agent_data, dry_run, tmpdir)
+                    except Exception as e:
+                        print(f"    ✗ MCP CONFIG FAILED: {e}", file=sys.stderr)
+                        counts["errors"] += 1
                     print(f"    ✓ unchanged (id={existing['id']})", file=sys.stderr)
                     counts["unchanged"] += 1
                     continue
 
+                agent_id = existing["id"]
                 print(f"    → updating (id={existing['id']})", file=sys.stderr)
                 try:
                     update_args = build_update_args(existing["id"], agent_data)
@@ -303,8 +355,6 @@ def sync_workspace(
                     print(f"    ✗ UPDATE FAILED: {e}", file=sys.stderr)
                     counts["errors"] += 1
                     continue
-
-                agent_id = existing["id"]
             else:
                 print(f"    → creating new agent", file=sys.stderr)
                 try:
@@ -327,6 +377,12 @@ def sync_workspace(
                     print(f"    ✗ CREATE FAILED: {e}", file=sys.stderr)
                     counts["errors"] += 1
                     continue
+
+            try:
+                apply_mcp_config(agent_id, agent_data, dry_run, tmpdir)
+            except Exception as e:
+                print(f"    ✗ MCP CONFIG FAILED: {e}", file=sys.stderr)
+                counts["errors"] += 1
 
             desired_skills = agent_data.get("skills", [])
             if desired_skills and agent_id:
@@ -385,10 +441,13 @@ def main() -> None:
 
     totals: Dict[str, int] = defaultdict(int)
 
-    for ws in workspaces:
-        counts = sync_workspace(ws, schema, live_agents, skill_map, args.dry_run)
-        for k, v in counts.items():
-            totals[k] += v
+    import tempfile
+    with tempfile.TemporaryDirectory(prefix="multica-sync-") as tmpdir_path:
+        tmpdir = pathlib.Path(tmpdir_path)
+        for ws in workspaces:
+            counts = sync_workspace(ws, schema, live_agents, skill_map, args.dry_run, tmpdir)
+            for k, v in counts.items():
+                totals[k] += v
 
     mode = "DRY-RUN" if args.dry_run else "SYNC"
     print(f"\n==> {mode} COMPLETE", file=sys.stderr)
