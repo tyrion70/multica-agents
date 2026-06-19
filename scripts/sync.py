@@ -252,7 +252,6 @@ def sync_workspace(
             continue
 
         squad_name = squad_dir.name
-        is_shared = squad_name == "_shared"
 
         for agent_dir in sorted(squad_dir.iterdir()):
             if not agent_dir.is_dir():
@@ -263,8 +262,7 @@ def sync_workspace(
 
             agent_slug = agent_dir.name
             rel_path = agent_json_path.relative_to(REPO_ROOT)
-            prefix = "shared" if is_shared else squad_name
-            label = f"{workspace_name}/{prefix}/{agent_slug}"
+            label = f"{workspace_name}/{squad_name}/{agent_slug}"
             print(f"  {rel_path}", file=sys.stderr)
 
             try:
