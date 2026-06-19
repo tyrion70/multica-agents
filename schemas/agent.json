@@ -81,9 +81,9 @@
     },
     "visibility": {
       "type": "string",
-      "enum": ["private", "public"],
+      "enum": ["private", "workspace"],
       "default": "private",
-      "description": "Access control. 'private' gated to workspace owner/admin and private squad leaders; 'public' visible to all workspace members."
+      "description": "Access control. 'private' gated to workspace owner/admin; 'workspace' visible to all workspace members."
     },
     "max_concurrent_tasks": {
       "type": "integer",
