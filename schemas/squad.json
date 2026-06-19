@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/tyrion70/multica-agents/main/schemas/squad.json",
+  "title": "Multica Squad Configuration",
+  "description": "Optional schema for a squad-level configuration file. Each squad folder may contain a squad.json alongside its agent subfolders.",
+  "type": "object",
+  "required": ["name"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Display name of the squad."
+    },
+    "description": {
+      "type": "string",
+      "description": "Purpose and scope of the squad."
+    },
+    "leader_agent": {
+      "type": "string",
+      "description": "Slug of the agent that serves as this squad's leader. References an agent folder within this squad directory."
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["agent_slug", "role"],
+        "properties": {
+          "agent_slug": {
+            "type": "string",
+            "description": "Slug of the agent folder within this squad directory."
+          },
+          "role": {
+            "type": "string",
+            "enum": ["leader", "member"],
+            "default": "member"
+          }
+        },
+        "additionalProperties": false
+      },
+      "description": "Agents that belong to this squad, with their roles."
+    }
+  },
+  "additionalProperties": false
+}

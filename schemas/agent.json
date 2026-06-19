@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/tyrion70/multica-agents/main/schemas/agent.json",
+  "title": "Multica Agent Configuration",
+  "description": "Schema for a Multica agent definition. Each agent is stored as an agent.json inside a workspace/squad/agent-slug/ folder.",
+  "type": "object",
+  "required": ["name", "runtime_id"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Display name of the agent."
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "Short catalog summary. Human-facing metadata only — NOT injected into the runtime prompt. Max 255 Unicode code points."
+    },
+    "instructions": {
+      "type": "string",
+      "description": "Runtime behavior contract. Shipped to the provider at claim time as the agent's durable instructions. Persona, responsibilities, boundaries, output and escalation rules go here."
+    },
+    "runtime_id": {
+      "type": "string",
+      "description": "ID of the runtime this agent executes on. Must resolve to a runtime in the target workspace."
+    },
+    "model": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "description": "Provider model override. Empty/null = runtime default."
+    },
+    "thinking_level": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "null" }
+      ],
+      "description": "Thinking level for the provider. Validated at provider level; an unknown literal is rejected. Empty/null = runtime default."
+    },
+    "custom_args": {
+      "type": "array",
+      "items": { "type": "string" },
+      "default": [],
+      "description": "Extra CLI switches passed to the provider. Each element is a raw flag or argument."
+    },
+    "runtime_config": {
+      "type": "object",
+      "default": {},
+      "description": "Runtime-specific configuration (arbitrary JSON object)."
+    },
+    "custom_env": {
+      "type": "object",
+      "description": "Secret environment variables injected into the agent's process. Use placeholder strings for actual values: {{VAULT:folder/item-name}} for Bitwarden secrets, {{SECRET:name}} for other secret references. Never commit plaintext secrets.",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "mcp_config": {
+      "type": "object",
+      "description": "MCP server configuration (e.g. {\"mcpServers\": {...}}). Secret material — use {{VAULT:...}} and {{SECRET:...}} placeholders for API tokens and credentials. Never commit plaintext secrets.",
+      "properties": {
+        "mcpServers": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "command": { "type": "string" },
+              "args": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "env": {
+                "type": "object",
+                "additionalProperties": { "type": "string" }
+              }
+            },
+            "required": ["command"]
+          }
+        }
+      }
+    },
+    "visibility": {
+      "type": "string",
+      "enum": ["private", "public"],
+      "default": "private",
+      "description": "Access control. 'private' gated to workspace owner/admin and private squad leaders; 'public' visible to all workspace members."
+    },
+    "max_concurrent_tasks": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 6,
+      "description": "Maximum concurrent tasks this agent can run. Scheduler cap at claim time."
+    },
+    "skills": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "List of workspace skill slugs to bind to this agent. Binding is a separate post-create operation — this field records the intended bindings for the sync script."
+    }
+  },
+  "additionalProperties": false
+}
