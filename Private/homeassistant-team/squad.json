@@ -1,0 +1,11 @@
+{
+  "name": "Homeassistant team",
+  "description": "Home Assistant operations team. Assign or @mention to operate Peter's Home Assistant instance (homeassistant.252h.org).",
+  "leader_agent": "home-assistant-helper",
+  "members": [
+    {
+      "agent_slug": "home-assistant-helper",
+      "role": "leader"
+    }
+  ]
+}

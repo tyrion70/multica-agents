@@ -1,0 +1,27 @@
+{
+  "name": "Tremor team",
+  "description": "Issue-lifecycle squad for the Tremor project. Assign or @mention the squad and the Tremor Tech Lead leader triages and routes to Refiner/Coder/QA/Deployer, escalating to the human when unclear.",
+  "leader_agent": "tremor-tech-lead",
+  "members": [
+    {
+      "agent_slug": "tremor-tech-lead",
+      "role": "leader"
+    },
+    {
+      "agent_slug": "tremor-refiner",
+      "role": "Refine & investigate"
+    },
+    {
+      "agent_slug": "tremor-coder",
+      "role": "Code & ship PR"
+    },
+    {
+      "agent_slug": "tremor-qa",
+      "role": "Test & acceptance"
+    },
+    {
+      "agent_slug": "tremor-deployer",
+      "role": "Deploy & verify"
+    }
+  ]
+}
