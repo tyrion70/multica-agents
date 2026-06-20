@@ -192,10 +192,12 @@ def _resolve_vault_value(placeholder: str) -> str:
 
 
 def _resolve_placeholders(obj: Any) -> Any:
+    import re
+
     if isinstance(obj, str):
-        if obj.startswith("{{VAULT:") and obj.endswith("}}"):
-            return _resolve_vault_value(obj)
-        return obj
+        def _replace(m: re.Match) -> str:
+            return _resolve_vault_value(m.group(0))
+        return re.sub(r"\{\{VAULT:\w+/.+?:[^}]+\}\}", _replace, obj)
     elif isinstance(obj, dict):
         return {k: _resolve_placeholders(v) for k, v in obj.items()}
     elif isinstance(obj, list):
