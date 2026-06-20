@@ -1,0 +1,31 @@
+{
+  "name": "Game Dev team",
+  "description": "Generic private game-development squad for design, code, art, and QA work.",
+  "leader_agent": "game-dev-lead",
+  "members": [
+    {
+      "agent_slug": "game-dev-lead",
+      "role": "leader"
+    },
+    {
+      "agent_slug": "game-dev-refiner",
+      "role": "Refine & investigate"
+    },
+    {
+      "agent_slug": "game-dev-designer",
+      "role": "Design & balance"
+    },
+    {
+      "agent_slug": "game-dev-coder",
+      "role": "Code & ship"
+    },
+    {
+      "agent_slug": "game-dev-artist",
+      "role": "Art & assets"
+    },
+    {
+      "agent_slug": "game-dev-qa",
+      "role": "Test & acceptance"
+    }
+  ]
+}
