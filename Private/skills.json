@@ -1,0 +1,15 @@
+[
+  "bitwarden",
+  "deploy-verify-rollback",
+  "git-pr",
+  "homeassistant",
+  "homelab",
+  "linear-private",
+  "multica-private",
+  "multica-sync",
+  "new-repo-private",
+  "private-knowledge",
+  "ssh",
+  "tremor",
+  "tremor-testing"
+]

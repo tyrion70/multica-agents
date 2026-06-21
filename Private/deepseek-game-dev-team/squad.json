@@ -26,6 +26,10 @@
     {
       "agent_slug": "deepseek-game-dev-qa",
       "role": "Test & acceptance"
+    },
+    {
+      "agent_slug": "skill-maintainer",
+      "role": "Skill sync"
     }
   ]
 }

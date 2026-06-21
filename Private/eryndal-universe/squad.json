@@ -34,6 +34,10 @@
     {
       "agent_slug": "eryndal-social-producer",
       "role": "Social content"
+    },
+    {
+      "agent_slug": "skill-maintainer",
+      "role": "Skill sync"
     }
   ]
 }
