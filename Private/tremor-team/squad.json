@@ -22,6 +22,10 @@
     {
       "agent_slug": "tremor-deployer",
       "role": "Deploy & verify"
+    },
+    {
+      "agent_slug": "skill-maintainer",
+      "role": "Skill sync"
     }
   ]
 }

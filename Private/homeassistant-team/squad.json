@@ -6,6 +6,10 @@
     {
       "agent_slug": "home-assistant-helper",
       "role": "leader"
+    },
+    {
+      "agent_slug": "skill-maintainer",
+      "role": "Skill sync"
     }
   ]
 }

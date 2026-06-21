@@ -24,9 +24,14 @@ Usage:
   scripts/sync.py                              # sync agents + skills, all workspaces
   scripts/sync.py --type agents                # agents only
   scripts/sync.py --type skills                # skills only
-  scripts/sync.py --workspace Chainlayer       # one workspace
+  scripts/sync.py --workspace Chainlayer       # one workspace; sets MULTICA_WORKSPACE_ID automatically
+  scripts/sync.py --workspace Private          # Private workspace (9627be94-...)
   scripts/sync.py --dry-run                    # print what would happen, no writes
   scripts/sync.py --sync-state /tmp/state.json # alternate state file
+
+Workspace IDs (same Multica instance, multica.252h.org):
+  Chainlayer  0014efc5-f6fb-42bf-9616-4aaeb07ce237  (default on multica-02)
+  Private     9627be94-0c29-49f7-a104-dff19d11a089  (default on multica-01)
 
 Skills folder layout:
   skills/<name>/SKILL.md           # frontmatter (name, description) + body
@@ -54,6 +59,19 @@ DEFAULT_STATE_PATH = REPO_ROOT / ".sync-state.json"
 SKIP_DIRS = {"schemas", "scripts", ".git", "skills"}
 
 MULTICA = os.environ.get("MULTICA", "multica")
+
+# Workspace slug → UUID mapping.
+# Both workspaces live on the same Multica instance (multica.252h.org).
+# Passing --workspace <slug> automatically sets MULTICA_WORKSPACE_ID so every
+# CLI call targets the right workspace without per-call --workspace-id flags.
+WORKSPACE_IDS = {
+    "Chainlayer": "0014efc5-f6fb-42bf-9616-4aaeb07ce237",
+    "Private": "9627be94-0c29-49f7-a104-dff19d11a089",
+}
+
+# Machine defaults (informational; used by the sync autopilots):
+#   multica-01  → Private workspace
+#   multica-02  → Chainlayer workspace
 
 COMPARABLE_FIELDS = (
     "name",
@@ -801,6 +819,20 @@ def main() -> None:
         help=f"Path to the sync-state snapshot file (default: {DEFAULT_STATE_PATH})",
     )
     args = parser.parse_args()
+
+    # Resolve workspace slug to UUID and inject as env var so every multica
+    # call in this process targets the correct workspace automatically.
+    if args.workspace:
+        workspace_id = WORKSPACE_IDS.get(args.workspace)
+        if workspace_id:
+            os.environ["MULTICA_WORKSPACE_ID"] = workspace_id
+            print(f"==> Workspace: {args.workspace} ({workspace_id})", file=sys.stderr)
+        else:
+            print(
+                f"WARNING: workspace '{args.workspace}' not in WORKSPACE_IDS — "
+                f"multica will use the host default workspace. Known slugs: {list(WORKSPACE_IDS)}",
+                file=sys.stderr,
+            )
 
     state_path = pathlib.Path(args.sync_state)
     sync_agents = args.type in ("agents", "all")

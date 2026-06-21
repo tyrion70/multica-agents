@@ -22,6 +22,10 @@
     {
       "agent_slug": "cancer-game-evidence-reviewer",
       "role": "Evidence & accuracy review"
+    },
+    {
+      "agent_slug": "skill-maintainer",
+      "role": "Skill sync"
     }
   ]
 }

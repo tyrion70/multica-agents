@@ -77,8 +77,15 @@ After a pull-to-repo run, the autopilot must commit and push the updated files a
 **Flags:**
 ```
 scripts/sync.sh --type agents|skills|all   # default: all
-scripts/sync.sh --workspace Chainlayer     # one workspace only
+scripts/sync.sh --workspace Chainlayer     # one workspace; sets MULTICA_WORKSPACE_ID automatically
+scripts/sync.sh --workspace Private        # Private workspace (9627be94-...)
 scripts/sync.sh --dry-run                  # print what would happen
+```
+
+Always clone the repo via SSH — never use `multica repo checkout`:
+```bash
+git clone git@github.com:tyrion70/multica-agents.git multica-agents
+# or refresh: git -C multica-agents pull --ff-only
 ```
 
 ### Adding a skill
@@ -93,10 +100,17 @@ When an agent's configuration changes in Multica, the next autopilot run detects
 
 ## Workspaces
 
+Both workspaces live on the same Multica instance (`multica.252h.org`). Passing `--workspace <slug>` to `sync.sh` sets `MULTICA_WORKSPACE_ID` automatically.
+
+| Workspace | UUID | Host default |
+|---|---|---|
+| Chainlayer | `0014efc5-f6fb-42bf-9616-4aaeb07ce237` | multica-02 |
+| Private | `9627be94-0c29-49f7-a104-dff19d11a089` | multica-01 |
+
 ### Chainlayer
 
-Company workspace — ChainLayer infrastructure and operations agents. Managed by the Chainlayer Squad DeepSeek.
+Company workspace — ChainLayer infrastructure and operations agents.
 
 ### Private
 
-Personal workspace. This folder requires manual population — current workspace actors cannot access the private workspace. Add agent configurations here for personal projects.
+Personal workspace — homelab, game dev, Eryndal creative projects, and personal tooling agents.
