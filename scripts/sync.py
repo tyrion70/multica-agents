@@ -1,15 +1,30 @@
 #!/usr/bin/env python3
 """
-sync.py — Reconcile multica-agents repo → Multica workspace.
+sync.py — Bidirectional reconciliation: multica-agents repo ↔ Multica workspace.
 
-Reads agent.json files from the repo's workspace/squad/agent/ structure,
-validates them against schemas/agent.json, diffs against the live Multica
-state, and creates or updates agents via the multica CLI.
+Detects which side changed since the last sync using a .sync-state.json snapshot
+file and applies the newer side:
+
+  repo changed, Multica unchanged  → push repo → Multica (create or update)
+  Multica changed, repo unchanged  → pull Multica → repo (writes agent.json files)
+  both changed                     → conflict: printed to stderr + JSON on stdout, exit 2
+  neither changed                  → unchanged
+
+On first sync (no state file), repo is treated as source of truth.
+
+After a run that writes agent.json files back to the repo, the caller is
+responsible for committing and pushing them (including .sync-state.json).
+
+Exit codes:
+  0  success (no conflicts)
+  1  one or more errors (schema validation, API failure, etc.)
+  2  one or more conflicts (no errors; manual resolution needed)
 
 Usage:
-  scripts/sync.py                    # full sync, all workspaces
-  scripts/sync.py --dry-run          # print what would happen, no API calls
+  scripts/sync.py                         # full sync, all workspaces
+  scripts/sync.py --dry-run               # print what would happen, no writes
   scripts/sync.py --workspace Chainlayer  # sync a single workspace
+  scripts/sync.py --sync-state /tmp/state.json  # use an alternate state file
 """
 
 import argparse
@@ -19,41 +34,64 @@ import pathlib
 import subprocess
 import sys
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 SCHEMA_PATH = REPO_ROOT / "schemas" / "agent.json"
+DEFAULT_STATE_PATH = REPO_ROOT / ".sync-state.json"
 SKIP_DIRS = {"schemas", "scripts", ".git"}
 
 MULTICA = os.environ.get("MULTICA", "multica")
 
+# Fields compared between repo and Multica sides.
+# custom_env: secrets live only in Multica, never in repo.
+# mcp_config: redacted in Multica API responses — cannot be read back.
+COMPARABLE_FIELDS = (
+    "name",
+    "description",
+    "instructions",
+    "runtime_id",
+    "model",
+    "thinking_level",
+    "custom_args",
+    "runtime_config",
+    "visibility",
+    "max_concurrent_tasks",
+    "skills",
+)
+
+
+# ---------------------------------------------------------------------------
+# Multica CLI wrapper
+# ---------------------------------------------------------------------------
 
 def _multica(args: List[str], dry_run: bool = False) -> Any:
     """Run a multica CLI command and return parsed JSON output.
 
-    If dry_run is True, mutating commands (create, update, skills set/add)
-    are skipped and a dry-run log is printed instead.
+    Mutating agent commands are skipped in dry-run mode.
     """
     assert len(args) > 0
     mutating_verbs = {"create", "update", "skills"}
     is_mutation = args[0] == "agent" and len(args) >= 2 and args[1] in mutating_verbs
 
     if dry_run and is_mutation:
-        cmd_str = " ".join([MULTICA] + args)
-        print(f"      [DRY-RUN] would run: {cmd_str}", file=sys.stderr)
+        print(f"      [DRY-RUN] would run: {MULTICA} {' '.join(args)}", file=sys.stderr)
         return None
 
     cmd = [MULTICA] + args + ["--output", "json"]
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
-        cmd_str = " ".join(cmd)
         raise RuntimeError(
             f"multica command failed (exit {result.returncode}):\n"
-            f"  command: {cmd_str}\n"
+            f"  command: {' '.join(cmd)}\n"
             f"  stderr: {result.stderr.strip()}"
         )
     return json.loads(result.stdout)
 
+
+# ---------------------------------------------------------------------------
+# Schema validation
+# ---------------------------------------------------------------------------
 
 def load_schema() -> Dict[str, Any]:
     with open(SCHEMA_PATH) as f:
@@ -77,144 +115,138 @@ def get_workspace_dirs() -> List[pathlib.Path]:
     return ws
 
 
-def _normalize(val: Any) -> Any:
-    """Normalize None → '' for optional string fields used in comparison."""
-    if val is None:
-        return ""
+# ---------------------------------------------------------------------------
+# Normalization: extract and canonicalise the comparable fields
+# ---------------------------------------------------------------------------
+
+def _norm_field(key: str, val: Any) -> Any:
+    if key in ("model", "thinking_level"):
+        # Treat None and "" as equivalent so agent.json null ↔ Multica "" don't diverge.
+        return val or ""
+    if key == "skills":
+        if not isinstance(val, list):
+            return []
+        names = []
+        for item in val:
+            if isinstance(item, str):
+                names.append(item)
+            elif isinstance(item, dict):
+                names.append(item.get("name") or item.get("slug") or "")
+        return sorted(names)
     return val
 
 
-def fetch_live_agents(dry_run: bool) -> Dict[str, Dict[str, Any]]:
-    """Return {agent_name: agent_dict} from current Multica workspace.
+def normalize_agent(data: Dict[str, Any]) -> Dict[str, Any]:
+    """Extract and normalise COMPARABLE_FIELDS from an agent.json dict or a live Multica agent dict."""
+    return {f: _norm_field(f, data.get(f)) for f in COMPARABLE_FIELDS}
 
-    This is read-only; dry_run does not affect it.
+
+# ---------------------------------------------------------------------------
+# Sync state file
+# ---------------------------------------------------------------------------
+
+def load_sync_state(state_path: pathlib.Path) -> Dict[str, Any]:
+    """Load .sync-state.json; returns an empty structure if missing or unreadable."""
+    if not state_path.is_file():
+        return {"version": 1, "agents": {}}
+    try:
+        with open(state_path) as f:
+            return json.load(f)
+    except Exception as e:
+        print(f"WARNING: could not read state file {state_path}: {e}", file=sys.stderr)
+        return {"version": 1, "agents": {}}
+
+
+def save_sync_state(state_path: pathlib.Path, state: Dict[str, Any]) -> None:
+    with open(state_path, "w") as f:
+        json.dump(state, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+
+# ---------------------------------------------------------------------------
+# Write-back: Multica → repo
+# ---------------------------------------------------------------------------
+
+def multica_to_agent_json(
+    live: Dict[str, Any],
+    existing: Optional[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Build an agent.json dict from a live Multica agent.
+
+    Preserves custom_env and mcp_config from the existing file — both are
+    excluded from the Multica API response and must not be overwritten.
     """
+    result: Dict[str, Any] = {}
+
+    if existing:
+        for key in ("custom_env", "mcp_config"):
+            if key in existing:
+                result[key] = existing[key]
+
+    for field in COMPARABLE_FIELDS:
+        if field == "skills":
+            result["skills"] = _norm_field("skills", live.get("skills"))
+        elif field in ("model", "thinking_level"):
+            val = live.get(field)
+            # Store None explicitly (matches the schema's oneOf null|string)
+            result[field] = val if val != "" else None
+        else:
+            val = live.get(field)
+            if val is not None:
+                result[field] = val
+
+    return result
+
+
+def write_agent_json(
+    agent_json_path: pathlib.Path,
+    live_agent: Dict[str, Any],
+    dry_run: bool,
+) -> None:
+    """Write (or update) an agent.json from a live Multica agent dict."""
+    existing: Optional[Dict[str, Any]] = None
+    if agent_json_path.is_file():
+        with open(agent_json_path) as f:
+            existing = json.load(f)
+
+    new_data = multica_to_agent_json(live_agent, existing)
+
+    if dry_run:
+        print(f"      [DRY-RUN] would write {agent_json_path}", file=sys.stderr)
+        return
+
+    agent_json_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(agent_json_path, "w") as f:
+        json.dump(new_data, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+
+# ---------------------------------------------------------------------------
+# Live data fetching
+# ---------------------------------------------------------------------------
+
+def fetch_live_agents(dry_run: bool) -> Dict[str, Dict[str, Any]]:
+    """Return {agent_name: agent_dict} for all agents in the workspace."""
     agents = _multica(["agent", "list"], dry_run=False)
-    by_name: Dict[str, Dict[str, Any]] = {}
-    for a in agents:
-        by_name[a["name"]] = a
-    return by_name
+    return {a["name"]: a for a in agents}
 
 
 def fetch_live_skills(dry_run: bool) -> Dict[str, str]:
-    """Return {skill_name: skill_id} from current Multica workspace."""
+    """Return {skill_name: skill_id} for all skills in the workspace."""
     skills = _multica(["skill", "list"], dry_run=False)
     return {s["name"]: s["id"] for s in skills}
 
 
-def agent_differs(
-    desired: Dict[str, Any],
-    live: Dict[str, Any],
-) -> bool:
-    """Compare repo agent.json fields against the live Multica agent.
-
-    Excluded from comparison: custom_env (secrets live only in Multica),
-    mcp_config (redacted for agent actors — placeholder comparison only).
-    """
-    for key, desired_val in desired.items():
-        if key in ("custom_env", "mcp_config"):
-            continue
-        if key == "skills":
-            live_skill_names = sorted(s.get("name", s.get("slug", "")) for s in (live.get("skills") or []))
-            desired_skill_names = sorted(s for s in (desired_val or []))
-            if live_skill_names != desired_skill_names:
-                return True
-            continue
-        if key in ("model", "thinking_level"):
-            if _normalize(desired_val) != _normalize(live.get(key, "")):
-                return True
-            continue
-        if key in ("custom_args", "runtime_config"):
-            if desired_val != live.get(key):
-                return True
-            continue
-        if desired_val != live.get(key):
-            return True
-
-    return False
-
-
-def build_create_args(agent_data: Dict[str, Any]) -> List[str]:
-    """Build multica agent create CLI argument list from agent.json fields.
-
-    custom_env and mcp_config are intentionally excluded.
-    """
-    args: List[str] = []
-    args += ["--name", agent_data["name"]]
-    args += ["--runtime-id", agent_data["runtime_id"]]
-
-    for field, flag in [
-        ("description", "--description"),
-        ("instructions", "--instructions"),
-        ("model", "--model"),
-        ("thinking_level", "--thinking-level"),
-        ("visibility", "--visibility"),
-    ]:
-        val = agent_data.get(field)
-        if val is not None and val != "":
-            args += [flag, str(val)]
-
-    mt = agent_data.get("max_concurrent_tasks")
-    if mt is not None:
-        args += ["--max-concurrent-tasks", str(mt)]
-
-    ca = agent_data.get("custom_args")
-    if ca:
-        args += ["--custom-args", json.dumps(ca)]
-
-    rc = agent_data.get("runtime_config")
-    if rc:
-        args += ["--runtime-config", json.dumps(rc)]
-
-    return args
-
-
-def build_update_args(agent_id: str, agent_data: Dict[str, Any]) -> List[str]:
-    """Build multica agent update CLI argument list.
-
-    Only the agent ID and changed fields are included.
-    custom_env and mcp_config are intentionally excluded.
-    """
-    args: List[str] = [agent_id]
-
-    for field, flag in [
-        ("name", "--name"),
-        ("description", "--description"),
-        ("instructions", "--instructions"),
-        ("model", "--model"),
-        ("thinking_level", "--thinking-level"),
-        ("visibility", "--visibility"),
-        ("runtime_id", "--runtime-id"),
-    ]:
-        val = agent_data.get(field)
-        if val is not None and val != "":
-            args += [flag, str(val)]
-
-    mt = agent_data.get("max_concurrent_tasks")
-    if mt is not None:
-        args += ["--max-concurrent-tasks", str(mt)]
-
-    ca = agent_data.get("custom_args")
-    if ca is not None:
-        args += ["--custom-args", json.dumps(ca)]
-
-    rc = agent_data.get("runtime_config")
-    if rc is not None:
-        args += ["--runtime-config", json.dumps(rc)]
-
-    return args
-
+# ---------------------------------------------------------------------------
+# Skills sync
+# ---------------------------------------------------------------------------
 
 def ensure_skills(
     agent_id: str,
     desired_skill_names: List[str],
     skill_name_to_id: Dict[str, str],
     dry_run: bool,
-) -> bool:
-    """Set agent skills to match desired_skill_names.
-
-    Returns True if skills were changed (or would have been).
-    """
+) -> None:
     desired_ids: List[str] = []
     missing: List[str] = []
     for name in desired_skill_names:
@@ -228,30 +260,135 @@ def ensure_skills(
         print(f"      WARNING: skills not found in workspace: {', '.join(missing)}", file=sys.stderr)
 
     _multica(["agent", "skills", "set", agent_id, "--skill-ids", ",".join(desired_ids)], dry_run=dry_run)
-    return True
 
+
+# ---------------------------------------------------------------------------
+# CLI arg builders (repo → Multica)
+# ---------------------------------------------------------------------------
+
+def build_create_args(agent_data: Dict[str, Any]) -> List[str]:
+    args: List[str] = []
+    args += ["--name", agent_data["name"]]
+    args += ["--runtime-id", agent_data["runtime_id"]]
+    for field, flag in [
+        ("description", "--description"),
+        ("instructions", "--instructions"),
+        ("model", "--model"),
+        ("thinking_level", "--thinking-level"),
+        ("visibility", "--visibility"),
+    ]:
+        val = agent_data.get(field)
+        if val is not None and val != "":
+            args += [flag, str(val)]
+    mt = agent_data.get("max_concurrent_tasks")
+    if mt is not None:
+        args += ["--max-concurrent-tasks", str(mt)]
+    ca = agent_data.get("custom_args")
+    if ca:
+        args += ["--custom-args", json.dumps(ca)]
+    rc = agent_data.get("runtime_config")
+    if rc:
+        args += ["--runtime-config", json.dumps(rc)]
+    return args
+
+
+def build_update_args(agent_id: str, agent_data: Dict[str, Any]) -> List[str]:
+    args: List[str] = [agent_id]
+    for field, flag in [
+        ("name", "--name"),
+        ("description", "--description"),
+        ("instructions", "--instructions"),
+        ("model", "--model"),
+        ("thinking_level", "--thinking-level"),
+        ("visibility", "--visibility"),
+        ("runtime_id", "--runtime-id"),
+    ]:
+        val = agent_data.get(field)
+        if val is not None and val != "":
+            args += [flag, str(val)]
+    mt = agent_data.get("max_concurrent_tasks")
+    if mt is not None:
+        args += ["--max-concurrent-tasks", str(mt)]
+    ca = agent_data.get("custom_args")
+    if ca is not None:
+        args += ["--custom-args", json.dumps(ca)]
+    rc = agent_data.get("runtime_config")
+    if rc is not None:
+        args += ["--runtime-config", json.dumps(rc)]
+    return args
+
+
+# ---------------------------------------------------------------------------
+# Action determination
+# ---------------------------------------------------------------------------
+
+def _decide_action(
+    repo_norm: Dict[str, Any],
+    multica_norm: Optional[Dict[str, Any]],
+    last: Optional[Dict[str, Any]],
+) -> str:
+    """Return the sync action for one agent.
+
+    Possible return values:
+      unchanged       — both sides match, nothing to do
+      push_to_multica — repo is newer (or first sync); create/update Multica
+      pull_to_repo    — Multica is newer; write agent.json
+      conflict        — both sides changed since last sync
+    """
+    if last is None:
+        # First time this agent has been seen — repo wins.
+        if multica_norm is None:
+            return "push_to_multica"
+        if repo_norm == multica_norm:
+            return "unchanged"
+        return "push_to_multica"
+
+    last_repo = last.get("repo_state") or {}
+    last_multica = last.get("multica_state")
+
+    repo_changed = repo_norm != last_repo
+    multica_changed = multica_norm != last_multica
+
+    if not repo_changed and not multica_changed:
+        return "unchanged"
+    if repo_changed and not multica_changed:
+        return "push_to_multica"
+    if not repo_changed and multica_changed:
+        # If Multica deleted the agent (multica_norm is None) but the repo file
+        # is still present, do nothing — don't auto-recreate or delete.
+        if multica_norm is None:
+            return "unchanged"
+        return "pull_to_repo"
+    return "conflict"
+
+
+# ---------------------------------------------------------------------------
+# Workspace sync
+# ---------------------------------------------------------------------------
 
 def sync_workspace(
     workspace_dir: pathlib.Path,
     schema: Dict[str, Any],
     live_agents: Dict[str, Dict[str, Any]],
     skill_map: Dict[str, str],
+    state: Dict[str, Any],
     dry_run: bool,
-) -> Dict[str, int]:
+) -> Tuple[Dict[str, int], List[Dict[str, Any]]]:
     """Sync all agents under one workspace directory.
 
-    Returns a dict of counts: created, updated, unchanged, errors, skipped_schema.
+    Returns (counts, conflicts).
+    Mutates state["agents"] in place for successfully processed agents.
     """
     workspace_name = workspace_dir.name
     print(f"\n── Workspace: {workspace_name} ──", file=sys.stderr)
 
     counts: Dict[str, int] = defaultdict(int)
+    conflicts: List[Dict[str, Any]] = []
+    state_agents = state.setdefault("agents", {})
 
     for squad_dir in sorted(workspace_dir.iterdir()):
         if not squad_dir.is_dir() or squad_dir.name.startswith("."):
             continue
-
-        squad_name = squad_dir.name
 
         for agent_dir in sorted(squad_dir.iterdir()):
             if not agent_dir.is_dir():
@@ -260,109 +397,164 @@ def sync_workspace(
             if not agent_json_path.is_file():
                 continue
 
-            agent_slug = agent_dir.name
             rel_path = agent_json_path.relative_to(REPO_ROOT)
-            label = f"{workspace_name}/{squad_name}/{agent_slug}"
             print(f"  {rel_path}", file=sys.stderr)
 
             try:
-                agent_data = validate_agent_json(agent_json_path, schema)
+                repo_data = validate_agent_json(agent_json_path, schema)
             except Exception as e:
                 print(f"    ✗ SCHEMA VALIDATION FAILED: {e}", file=sys.stderr)
                 counts["errors"] += 1
                 continue
 
-            agent_name = agent_data.get("name", "")
+            agent_name = repo_data.get("name", "")
             if not agent_name:
                 print(f"    ✗ missing required 'name' field", file=sys.stderr)
                 counts["errors"] += 1
                 continue
 
-            if agent_name in live_agents:
-                existing = live_agents[agent_name]
-                if not agent_differs(agent_data, existing):
-                    print(f"    ✓ unchanged (id={existing['id']})", file=sys.stderr)
-                    counts["unchanged"] += 1
-                    continue
+            live_agent = live_agents.get(agent_name)
+            last = state_agents.get(agent_name)
+            repo_norm = normalize_agent(repo_data)
+            multica_norm = normalize_agent(live_agent) if live_agent else None
 
-                print(f"    → updating (id={existing['id']})", file=sys.stderr)
+            action = _decide_action(repo_norm, multica_norm, last)
+
+            agent_id: Optional[str] = live_agent["id"] if live_agent else None
+
+            # ----------------------------------------------------------
+            if action == "unchanged":
+                print(f"    ✓ unchanged", file=sys.stderr)
+                counts["unchanged"] += 1
+                state_agents[agent_name] = {
+                    "repo_file": str(rel_path),
+                    "repo_state": repo_norm,
+                    "multica_state": multica_norm,
+                }
+
+            # ----------------------------------------------------------
+            elif action == "push_to_multica":
+                if live_agent is None:
+                    print(f"    → creating in Multica (new in repo)", file=sys.stderr)
+                    try:
+                        if not dry_run:
+                            result = _multica(["agent", "create"] + build_create_args(repo_data))
+                            agent_id = result["id"]
+                            print(f"    ✓ created (id={agent_id})", file=sys.stderr)
+                        else:
+                            _multica(["agent", "create"] + build_create_args(repo_data), dry_run=True)
+                        counts["created"] += 1
+                    except Exception as e:
+                        print(f"    ✗ CREATE FAILED: {e}", file=sys.stderr)
+                        counts["errors"] += 1
+                        continue
+                else:
+                    print(f"    → updating Multica (repo changed, id={agent_id})", file=sys.stderr)
+                    try:
+                        _multica(["agent", "update"] + build_update_args(agent_id, repo_data), dry_run=dry_run)
+                        counts["updated"] += 1
+                    except Exception as e:
+                        print(f"    ✗ UPDATE FAILED: {e}", file=sys.stderr)
+                        counts["errors"] += 1
+                        continue
+
+                desired_skills = repo_norm.get("skills") or []
+                if desired_skills and agent_id:
+                    try:
+                        ensure_skills(agent_id, desired_skills, skill_map, dry_run)
+                        print(f"    ✓ skills set: {', '.join(desired_skills)}", file=sys.stderr)
+                    except Exception as e:
+                        print(f"    ✗ SKILLS FAILED: {e}", file=sys.stderr)
+                        counts["errors"] += 1
+
+                # After a successful push, both sides now mirror repo_norm.
+                state_agents[agent_name] = {
+                    "repo_file": str(rel_path),
+                    "repo_state": repo_norm,
+                    "multica_state": repo_norm,
+                }
+
+            # ----------------------------------------------------------
+            elif action == "pull_to_repo":
+                print(f"    → writing repo (Multica changed, id={agent_id})", file=sys.stderr)
                 try:
-                    update_args = build_update_args(existing["id"], agent_data)
-                    if not dry_run:
-                        result = _multica(
-                            ["agent", "update"] + update_args,
-                            dry_run=dry_run,
-                        )
-                    else:
-                        _multica(
-                            ["agent", "update"] + update_args,
-                            dry_run=dry_run,
-                        )
-                    counts["updated"] += 1
+                    write_agent_json(agent_json_path, live_agent, dry_run)
+                    counts["repo_updated"] += 1
+                    print(f"    ✓ wrote {rel_path}", file=sys.stderr)
                 except Exception as e:
-                    print(f"    ✗ UPDATE FAILED: {e}", file=sys.stderr)
+                    print(f"    ✗ REPO WRITE FAILED: {e}", file=sys.stderr)
                     counts["errors"] += 1
                     continue
 
-                agent_id = existing["id"]
-            else:
-                print(f"    → creating new agent", file=sys.stderr)
-                try:
-                    create_args = build_create_args(agent_data)
-                    if not dry_run:
-                        result = _multica(
-                            ["agent", "create"] + create_args,
-                            dry_run=dry_run,
-                        )
-                        agent_id = result["id"]
-                        print(f"    ✓ created (id={agent_id})", file=sys.stderr)
-                    else:
-                        _multica(
-                            ["agent", "create"] + create_args,
-                            dry_run=dry_run,
-                        )
-                        agent_id = None
-                    counts["created"] += 1
-                except Exception as e:
-                    print(f"    ✗ CREATE FAILED: {e}", file=sys.stderr)
-                    counts["errors"] += 1
-                    continue
+                # After a successful pull, both sides now mirror multica_norm.
+                state_agents[agent_name] = {
+                    "repo_file": str(rel_path),
+                    "repo_state": multica_norm,
+                    "multica_state": multica_norm,
+                }
 
-            desired_skills = agent_data.get("skills", [])
-            if desired_skills and agent_id:
-                try:
-                    ensure_skills(agent_id, desired_skills, skill_map, dry_run)
-                    print(f"    ✓ skills set: {', '.join(desired_skills)}", file=sys.stderr)
-                except Exception as e:
-                    print(f"    ✗ SKILLS FAILED: {e}", file=sys.stderr)
-                    counts["errors"] += 1
+            # ----------------------------------------------------------
+            elif action == "conflict":
+                print(
+                    f"    ✗ CONFLICT: both repo and Multica changed since last sync",
+                    file=sys.stderr,
+                )
+                conflicts.append({
+                    "agent_name": agent_name,
+                    "repo_file": str(rel_path),
+                    "repo_state": repo_norm,
+                    "multica_state": multica_norm,
+                    "last_synced_repo": last.get("repo_state") if last else None,
+                    "last_synced_multica": last.get("multica_state") if last else None,
+                })
+                counts["conflicts"] += 1
+                # Do NOT update state — leave snapshot unchanged so the conflict
+                # remains visible on the next run until it is manually resolved.
 
     print(
         f"  {workspace_name} summary: "
         f"created={counts['created']} updated={counts['updated']} "
-        f"unchanged={counts['unchanged']} errors={counts['errors']}",
+        f"repo_updated={counts['repo_updated']} "
+        f"unchanged={counts['unchanged']} conflicts={counts['conflicts']} errors={counts['errors']}",
         file=sys.stderr,
     )
-    return counts
+    return counts, conflicts
 
+
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Sync agents from repo to Multica workspace")
+    parser = argparse.ArgumentParser(
+        description="Bidirectional sync: multica-agents repo ↔ Multica workspace"
+    )
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Print what would be done without making any API calls",
+        help="Print what would be done without making any changes",
     )
     parser.add_argument(
         "--workspace",
         type=str,
         default=None,
-        help="Sync only the named workspace directory (default: all workspaces)",
+        help="Sync only the named workspace directory (default: all)",
+    )
+    parser.add_argument(
+        "--sync-state",
+        type=str,
+        default=str(DEFAULT_STATE_PATH),
+        help=f"Path to the sync-state snapshot file (default: {DEFAULT_STATE_PATH})",
     )
     args = parser.parse_args()
 
+    state_path = pathlib.Path(args.sync_state)
+
     print(f"==> Loading schema from {SCHEMA_PATH}", file=sys.stderr)
     schema = load_schema()
+
+    print(f"==> Loading sync state from {state_path}", file=sys.stderr)
+    state = load_sync_state(state_path)
 
     print("==> Fetching live agents from Multica", file=sys.stderr)
     live_agents = fetch_live_agents(args.dry_run)
@@ -384,22 +576,44 @@ def main() -> None:
         sys.exit(0)
 
     totals: Dict[str, int] = defaultdict(int)
+    all_conflicts: List[Dict[str, Any]] = []
 
     for ws in workspaces:
-        counts = sync_workspace(ws, schema, live_agents, skill_map, args.dry_run)
+        counts, conflicts = sync_workspace(ws, schema, live_agents, skill_map, state, args.dry_run)
         for k, v in counts.items():
             totals[k] += v
+        all_conflicts.extend(conflicts)
 
     mode = "DRY-RUN" if args.dry_run else "SYNC"
     print(f"\n==> {mode} COMPLETE", file=sys.stderr)
     print(
         f"    total: created={totals['created']} updated={totals['updated']} "
-        f"unchanged={totals['unchanged']} errors={totals['errors']}",
+        f"repo_updated={totals['repo_updated']} "
+        f"unchanged={totals['unchanged']} conflicts={totals['conflicts']} errors={totals['errors']}",
         file=sys.stderr,
     )
 
+    if not args.dry_run:
+        save_sync_state(state_path, state)
+        print(f"==> State saved to {state_path}", file=sys.stderr)
+        if totals["repo_updated"] > 0:
+            print(
+                f"==> {totals['repo_updated']} agent.json file(s) updated — "
+                f"commit {state_path.name} and changed agent.json files to persist.",
+                file=sys.stderr,
+            )
+
+    if all_conflicts:
+        print(f"\n==> CONFLICTS ({len(all_conflicts)} — manual resolution needed):", file=sys.stderr)
+        for c in all_conflicts:
+            print(f"    - {c['agent_name']} ({c['repo_file']})", file=sys.stderr)
+        # Emit structured conflict data to stdout for the calling agent to file issues.
+        print(json.dumps({"conflicts": all_conflicts}, indent=2))
+
     if totals["errors"] > 0:
         sys.exit(1)
+    if all_conflicts:
+        sys.exit(2)
 
 
 if __name__ == "__main__":
