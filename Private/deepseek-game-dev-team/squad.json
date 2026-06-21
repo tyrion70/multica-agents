@@ -28,8 +28,8 @@
       "role": "Test & acceptance"
     },
     {
-      "agent_slug": "skill-maintainer",
-      "role": "Skill sync"
+      "agent_slug": "maintainer",
+      "role": "member"
     }
   ]
 }
