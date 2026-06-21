@@ -1,0 +1,31 @@
+{
+  "name": "DeepSeek Game Dev team",
+  "description": "DeepSeek-only generic private game-development squad for design, code, art, and QA work.",
+  "leader_agent": "deepseek-game-dev-lead",
+  "members": [
+    {
+      "agent_slug": "deepseek-game-dev-lead",
+      "role": "leader"
+    },
+    {
+      "agent_slug": "deepseek-game-dev-refiner",
+      "role": "Refine & investigate"
+    },
+    {
+      "agent_slug": "deepseek-game-dev-designer",
+      "role": "Design & balance"
+    },
+    {
+      "agent_slug": "deepseek-game-dev-coder",
+      "role": "Code & ship"
+    },
+    {
+      "agent_slug": "deepseek-game-dev-artist",
+      "role": "Art & assets"
+    },
+    {
+      "agent_slug": "deepseek-game-dev-qa",
+      "role": "Test & acceptance"
+    }
+  ]
+}
