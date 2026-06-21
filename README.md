@@ -15,7 +15,9 @@ multica-agents/
     agent.json                # JSON Schema for agent config
     squad.json                # JSON Schema for squad config (optional)
   scripts/
-    sync.sh                   # sync agents to Multica via API
+    sync.sh                   # sync agents (thin wrapper around sync.py)
+    sync.py                   # bidirectional sync engine
+  .sync-state.json            # last-synced snapshot — committed after each run
 ```
 
 ## Placeholder format
@@ -52,9 +54,24 @@ Example:
 2. Optionally add `squad.json` conforming to `schemas/squad.json`
 3. Add agent subfolders as above
 
+### Sync behaviour (bidirectional)
+
+`scripts/sync.py` compares both sides against a `.sync-state.json` snapshot that is committed after each run:
+
+| Situation | Action |
+|---|---|
+| repo changed, Multica unchanged | push repo → Multica (create or update) |
+| Multica changed, repo unchanged | pull Multica → repo (write agent.json) |
+| both changed | conflict — exit 2, JSON details on stdout for the autopilot to file an issue |
+| neither changed | unchanged |
+
+On the **first sync** (no state file), repo wins.
+
+After a pull-to-repo run, the autopilot must commit and push the updated `agent.json` files and `.sync-state.json`.
+
 ### Updating agent configuration
 
-When an agent's configuration changes in Multica (new skills, env, MCP servers), the agent is instructed to open an MR to this repo to persist the change. The sync autopilot keeps the repo regularly synced with live Multica state.
+When an agent's configuration changes in Multica (new skills, env, MCP servers), the next autopilot run detects the Multica-side change and writes it back to the repo automatically (unless the repo also changed, in which case a conflict issue is filed). No manual MR needed for single-side changes.
 
 ## Workspaces
 
