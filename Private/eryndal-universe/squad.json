@@ -38,6 +38,10 @@
     {
       "agent_slug": "maintainer",
       "role": "member"
+    },
+    {
+      "agent_slug": "maintainer-chainlayer",
+      "role": "member"
     }
   ]
 }

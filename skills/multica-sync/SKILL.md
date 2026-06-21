@@ -92,6 +92,18 @@ The sync autopilots run on schedule and on merges to `main`. Each:
 
 multica-02 runs Chainlayer sync; multica-01 runs Private sync.
 
+## Cross-workspace maintainers
+
+Every squad in both workspaces has two maintainer agents as members:
+
+| Workspace | Local maintainer | Cross-workspace bridge |
+|---|---|---|
+| Chainlayer | DeepSeek / ChatGPT / Claude Maintainer (per-squad, runs on multica-02) | **Private Maintainer** (`_shared/maintainer-private`, runs on multica-01) |
+| Private | Per-squad Maintainer (runs on multica-01) | **Chainlayer Maintainer** (`_shared/maintainer-chainlayer`, runs on multica-02) |
+
+- The **local maintainer** handles workspace help and sync for its own workspace.
+- The **cross-workspace bridge** exists in the opposite workspace so squads can route work across. If a Chainlayer issue needs something done in Private, assign the **Private Maintainer**. If a Private issue needs something in Chainlayer, assign the **Chainlayer Maintainer**.
+
 ## Conflict handling
 
 When both sides change independently, the script exits 2 and prints a JSON conflict report on stdout. The calling agent or autopilot must:
