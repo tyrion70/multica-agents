@@ -24,7 +24,7 @@ Usage:
   scripts/sync.py                              # sync agents + skills, all workspaces
   scripts/sync.py --type agents                # agents only
   scripts/sync.py --type skills                # skills only
-  scripts/sync.py --workspace Chainlayer       # one workspace; sets MULTICA_WORKSPACE_ID automatically
+  scripts/sync.py --workspace Chainlayer       # one workspace; passes --workspace-id to every CLI call
   scripts/sync.py --workspace Private          # Private workspace (9627be94-...)
   scripts/sync.py --dry-run                    # print what would happen, no writes
   scripts/sync.py --sync-state /tmp/state.json # alternate state file
@@ -62,8 +62,8 @@ MULTICA = os.environ.get("MULTICA", "multica")
 
 # Workspace slug → UUID mapping.
 # Both workspaces live on the same Multica instance (multica.252h.org).
-# Passing --workspace <slug> automatically sets MULTICA_WORKSPACE_ID so every
-# CLI call targets the right workspace without per-call --workspace-id flags.
+# Passing --workspace <slug> resolves to a UUID that is forwarded to every
+# multica CLI call as --workspace-id <uuid>.
 WORKSPACE_IDS = {
     "Chainlayer": "0014efc5-f6fb-42bf-9616-4aaeb07ce237",
     "Private": "9627be94-0c29-49f7-a104-dff19d11a089",
@@ -72,6 +72,10 @@ WORKSPACE_IDS = {
 # Machine defaults (informational; used by the sync autopilots):
 #   multica-01  → Private workspace
 #   multica-02  → Chainlayer workspace
+
+# Set by main() when --workspace resolves to a known UUID; injected into every
+# CLI call as a global --workspace-id flag.
+_workspace_id: Optional[str] = None
 
 COMPARABLE_FIELDS = (
     "name",
@@ -99,8 +103,12 @@ def _multica(args: List[str], dry_run: bool = False, mutating: bool = False) -> 
     """
     assert len(args) > 0
 
+    def _dry_run_cmd() -> str:
+        flags = (["--workspace-id", _workspace_id] if _workspace_id else [])
+        return f"{MULTICA} {' '.join(flags + args)}"
+
     if dry_run and mutating:
-        print(f"      [DRY-RUN] would run: {MULTICA} {' '.join(args)}", file=sys.stderr)
+        print(f"      [DRY-RUN] would run: {_dry_run_cmd()}", file=sys.stderr)
         return None
 
     # Legacy agent mutation detection for backwards compatibility
@@ -110,10 +118,11 @@ def _multica(args: List[str], dry_run: bool = False, mutating: bool = False) -> 
         and args[1] in {"create", "update", "skills"}
     )
     if dry_run and agent_mutating:
-        print(f"      [DRY-RUN] would run: {MULTICA} {' '.join(args)}", file=sys.stderr)
+        print(f"      [DRY-RUN] would run: {_dry_run_cmd()}", file=sys.stderr)
         return None
 
-    cmd = [MULTICA] + args + ["--output", "json"]
+    global_flags = ["--workspace-id", _workspace_id] if _workspace_id else []
+    cmd = [MULTICA] + global_flags + args + ["--output", "json"]
     result = subprocess.run(cmd, capture_output=True, text=True)
     if result.returncode != 0:
         raise RuntimeError(
@@ -820,12 +829,13 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    # Resolve workspace slug to UUID and inject as env var so every multica
-    # call in this process targets the correct workspace automatically.
+    # Resolve workspace slug to UUID and forward as --workspace-id to every
+    # multica CLI call via the module-level _workspace_id variable.
+    global _workspace_id
     if args.workspace:
         workspace_id = WORKSPACE_IDS.get(args.workspace)
         if workspace_id:
-            os.environ["MULTICA_WORKSPACE_ID"] = workspace_id
+            _workspace_id = workspace_id
             print(f"==> Workspace: {args.workspace} ({workspace_id})", file=sys.stderr)
         else:
             print(
