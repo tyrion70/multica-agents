@@ -1,0 +1,39 @@
+{
+  "name": "Eryndal Universe",
+  "description": "Transmedia studio squad for the Eryndal universe (The Pale Road). Assign or @mention the squad and the Eryndal Showrunner triages and routes to the Chapter Writer, Story Editor, Loremaster, Card Designer, Art Director, Audiobook Producer, or Social Producer across the book, audiobook, card game, art, and social pillars, escalating to the human when unclear.",
+  "leader_agent": "eryndal-showrunner",
+  "members": [
+    {
+      "agent_slug": "eryndal-showrunner",
+      "role": "leader"
+    },
+    {
+      "agent_slug": "eryndal-chapter-writer",
+      "role": "Write & revise prose"
+    },
+    {
+      "agent_slug": "eryndal-story-editor",
+      "role": "Review & continuity"
+    },
+    {
+      "agent_slug": "eryndal-loremaster",
+      "role": "Lore & canon"
+    },
+    {
+      "agent_slug": "eryndal-card-designer",
+      "role": "Card game design"
+    },
+    {
+      "agent_slug": "eryndal-art-director",
+      "role": "Art generation"
+    },
+    {
+      "agent_slug": "eryndal-audiobook-producer",
+      "role": "Audiobook production"
+    },
+    {
+      "agent_slug": "eryndal-social-producer",
+      "role": "Social content"
+    }
+  ]
+}

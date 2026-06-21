@@ -1,0 +1,27 @@
+{
+  "name": "Cancer Game team",
+  "description": "Issue-lifecycle squad for the Cancer Game project (board game + Companion App at playitsafe.app). Assign or @mention the squad and the Cancer Game Lead triages and routes to Refiner / Coder / Artist / Evidence Reviewer, escalating to Peter when scope or a sourcing decision is unclear.",
+  "leader_agent": "cancer-game-lead",
+  "members": [
+    {
+      "agent_slug": "cancer-game-lead",
+      "role": "leader"
+    },
+    {
+      "agent_slug": "cancer-game-refiner",
+      "role": "Refine & scope"
+    },
+    {
+      "agent_slug": "cancer-game-coder",
+      "role": "Code & ship PR"
+    },
+    {
+      "agent_slug": "cancer-game-artist",
+      "role": "Generate art & assets"
+    },
+    {
+      "agent_slug": "cancer-game-evidence-reviewer",
+      "role": "Evidence & accuracy review"
+    }
+  ]
+}
