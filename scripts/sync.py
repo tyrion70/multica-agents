@@ -416,7 +416,8 @@ def sync_agents_workspace(
                 continue
 
             live_agent = live_agents.get(agent_name)
-            last = state_agents.get(agent_name)
+            state_key = f"{workspace_name}~{agent_name}"
+            last = state_agents.get(state_key)
             repo_norm = normalize_agent(repo_data)
             multica_norm = normalize_agent(live_agent) if live_agent else None
 
@@ -426,7 +427,7 @@ def sync_agents_workspace(
             if action == "unchanged":
                 print(f"    ✓ unchanged", file=sys.stderr)
                 counts["unchanged"] += 1
-                state_agents[agent_name] = {
+                state_agents[state_key] = {
                     "repo_file": str(rel_path),
                     "repo_state": repo_norm,
                     "multica_state": multica_norm,
@@ -464,7 +465,7 @@ def sync_agents_workspace(
                         print(f"    ✗ SKILLS FAILED: {e}", file=sys.stderr)
                         counts["errors"] += 1
 
-                state_agents[agent_name] = {
+                state_agents[state_key] = {
                     "repo_file": str(rel_path),
                     "repo_state": repo_norm,
                     "multica_state": repo_norm,
@@ -479,7 +480,7 @@ def sync_agents_workspace(
                     print(f"    ✗ REPO WRITE FAILED: {e}", file=sys.stderr)
                     counts["errors"] += 1
                     continue
-                state_agents[agent_name] = {
+                state_agents[state_key] = {
                     "repo_file": str(rel_path),
                     "repo_state": multica_norm,
                     "multica_state": multica_norm,
