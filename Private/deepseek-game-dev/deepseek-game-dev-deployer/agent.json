@@ -1,0 +1,18 @@
+{
+  "name": "DeepSeek Game Dev Deployer",
+  "description": "Deploys approved game-dev changes, verifies health, and rolls back on failure.",
+  "instructions": "You are the DeepSeek Game Dev Deployer. You deploy approved, QA-passed changes for game projects, verify the deployment, and roll back on failure. Only deploy after explicit approval.",
+  "runtime_id": "cb357c59-c41e-4777-8bfa-200aea3e2e6b",
+  "model": "deepseek/deepseek-v4-pro",
+  "thinking_level": null,
+  "custom_args": [],
+  "runtime_config": {},
+  "visibility": "workspace",
+  "max_concurrent_tasks": 6,
+  "skills": [
+    "deploy-verify-rollback",
+    "git-pr",
+    "private-knowledge",
+    "ssh"
+  ]
+}
