@@ -374,6 +374,54 @@ def _decide_action(
 # Agent workspace sync
 # ---------------------------------------------------------------------------
 
+def _agent_name_to_slug(name: str) -> str:
+    """Convert an agent name to a kebab-case directory slug."""
+    return name.lower().replace(" ", "-").replace("/", "-").replace("_", "-")
+
+
+def _squad_name_to_slug(name: str) -> str:
+    """Convert a squad name to a kebab-case directory slug."""
+    slug = name.lower().replace(" ", "-").replace("/", "-").replace("_", "-")
+    # Strip common prefixes/suffixes for directory names
+    for suffix in ("-squad", "-team", "-group"):
+        if slug.endswith(suffix):
+            slug = slug[: -len(suffix)]
+    return slug
+
+
+def _fetch_agent_squad_map(
+    dry_run: bool,
+) -> Dict[str, str]:
+    """Build a mapping agent_name → squad_name (lowercase directory slug).
+
+    Queries all squads and their members, then maps each agent member
+    to its squad. Agents not in any squad map to '_shared'.
+    """
+    agent_squad: Dict[str, str] = {}
+    try:
+        squads = _multica(["squad", "list"], dry_run=False)
+        for squad in squads:
+            squad_id = squad["id"]
+            squad_name = squad.get("name", "")
+            squad_slug = _squad_name_to_slug(squad_name) if squad_name else ""
+            if not squad_slug:
+                continue
+            try:
+                members = _multica(["squad", "member", "list", squad_id], dry_run=False)
+                for member in members:
+                    if member.get("member_type") == "agent":
+                        agent_id = member.get("member_id", "")
+                        if agent_id:
+                            agent_squad[agent_id] = squad_slug
+            except RuntimeError:
+                # Squad may have been deleted between list and member query
+                pass
+    except RuntimeError:
+        # Fallback: no squads → everything in _shared
+        pass
+    return agent_squad
+
+
 def sync_agents_workspace(
     workspace_dir: pathlib.Path,
     schema: Dict[str, Any],
@@ -388,6 +436,8 @@ def sync_agents_workspace(
     counts: Dict[str, int] = defaultdict(int)
     conflicts: List[Dict[str, Any]] = []
     state_agents = state.setdefault("agents", {})
+
+    known_agent_names: set = set()
 
     for squad_dir in sorted(workspace_dir.iterdir()):
         if not squad_dir.is_dir() or squad_dir.name.startswith("."):
@@ -414,6 +464,8 @@ def sync_agents_workspace(
                 print(f"    ✗ missing required 'name' field", file=sys.stderr)
                 counts["errors"] += 1
                 continue
+
+            known_agent_names.add(agent_name)
 
             live_agent = live_agents.get(agent_name)
             state_key = f"{workspace_name}~{agent_name}"
@@ -498,6 +550,86 @@ def sync_agents_workspace(
                     "last_synced_multica": last.get("multica_state") if last else None,
                 })
                 counts["conflicts"] += 1
+
+    # --- Discovery phase: Multica agents not in the repo ---
+    agent_squad_map: Optional[Dict[str, str]] = None
+
+    for live_name, live_agent in sorted(live_agents.items()):
+        if live_name in known_agent_names:
+            continue
+
+        state_key = f"{workspace_name}~{live_name}"
+        last = state_agents.get(state_key)
+
+        # Determine action: if never synced → pull to repo;
+        # if last state exists, use normal direction detection.
+        if last is None:
+            action = "pull_to_repo"
+        else:
+            # Build a dummy repo_norm (doesn't exist in repo files)
+            # to detect direction via _decide_action.
+            repo_norm = normalize_agent({})
+            multica_norm = normalize_agent(live_agent) if live_agent else None
+            action = _decide_action(repo_norm, multica_norm, last)
+
+        agent_id = live_agent.get("id", "")
+
+        if action == "unchanged":
+            counts["unchanged"] += 1
+            continue
+
+        elif action == "push_to_multica":
+            # Agent exists in Multica but repo "wants" to push —
+            # this shouldn't happen for a new agent, but handle safely:
+            counts["unchanged"] += 1
+            continue
+
+        elif action == "pull_to_repo":
+            # Build squad mapping lazily on first need
+            if agent_squad_map is None:
+                agent_squad_map = _fetch_agent_squad_map(dry_run)
+
+            squad_slug = agent_squad_map.get(agent_id, "_shared")
+            agent_slug = _agent_name_to_slug(live_name)
+            squad_dir = workspace_dir / squad_slug
+            agent_dir = squad_dir / agent_slug
+            agent_json_path = agent_dir / "agent.json"
+            rel_path = agent_json_path.relative_to(REPO_ROOT)
+
+            if agent_json_path.exists():
+                print(f"  {rel_path}")
+                print(f"    ✗ path collision — agent '{live_name}' already has a file", file=sys.stderr)
+                counts["errors"] += 1
+                continue
+
+            print(f"  {rel_path}")
+            print(f"    → writing repo (new agent discovered in Multica)", file=sys.stderr)
+            try:
+                write_agent_json(agent_json_path, live_agent, dry_run)
+                counts["repo_updated"] += 1
+            except Exception as e:
+                print(f"    ✗ REPO WRITE FAILED: {e}", file=sys.stderr)
+                counts["errors"] += 1
+                continue
+
+            state_agents[state_key] = {
+                "repo_file": str(rel_path),
+                "repo_state": normalize_agent(live_agent),
+                "multica_state": normalize_agent(live_agent),
+            }
+
+        elif action == "conflict":
+            print(f"    ✗ CONFLICT: agent '{live_name}' — both sides changed", file=sys.stderr)
+            conflicts.append({
+                "type": "agent",
+                "name": live_name,
+                "repo_file": "(missing — agent only in Multica)",
+                "repo_state": None,
+                "multica_state": normalize_agent(live_agent),
+                "last_synced_repo": last.get("repo_state") if last else None,
+                "last_synced_multica": last.get("multica_state") if last else None,
+            })
+            counts["conflicts"] += 1
 
     print(
         f"  agents {workspace_name}: created={counts['created']} updated={counts['updated']} "
