@@ -12,7 +12,6 @@ set -euo pipefail
 CONFIG_DIR="${HOME}/.config/google-drive-mcp"
 OAUTH_KEYS="${CONFIG_DIR}/gcp-oauth.keys.json"
 TOKEN_PATH="${CONFIG_DIR}/tokens.json"
-BW_ITEM="mailtriage — Google OAuth client (chainlayer / peter@chainlayer.io)"
 
 # --- helpers -----------------------------------------------------------
 die() { echo >&2 "error: $*"; exit 1; }
@@ -46,6 +45,16 @@ esac
 
 info "Target workspace: ${WS}"
 mkdir -p "$CONFIG_DIR"
+
+# Pick the right OAuth client credentials from Bitwarden
+case "$WS" in
+  chainlayer)
+    BW_ITEM="mailtriage — Google OAuth client (chainlayer / peter@chainlayer.io)"
+    ;;
+  private)
+    BW_ITEM="mailtriage — Google OAuth client (tyrion / pvmourik@tyrion.eu)"
+    ;;
+esac
 
 # Fetch OAuth client credentials from Bitwarden
 info "Fetching Google OAuth client credentials from Bitwarden …"
