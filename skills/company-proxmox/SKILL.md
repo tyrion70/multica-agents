@@ -158,7 +158,7 @@ curl -sk -X PUT -H "Authorization: PVEAPIToken=$PROX9_TOKEN" \
 | `+ vga { memory=16, type=std, clipboard=null }` | import doesn't populate `vga` block in state, but module sets it |
 | `comment: "Managed by Terraform - Protected" -> "Managed by Terraform in proxmox-iac"` | older provider/module wrote one tag, current default is the other |
 | `fortios subnet: "IP MASK" -> "IP/32"` | fortios provider serialization changed between versions; recurs only if provider version downgrades |
-| `network_device.enabled: null -> true` | non-protected module's dynamic network_device doesn't set `enabled`; protected module sets it explicitly (only on non-protected → protected moves) |
+| `network_device.enabled: null -> true` | observed on non-protected → protected module moves; exact cause is provider-internal (the `dynamic "network_device"` block is identical in both modules) |
 
 **Dated incident references:**
 - mtu drift first observed: OPS-1738 fuel migration (2026-04-29) — never goes
@@ -241,10 +241,10 @@ Merge ordering matters because MR config and state must land close together
 3. Merge MR promptly (apply against the new state is near no-op)
 
 The `proxmox_vm_ubuntu` vs `proxmox_vm_ubuntu_protected` modules are **not
-byte-identical**: protected uses a static single `network_device` (vs the
-non-protected `dynamic "network_device"` with `vm_extra_interface` support) and
-adds `enabled = true` plus `lifecycle { prevent_destroy = true }`. These cause
-some first-plan attribute drift after relocation regardless of method.
+byte-identical**: the only difference is `lifecycle { prevent_destroy = true }`
+on the protected variant. The `dynamic "network_device"` block is identical in
+both. This causes a `network_device.enabled: null -> true` drift entry on the
+first plan after non-protected → protected relocation.
 
 ### LVM disk-size off-by-one — module formula and sum table
 
