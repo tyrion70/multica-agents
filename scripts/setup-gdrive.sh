@@ -18,7 +18,7 @@ die() { echo >&2 "error: $*"; exit 1; }
 info() { echo "==> $*"; }
 
 unlock_bw() {
-  if ! bw status --session "$BW_SESSION" 2>/dev/null \
+  if ! bw status --session "${BW_SESSION:-}" 2>/dev/null \
     | python3 -c "import json,sys; exit(0 if json.load(sys.stdin)['status']=='unlocked' else 1)"; then
     set -a; . ~/.claude/secrets/bw-bootstrap.env; set +a
     export NODE_TLS_REJECT_UNAUTHORIZED=0
@@ -82,6 +82,7 @@ echo ""
 
 export GOOGLE_DRIVE_OAUTH_CREDENTIALS="$OAUTH_KEYS"
 export GOOGLE_DRIVE_MCP_TOKEN_PATH="$TOKEN_PATH"
+export GOOGLE_DRIVE_MCP_AUTH_PORT=3101
 
 npx @piotr-agier/google-drive-mcp auth
 
