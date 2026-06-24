@@ -1,0 +1,9 @@
+{
+  "_comment": "Shape of the per-agent mcp_config. apply-mcp.sh fills the <...> from the Bitwarden company folder. Do NOT commit real secrets.",
+  "mcpServers": {
+    "linear":     { "type": "http", "url": "https://mcp.linear.app/mcp",   "headers": { "Authorization": "Bearer <linear-key>" } },
+    "incidentio": { "type": "http", "url": "https://mcp.incident.io/mcp",  "headers": { "Authorization": "Bearer <incident.io-key>" } },
+    "atlassian":  { "type": "http", "url": "https://mcp.atlassian.com/v1/mcp", "headers": { "Authorization": "Basic <base64(email:jira-token)>" } },
+    "slack":      { "command": "npx", "args": ["-y", "@modelcontextprotocol/server-slack"], "env": { "SLACK_BOT_TOKEN": "<xoxb-...>", "SLACK_TEAM_ID": "TL8TVRYF8" } }
+  }
+}
