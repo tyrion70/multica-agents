@@ -351,10 +351,35 @@ def build_update_args(agent_id: str, agent_data: Dict[str, Any]) -> List[str]:
     return args
 
 
+_PLACEHOLDER_RE = re.compile(r"#[^#]*/\s*([A-Z_][A-Z0-9_]*)\s*#")
+
+
+def _resolve_mcp_secrets(mcp_config: Any) -> Any:
+    """Walk mcp_config recursively, replacing #description / KEY_NAME# placeholders
+    with values from environment variables (sourced by sync.sh from the host-local
+    /etc/multica/mcp-secrets.env file).
+    """
+    if isinstance(mcp_config, dict):
+        return {k: _resolve_mcp_secrets(v) for k, v in mcp_config.items()}
+    if isinstance(mcp_config, list):
+        return [_resolve_mcp_secrets(v) for v in mcp_config]
+    if isinstance(mcp_config, str):
+        def _replace(m: re.Match) -> str:
+            key = m.group(1)
+            val = os.environ.get(key)
+            if val is None:
+                print(f"      WARNING: mcp placeholder key {key} not found in environment — leaving as-is", file=sys.stderr)
+                return m.group(0)
+            return val
+        return _PLACEHOLDER_RE.sub(_replace, mcp_config)
+    return mcp_config
+
+
 def _write_mcp_config_tempfile(agent_data: Dict[str, Any]) -> Optional[str]:
     mcp = agent_data.get("mcp_config")
     if mcp is None:
         return None
+    mcp = _resolve_mcp_secrets(mcp)
     fd, path = tempfile.mkstemp(suffix=".json", prefix="mcp-config-")
     with os.fdopen(fd, "w") as f:
         json.dump(mcp, f)
