@@ -374,13 +374,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "cloudflare",
-          "company-k8s",
-          "git-mr",
           "git-pr",
-          "haproxy",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -398,13 +392,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "cloudflare",
-          "company-k8s",
-          "git-mr",
           "git-pr",
-          "haproxy",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -425,9 +413,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-pr",
-          "linear-company"
+          "git-pr"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
       },
@@ -444,9 +430,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-pr",
-          "linear-company"
+          "git-pr"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
       }
@@ -466,11 +450,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -488,11 +468,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -513,13 +489,8 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "deploy-app",
           "deploy-verify-rollback",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -537,13 +508,8 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "deploy-app",
           "deploy-verify-rollback",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -564,10 +530,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -585,10 +548,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -609,10 +569,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -630,10 +587,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -654,13 +608,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "grafana-monitoring",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -678,13 +626,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "grafana-monitoring",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -705,10 +647,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -726,10 +665,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -750,13 +686,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "cloudflare",
-          "company-k8s",
-          "git-mr",
           "git-pr",
-          "haproxy",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -774,13 +704,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "cloudflare",
-          "company-k8s",
-          "git-mr",
           "git-pr",
-          "haproxy",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -801,9 +725,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-pr",
-          "linear-company"
+          "git-pr"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
       },
@@ -820,9 +742,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-pr",
-          "linear-company"
+          "git-pr"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
       }
@@ -842,12 +762,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "linear-company",
-          "new-repo-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -865,12 +780,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "linear-company",
-          "new-repo-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -891,10 +801,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -912,10 +819,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -936,13 +840,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "grafana-monitoring",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -960,13 +858,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "grafana-monitoring",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -987,10 +879,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1008,10 +897,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1032,13 +918,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "cloudflare",
-          "company-k8s",
-          "git-mr",
           "git-pr",
-          "haproxy",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1056,13 +936,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "cloudflare",
-          "company-k8s",
-          "git-mr",
           "git-pr",
-          "haproxy",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1083,10 +957,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1104,10 +975,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1128,10 +996,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1149,10 +1014,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1173,10 +1035,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1194,10 +1053,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1218,13 +1074,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "grafana-monitoring",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1242,13 +1092,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "grafana-monitoring",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1269,10 +1113,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1290,10 +1131,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1313,11 +1151,6 @@
         "visibility": "workspace",
         "max_concurrent_tasks": 6,
         "skills": [
-          "chainlayer-docs",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "git-mr",
-          "grafana-monitoring",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1334,11 +1167,6 @@
         "visibility": "workspace",
         "max_concurrent_tasks": 6,
         "skills": [
-          "chainlayer-docs",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "git-mr",
-          "grafana-monitoring",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1358,11 +1186,6 @@
         "visibility": "workspace",
         "max_concurrent_tasks": 6,
         "skills": [
-          "chainlayer-docs",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "git-mr",
-          "grafana-monitoring",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1379,11 +1202,6 @@
         "visibility": "workspace",
         "max_concurrent_tasks": 6,
         "skills": [
-          "chainlayer-docs",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "git-mr",
-          "grafana-monitoring",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1402,10 +1220,7 @@
         "runtime_config": {},
         "visibility": "workspace",
         "max_concurrent_tasks": 6,
-        "skills": [
-          "chainlayer-knowledge",
-          "git-mr"
-        ],
+        "skills": [],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
       },
       "multica_state": {
@@ -1419,10 +1234,7 @@
         "runtime_config": {},
         "visibility": "workspace",
         "max_concurrent_tasks": 6,
-        "skills": [
-          "chainlayer-knowledge",
-          "git-mr"
-        ],
+        "skills": [],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
       }
     },
@@ -1441,14 +1253,8 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "deploy-app",
           "deploy-verify-rollback",
-          "git-mr",
           "git-pr",
-          "linear-company",
-          "rag-ops",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1466,14 +1272,8 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
-          "deploy-app",
           "deploy-verify-rollback",
-          "git-mr",
           "git-pr",
-          "linear-company",
-          "rag-ops",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1494,11 +1294,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
           "git-pr",
-          "linear-company",
-          "rag-ops",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1516,11 +1312,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-k8s",
           "git-pr",
-          "linear-company",
-          "rag-ops",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1541,13 +1333,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "linear-company",
-          "new-repo-company",
-          "rag-ops",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1565,13 +1351,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "company-proxmox",
-          "git-mr",
           "git-pr",
-          "linear-company",
-          "new-repo-company",
-          "rag-ops",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1592,11 +1372,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
-          "rag-ops",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1614,11 +1390,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
-          "rag-ops",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1639,11 +1411,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
-          "rag-ops",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
@@ -1661,11 +1429,7 @@
         "max_concurrent_tasks": 6,
         "skills": [
           "bitwarden",
-          "chainlayer-knowledge",
-          "git-mr",
           "git-pr",
-          "linear-company",
-          "rag-ops",
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
