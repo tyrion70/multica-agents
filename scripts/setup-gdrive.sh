@@ -82,6 +82,7 @@ echo ""
 
 export GOOGLE_DRIVE_OAUTH_CREDENTIALS="$OAUTH_KEYS"
 export GOOGLE_DRIVE_MCP_TOKEN_PATH="$TOKEN_PATH"
+export GOOGLE_DRIVE_MCP_AUTH_PORT=3101
 
 npx @piotr-agier/google-drive-mcp auth
 
