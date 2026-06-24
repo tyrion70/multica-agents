@@ -89,6 +89,7 @@ COMPARABLE_FIELDS = (
     "visibility",
     "max_concurrent_tasks",
     "skills",
+    "mcp_config",
 )
 
 
@@ -176,6 +177,17 @@ def _norm_agent_field(key: str, val: Any) -> Any:
             elif isinstance(item, dict):
                 names.append(item.get("name") or item.get("slug") or "")
         return sorted(names)
+    if key == "mcp_config":
+        if val is None:
+            return None
+        if isinstance(val, str):
+            try:
+                val = json.loads(val)
+            except (json.JSONDecodeError, TypeError):
+                return val
+        if isinstance(val, dict):
+            return json.dumps(val, sort_keys=True)
+        return val
     return val
 
 
@@ -226,6 +238,8 @@ def multica_to_agent_json(
         elif field in ("model", "thinking_level"):
             val = live.get(field)
             result[field] = val if val != "" else None
+        elif field == "mcp_config":
+            pass
         else:
             val = live.get(field)
             if val is not None:
@@ -337,6 +351,16 @@ def build_update_args(agent_id: str, agent_data: Dict[str, Any]) -> List[str]:
     return args
 
 
+def _write_mcp_config_tempfile(agent_data: Dict[str, Any]) -> Optional[str]:
+    mcp = agent_data.get("mcp_config")
+    if mcp is None:
+        return None
+    fd, path = tempfile.mkstemp(suffix=".json", prefix="mcp-config-")
+    with os.fdopen(fd, "w") as f:
+        json.dump(mcp, f)
+    return path
+
+
 # ---------------------------------------------------------------------------
 # Direction detection (shared by agents and skills)
 # ---------------------------------------------------------------------------
@@ -367,6 +391,8 @@ def _decide_action(
         if multica_norm is None:
             return "unchanged"
         return "pull_to_repo"
+    if repo_norm == multica_norm:
+        return "unchanged"
     return "conflict"
 
 
@@ -486,28 +512,34 @@ def sync_agents_workspace(
                 }
 
             elif action == "push_to_multica":
-                if live_agent is None:
-                    print(f"    → creating in Multica", file=sys.stderr)
-                    try:
-                        if not dry_run:
-                            result = _multica(["agent", "create"] + build_create_args(repo_data))
-                            agent_id = result["id"]
-                        else:
-                            _multica(["agent", "create"] + build_create_args(repo_data), dry_run=True)
-                        counts["created"] += 1
-                    except Exception as e:
-                        print(f"    ✗ CREATE FAILED: {e}", file=sys.stderr)
-                        counts["errors"] += 1
-                        continue
-                else:
-                    print(f"    → updating Multica (repo changed, id={agent_id})", file=sys.stderr)
-                    try:
-                        _multica(["agent", "update"] + build_update_args(agent_id, repo_data), dry_run=dry_run)
-                        counts["updated"] += 1
-                    except Exception as e:
-                        print(f"    ✗ UPDATE FAILED: {e}", file=sys.stderr)
-                        counts["errors"] += 1
-                        continue
+                mcp_file = _write_mcp_config_tempfile(repo_data)
+                try:
+                    mcp_args = ["--mcp-config-file", mcp_file] if mcp_file else []
+                    if live_agent is None:
+                        print(f"    → creating in Multica", file=sys.stderr)
+                        try:
+                            if not dry_run:
+                                result = _multica(["agent", "create"] + build_create_args(repo_data) + mcp_args)
+                                agent_id = result["id"]
+                            else:
+                                _multica(["agent", "create"] + build_create_args(repo_data) + mcp_args, dry_run=True)
+                            counts["created"] += 1
+                        except Exception as e:
+                            print(f"    ✗ CREATE FAILED: {e}", file=sys.stderr)
+                            counts["errors"] += 1
+                            continue
+                    else:
+                        print(f"    → updating Multica (repo changed, id={agent_id})", file=sys.stderr)
+                        try:
+                            _multica(["agent", "update"] + build_update_args(agent_id, repo_data) + mcp_args, dry_run=dry_run)
+                            counts["updated"] += 1
+                        except Exception as e:
+                            print(f"    ✗ UPDATE FAILED: {e}", file=sys.stderr)
+                            counts["errors"] += 1
+                            continue
+                finally:
+                    if mcp_file:
+                        os.unlink(mcp_file)
 
                 desired_skills = repo_norm.get("skills") or []
                 if desired_skills and agent_id:
