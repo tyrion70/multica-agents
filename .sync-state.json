@@ -2571,7 +2571,7 @@
           "multica-sync",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "Chainlayer Maintainer",
@@ -2592,7 +2592,7 @@
           "multica-sync",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~Private Maintainer": {
@@ -2614,7 +2614,7 @@
           "multica-sync",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "Private Maintainer",
@@ -2633,7 +2633,7 @@
           "multica-sync",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~ChatGPT CF/HAProxy Expert": {
@@ -2660,7 +2660,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "ChatGPT CF/HAProxy Expert",
@@ -2684,7 +2684,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~ChatGPT Communicator": {
@@ -2706,7 +2706,7 @@
           "git-pr",
           "linear-company"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "ChatGPT Communicator",
@@ -2725,7 +2725,7 @@
           "git-pr",
           "linear-company"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~ChatGPT Issue Coder": {
@@ -2750,7 +2750,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "ChatGPT Issue Coder",
@@ -2772,7 +2772,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~ChatGPT Issue Deployer": {
@@ -2799,7 +2799,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "ChatGPT Issue Deployer",
@@ -2823,7 +2823,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~ChatGPT Issue QA": {
@@ -2847,7 +2847,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "ChatGPT Issue QA",
@@ -2868,7 +2868,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~ChatGPT Issue Refiner": {
@@ -2892,7 +2892,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "ChatGPT Issue Refiner",
@@ -2913,7 +2913,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~ChatGPT Monitoring Operator": {
@@ -2940,7 +2940,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "ChatGPT Monitoring Operator",
@@ -2964,7 +2964,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~ChatGPT Tech Lead": {
@@ -2988,7 +2988,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "ChatGPT Tech Lead",
@@ -3009,7 +3009,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~Claude CF/HAProxy Expert": {
@@ -3036,7 +3036,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "Claude CF/HAProxy Expert",
@@ -3060,7 +3060,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~Claude Communicator": {
@@ -3082,7 +3082,7 @@
           "git-pr",
           "linear-company"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "Claude Communicator",
@@ -3101,7 +3101,7 @@
           "git-pr",
           "linear-company"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~Claude Issue Coder": {
@@ -3127,7 +3127,7 @@
           "new-repo-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "Claude Issue Coder",
@@ -3150,7 +3150,7 @@
           "new-repo-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~Claude Issue Deployer": {
@@ -3178,7 +3178,7 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "Claude Issue Deployer",
@@ -3203,7 +3203,7 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~Claude Issue QA": {
@@ -3228,7 +3228,7 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "Claude Issue QA",
@@ -3250,7 +3250,7 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~Claude Issue Refiner": {
@@ -3274,7 +3274,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "Claude Issue Refiner",
@@ -3295,7 +3295,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~Claude Monitoring Operator": {
@@ -3322,7 +3322,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "Claude Monitoring Operator",
@@ -3346,7 +3346,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~Claude Tech Lead": {
@@ -3370,7 +3370,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "Claude Tech Lead",
@@ -3391,7 +3391,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~DeepSeek CF/HAProxy Expert": {
@@ -3418,7 +3418,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "DeepSeek CF/HAProxy Expert",
@@ -3442,7 +3442,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~DeepSeek Communicator": {
@@ -3466,7 +3466,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "DeepSeek Communicator",
@@ -3487,7 +3487,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~DeepSeek Issue Coder": {
@@ -3514,7 +3514,7 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "DeepSeek Issue Coder",
@@ -3538,7 +3538,7 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~DeepSeek Issue Deployer": {
@@ -3562,7 +3562,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "DeepSeek Issue Deployer",
@@ -3583,7 +3583,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~DeepSeek Issue QA": {
@@ -3607,7 +3607,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "DeepSeek Issue QA",
@@ -3628,7 +3628,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~DeepSeek Issue Refiner": {
@@ -3653,7 +3653,7 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "DeepSeek Issue Refiner",
@@ -3675,7 +3675,7 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~DeepSeek Monitoring Operator": {
@@ -3702,7 +3702,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "DeepSeek Monitoring Operator",
@@ -3726,7 +3726,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~DeepSeek Tech Lead": {
@@ -3750,7 +3750,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       },
       "multica_state": {
         "name": "DeepSeek Tech Lead",
@@ -3771,7 +3771,7 @@
           "linear-company",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"#Google Drive \\u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"#Google Drive \\u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#\"}}, \"incidentio\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 incident.io \\u2014 API key / INCIDENT_IO_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.incident.io/mcp\"}, \"linear\": {\"headers\": {\"Authorization\": \"Bearer #ChainLayer \\u00b7 Linear \\u2014 API key / LINEAR_API_KEY#\"}, \"type\": \"http\", \"url\": \"https://mcp.linear.app/mcp\"}, \"slack\": {\"args\": [\"-y\", \"slack-mcp-server@latest\", \"-no-cache\"], \"command\": \"npx\", \"env\": {\"SLACK_MCP_ADD_MESSAGE_TOOL\": \"true\", \"SLACK_MCP_REACTION_TOOL\": \"true\", \"SLACK_MCP_XOXP_TOKEN\": \"#ChainLayer \\u00b7 Slack \\u2014 personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#\"}}}}"
+        "mcp_config": null
       }
     },
     "Chainlayer~Doc Reviewer/Publisher": {
@@ -4329,13 +4329,13 @@
         "repo_state": {
           "name": "multica-sync",
           "description": "How agent and skill configuration is managed in both workspaces via the multica-agents repo and bidirectional sync.",
-          "body": "# Multica Agent & Skill Sync\n\nAll Multica agent and skill configuration is version-controlled in the **`multica-agents` repository** (`github.com/tyrion70/multica-agents`, private). Changes to agents and skills must go through that repo — the sync autopilot pushes repo changes to the workspace and pulls any workspace-side edits back to the repo.\n\n## Repository layout\n\n```\nmultica-agents/\n  Chainlayer/            # Chainlayer workspace (0014efc5-f6fb-42bf-9616-4aaeb07ce237)\n    skills.json          # skill names owned by Chainlayer\n    <squad>/<agent>/agent.json\n  Private/               # Private workspace (9627be94-0c29-49f7-a104-dff19d11a089)\n    skills.json          # skill names owned by Private\n    <squad>/<agent>/agent.json\n  skills/\n    <name>/SKILL.md      # frontmatter (name, description) + body\n    <name>/<subdir>/...  # optional supporting files\n  scripts/\n    sync.sh              # entry point (thin wrapper)\n    sync.py              # bidirectional sync engine\n  .sync-state.json       # committed snapshot used for direction detection\n```\n\n## Making a change\n\n**To update an agent or skill**, edit the repo and open a pull request against `main`. The sync autopilot triggers on merge and applies the change. Never edit agents or skills directly in the Multica UI as the permanent state — the next sync will detect a conflict.\n\nIf you make an emergency edit directly in the workspace, the next sync writes it back to the repo automatically (pull direction).\n\n## Sync direction logic\n\n`sync.py` compares the current repo state and live Multica state against the last-committed `.sync-state.json` snapshot:\n\n| Repo changed | Multica changed | Action |\n|---|---|---|\n| yes | no | push repo → Multica (create or update) |\n| no | yes | pull Multica → repo (write files back, then commit) |\n| yes | yes | **conflict** — exit 2, file an issue, do not overwrite either side |\n| no | no | unchanged |\n\nOn first sync (no state file), repo wins.\n\n## Running the sync manually\n\n```bash\ngit clone git@github.com:tyrion70/multica-agents.git multica-agents\n# or refresh: git -C multica-agents pull --ff-only\n\ncd multica-agents\nscripts/sync.sh                             # agents + skills, all workspaces\nscripts/sync.sh --type skills               # skills only\nscripts/sync.sh --type agents               # agents only\nscripts/sync.sh --workspace Chainlayer      # Chainlayer workspace only\nscripts/sync.sh --workspace Private         # Private workspace only\nscripts/sync.sh --dry-run                   # preview without changes\n```\n\nAlways use SSH for cloning (consult the `ssh` skill). Never fall back to HTTPS.\n\n## Workspace IDs\n\nBoth workspaces live on the same Multica instance (`multica.252h.org`):\n\n| Workspace slug | UUID |\n|---|---|\n| Chainlayer | `0014efc5-f6fb-42bf-9616-4aaeb07ce237` |\n| Private | `9627be94-0c29-49f7-a104-dff19d11a089` |\n\nPassing `--workspace Chainlayer` or `--workspace Private` automatically sets `MULTICA_WORKSPACE_ID` to the correct UUID so all CLI calls target the right workspace.\n\n## Machine defaults\n\n| Host | Default workspace |\n|---|---|\n| multica-01 | Private |\n| multica-02 | Chainlayer |\n\nRunning `sync.sh` without `--workspace` targets all workspace directories in the repo but uses the host's default workspace ID for CLI calls. Always pass `--workspace` explicitly in autopilots and agents.\n\n## Autopilots\n\nThe sync autopilots run on schedule and on merges to `main`. Each:\n1. Clones (or pulls) the `multica-agents` repo via SSH\n2. Runs `sync.sh --workspace <slug>`\n3. Commits any pull-back files and the updated `.sync-state.json`\n4. Files conflict issues to the relevant squad on divergence\n\nmultica-02 runs Chainlayer sync; multica-01 runs Private sync.\n\n## Cross-workspace maintainers\n\nEvery squad in both workspaces has two maintainer agents as members:\n\n| Workspace | Local maintainer | Cross-workspace bridge |\n|---|---|---|\n| Chainlayer | DeepSeek / ChatGPT / Claude Maintainer (per-squad, runs on multica-02) | **Private Maintainer** (`_shared/maintainer-private`, runs on multica-01) |\n| Private | Per-squad Maintainer (runs on multica-01) | **Chainlayer Maintainer** (`_shared/maintainer-chainlayer`, runs on multica-02) |\n\n- The **local maintainer** handles workspace help and sync for its own workspace.\n- The **cross-workspace bridge** exists in the opposite workspace so squads can route work across. If a Chainlayer issue needs something done in Private, assign the **Private Maintainer**. If a Private issue needs something in Chainlayer, assign the **Chainlayer Maintainer**.\n\n## Conflict handling\n\nWhen both sides change independently, the script exits 2 and prints a JSON conflict report on stdout. The calling agent or autopilot must:\n1. File one issue per conflicting item\n2. For Chainlayer: assign to squad `610be128-4320-4ca1-8f1d-413c2657cd2c`\n3. For Private: assign to Peter (`997b06ce-c4e1-4ca9-b5e8-bcc0325749c9`)\n4. Leave both sides unchanged — do not pick a winner\n\n## Adding a new skill\n\n1. Create `skills/<name>/SKILL.md` with YAML frontmatter (`name:`, `description:`) and body.\n2. Add any supporting files under `skills/<name>/`.\n3. Add the skill name to `Chainlayer/skills.json` and/or `Private/skills.json`.\n4. Open a PR. Merge triggers the skill sync autopilot.\n\n## Adding a new agent\n\n1. Create `<workspace>/<squad>/<agent-slug>/agent.json` (see `schemas/agent.json`).\n2. Optionally add the agent to the squad's `squad.json` members list.\n3. Open a PR. Merge triggers the agent sync autopilot.\n\n## SSH access\n\nThe repo requires SSH auth to GitHub. The correct key and any needed SSH config are documented in the `ssh` skill. Identity: `git@github.com:tyrion70/multica-agents.git`.\n",
+          "body": "# Multica Agent & Skill Sync\n\nAll Multica agent and skill configuration is version-controlled in the **`multica-agents` repository** (`github.com/tyrion70/multica-agents`, private). Changes to agents and skills must go through that repo — the sync autopilot pushes repo changes to the workspace and pulls any workspace-side edits back to the repo.\n\n## Repository layout\n\n```\nmultica-agents/\n  Chainlayer/            # Chainlayer workspace (0014efc5-f6fb-42bf-9616-4aaeb07ce237)\n    skills.json          # skill names owned by Chainlayer\n    agent-ids.json       # identity anchor: agent-dir → Multica UUID (Chainlayer)\n    <squad>/<agent>/agent.json\n  Private/               # Private workspace (9627be94-0c29-49f7-a104-dff19d11a089)\n    skills.json          # skill names owned by Private\n    agent-ids.json       # identity anchor: agent-dir → Multica UUID (Private)\n    <squad>/<agent>/agent.json\n  skills/\n    <name>/SKILL.md      # frontmatter (name, description) + body\n    <name>/<subdir>/...  # optional supporting files\n  scripts/\n    sync.sh              # entry point (thin wrapper)\n    sync.py              # bidirectional sync engine\n  .sync-state.json       # committed snapshot used for direction detection\n```\n\n## Making a change\n\n**To update an agent or skill**, edit the repo and open a pull request against `main`. The sync autopilot triggers on merge and applies the change. Never edit agents or skills directly in the Multica UI as the permanent state — the next sync will detect a conflict.\n\nIf you make an emergency edit directly in the workspace, the next sync writes it back to the repo automatically (pull direction).\n\n## Sync direction logic\n\n`sync.py` compares the current repo state and live Multica state against the last-committed `.sync-state.json` snapshot:\n\n| Repo changed | Multica changed | Action |\n|---|---|---|\n| yes | no | push repo → Multica (create or update) |\n| no | yes | pull Multica → repo (write files back, then commit) |\n| yes | yes | **conflict** — exit 2, file an issue, do not overwrite either side |\n| no | no | unchanged |\n\nOn first sync (no state file), repo wins.\n\n## Agent identity (why syncs no longer churn UUIDs)\n\nAgents are upserted **by UUID**, never by display name. Each workspace has an\n`agent-ids.json` sidecar mapping the agent's directory path (e.g.\n`_shared/maintainer`) to its Multica UUID. On every run sync:\n\n1. uses the stored UUID if it still resolves to a live agent → `agent update <id>`;\n2. else falls back to a one-time **name match** and adopts that UUID into the\n   sidecar (this re-anchors an identity that previously churned, on the first run\n   after the fix);\n3. else treats the agent as genuinely new and **refuses to create** unless\n   `--allow-create` is given.\n\nConsequences:\n\n- Renaming an agent's `name` updates the **same** agent (the directory key, not the\n  name, is the anchor) — no orphaned squad rosters, mentions, or assignments.\n- A transient or mis-scoped `agent list` can no longer silently re-create an agent\n  with a fresh UUID. Steady-state autopilot runs pass **no** `--allow-create`, so\n  they can only update — never mint.\n- A run is hard-capped at `--max-creates` creates (default 2) even with\n  `--allow-create`, so a mistake can never mass-mint the whole roster.\n\nCommit `agent-ids.json` along with `.sync-state.json` after any run that changes it.\n\n## Running the sync manually\n\n```bash\ngit clone git@github.com:tyrion70/multica-agents.git multica-agents\n# or refresh: git -C multica-agents pull --ff-only\n\ncd multica-agents\nscripts/sync.sh                             # agents + skills, all workspaces\nscripts/sync.sh --type skills               # skills only\nscripts/sync.sh --type agents               # agents only\nscripts/sync.sh --workspace Chainlayer      # Chainlayer workspace only\nscripts/sync.sh --workspace Private         # Private workspace only\nscripts/sync.sh --dry-run                   # preview without changes\nscripts/sync.sh --workspace Private --allow-create   # permit creating new agents (off by default)\n```\n\nCreating agents is **off by default**. A steady-state sync only updates existing\nagents; if a repo agent has no identity anchor and no name match, the run reports an\nerror rather than minting a UUID. To add a genuinely new agent, run once with\n`--allow-create` (and raise `--max-creates` only for a deliberate bulk bootstrap).\n\nAlways use SSH for cloning (consult the `ssh` skill). Never fall back to HTTPS.\n\n## Workspace IDs\n\nBoth workspaces live on the same Multica instance (`multica.252h.org`):\n\n| Workspace slug | UUID |\n|---|---|\n| Chainlayer | `0014efc5-f6fb-42bf-9616-4aaeb07ce237` |\n| Private | `9627be94-0c29-49f7-a104-dff19d11a089` |\n\nPassing `--workspace Chainlayer` or `--workspace Private` automatically sets `MULTICA_WORKSPACE_ID` to the correct UUID so all CLI calls target the right workspace.\n\n## Machine defaults\n\n| Host | Default workspace |\n|---|---|\n| multica-01 | Private |\n| multica-02 | Chainlayer |\n\nEach workspace directory is scoped to its own UUID (from the script's\n`WORKSPACE_IDS` map) for the duration of its sync — `agent list`/`create`/`update`\nalways target that workspace, never the host default. A run still **refuses** to\nsync agents for a directory whose name isn't a known workspace. The two production\nautopilots each pass `--workspace <slug>` explicitly anyway (one per workspace).\n\n## Autopilots\n\nThe sync autopilots run on schedule and on merges to `main`. Each:\n1. Clones (or pulls) the `multica-agents` repo via SSH\n2. Runs `sync.sh --workspace <slug>`\n3. Commits any pull-back files and the updated `.sync-state.json`\n4. Files conflict issues to the relevant squad on divergence\n\nmultica-02 runs Chainlayer sync; multica-01 runs Private sync.\n\n## Cross-workspace maintainers\n\nEvery squad in both workspaces has two maintainer agents as members:\n\n| Workspace | Local maintainer | Cross-workspace bridge |\n|---|---|---|\n| Chainlayer | DeepSeek / ChatGPT / Claude Maintainer (per-squad, runs on multica-02) | **Private Maintainer** (`_shared/maintainer-private`, runs on multica-01) |\n| Private | Per-squad Maintainer (runs on multica-01) | **Chainlayer Maintainer** (`_shared/maintainer-chainlayer`, runs on multica-02) |\n\n- The **local maintainer** handles workspace help and sync for its own workspace.\n- The **cross-workspace bridge** exists in the opposite workspace so squads can route work across. If a Chainlayer issue needs something done in Private, assign the **Private Maintainer**. If a Private issue needs something in Chainlayer, assign the **Chainlayer Maintainer**.\n\n## Conflict handling\n\nWhen both sides change independently, the script exits 2 and prints a JSON conflict report on stdout. The calling agent or autopilot must:\n1. File one issue per conflicting item\n2. For Chainlayer: assign to squad `610be128-4320-4ca1-8f1d-413c2657cd2c`\n3. For Private: assign to Peter (`997b06ce-c4e1-4ca9-b5e8-bcc0325749c9`)\n4. Leave both sides unchanged — do not pick a winner\n\n## Adding a new skill\n\n1. Create `skills/<name>/SKILL.md` with YAML frontmatter (`name:`, `description:`) and body.\n2. Add any supporting files under `skills/<name>/`.\n3. Add the skill name to `Chainlayer/skills.json` and/or `Private/skills.json`.\n4. Open a PR. Merge triggers the skill sync autopilot.\n\n## Adding a new agent\n\n1. Create `<workspace>/<squad>/<agent-slug>/agent.json` (see `schemas/agent.json`).\n2. Optionally add the agent to the squad's `squad.json` members list.\n3. Open a PR. After merge, create it with one deliberate run:\n   `scripts/sync.sh --workspace <ws> --allow-create`. The run writes the new UUID\n   into `<workspace>/agent-ids.json`; commit that file so later steady-state syncs\n   upsert the agent by id. (The scheduled autopilot does **not** pass\n   `--allow-create`, so it will not create the agent on its own.)\n\n## SSH access\n\nThe repo requires SSH auth to GitHub. The correct key and any needed SSH config are documented in the `ssh` skill. Identity: `git@github.com:tyrion70/multica-agents.git`.\n",
           "files": {}
         },
         "multica_state": {
           "name": "multica-sync",
           "description": "How agent and skill configuration is managed in both workspaces via the multica-agents repo and bidirectional sync.",
-          "body": "# Multica Agent & Skill Sync\n\nAll Multica agent and skill configuration is version-controlled in the **`multica-agents` repository** (`github.com/tyrion70/multica-agents`, private). Changes to agents and skills must go through that repo — the sync autopilot pushes repo changes to the workspace and pulls any workspace-side edits back to the repo.\n\n## Repository layout\n\n```\nmultica-agents/\n  Chainlayer/            # Chainlayer workspace (0014efc5-f6fb-42bf-9616-4aaeb07ce237)\n    skills.json          # skill names owned by Chainlayer\n    <squad>/<agent>/agent.json\n  Private/               # Private workspace (9627be94-0c29-49f7-a104-dff19d11a089)\n    skills.json          # skill names owned by Private\n    <squad>/<agent>/agent.json\n  skills/\n    <name>/SKILL.md      # frontmatter (name, description) + body\n    <name>/<subdir>/...  # optional supporting files\n  scripts/\n    sync.sh              # entry point (thin wrapper)\n    sync.py              # bidirectional sync engine\n  .sync-state.json       # committed snapshot used for direction detection\n```\n\n## Making a change\n\n**To update an agent or skill**, edit the repo and open a pull request against `main`. The sync autopilot triggers on merge and applies the change. Never edit agents or skills directly in the Multica UI as the permanent state — the next sync will detect a conflict.\n\nIf you make an emergency edit directly in the workspace, the next sync writes it back to the repo automatically (pull direction).\n\n## Sync direction logic\n\n`sync.py` compares the current repo state and live Multica state against the last-committed `.sync-state.json` snapshot:\n\n| Repo changed | Multica changed | Action |\n|---|---|---|\n| yes | no | push repo → Multica (create or update) |\n| no | yes | pull Multica → repo (write files back, then commit) |\n| yes | yes | **conflict** — exit 2, file an issue, do not overwrite either side |\n| no | no | unchanged |\n\nOn first sync (no state file), repo wins.\n\n## Running the sync manually\n\n```bash\ngit clone git@github.com:tyrion70/multica-agents.git multica-agents\n# or refresh: git -C multica-agents pull --ff-only\n\ncd multica-agents\nscripts/sync.sh                             # agents + skills, all workspaces\nscripts/sync.sh --type skills               # skills only\nscripts/sync.sh --type agents               # agents only\nscripts/sync.sh --workspace Chainlayer      # Chainlayer workspace only\nscripts/sync.sh --workspace Private         # Private workspace only\nscripts/sync.sh --dry-run                   # preview without changes\n```\n\nAlways use SSH for cloning (consult the `ssh` skill). Never fall back to HTTPS.\n\n## Workspace IDs\n\nBoth workspaces live on the same Multica instance (`multica.252h.org`):\n\n| Workspace slug | UUID |\n|---|---|\n| Chainlayer | `0014efc5-f6fb-42bf-9616-4aaeb07ce237` |\n| Private | `9627be94-0c29-49f7-a104-dff19d11a089` |\n\nPassing `--workspace Chainlayer` or `--workspace Private` automatically sets `MULTICA_WORKSPACE_ID` to the correct UUID so all CLI calls target the right workspace.\n\n## Machine defaults\n\n| Host | Default workspace |\n|---|---|\n| multica-01 | Private |\n| multica-02 | Chainlayer |\n\nRunning `sync.sh` without `--workspace` targets all workspace directories in the repo but uses the host's default workspace ID for CLI calls. Always pass `--workspace` explicitly in autopilots and agents.\n\n## Autopilots\n\nThe sync autopilots run on schedule and on merges to `main`. Each:\n1. Clones (or pulls) the `multica-agents` repo via SSH\n2. Runs `sync.sh --workspace <slug>`\n3. Commits any pull-back files and the updated `.sync-state.json`\n4. Files conflict issues to the relevant squad on divergence\n\nmultica-02 runs Chainlayer sync; multica-01 runs Private sync.\n\n## Cross-workspace maintainers\n\nEvery squad in both workspaces has two maintainer agents as members:\n\n| Workspace | Local maintainer | Cross-workspace bridge |\n|---|---|---|\n| Chainlayer | DeepSeek / ChatGPT / Claude Maintainer (per-squad, runs on multica-02) | **Private Maintainer** (`_shared/maintainer-private`, runs on multica-01) |\n| Private | Per-squad Maintainer (runs on multica-01) | **Chainlayer Maintainer** (`_shared/maintainer-chainlayer`, runs on multica-02) |\n\n- The **local maintainer** handles workspace help and sync for its own workspace.\n- The **cross-workspace bridge** exists in the opposite workspace so squads can route work across. If a Chainlayer issue needs something done in Private, assign the **Private Maintainer**. If a Private issue needs something in Chainlayer, assign the **Chainlayer Maintainer**.\n\n## Conflict handling\n\nWhen both sides change independently, the script exits 2 and prints a JSON conflict report on stdout. The calling agent or autopilot must:\n1. File one issue per conflicting item\n2. For Chainlayer: assign to squad `610be128-4320-4ca1-8f1d-413c2657cd2c`\n3. For Private: assign to Peter (`997b06ce-c4e1-4ca9-b5e8-bcc0325749c9`)\n4. Leave both sides unchanged — do not pick a winner\n\n## Adding a new skill\n\n1. Create `skills/<name>/SKILL.md` with YAML frontmatter (`name:`, `description:`) and body.\n2. Add any supporting files under `skills/<name>/`.\n3. Add the skill name to `Chainlayer/skills.json` and/or `Private/skills.json`.\n4. Open a PR. Merge triggers the skill sync autopilot.\n\n## Adding a new agent\n\n1. Create `<workspace>/<squad>/<agent-slug>/agent.json` (see `schemas/agent.json`).\n2. Optionally add the agent to the squad's `squad.json` members list.\n3. Open a PR. Merge triggers the agent sync autopilot.\n\n## SSH access\n\nThe repo requires SSH auth to GitHub. The correct key and any needed SSH config are documented in the `ssh` skill. Identity: `git@github.com:tyrion70/multica-agents.git`.\n",
+          "body": "# Multica Agent & Skill Sync\n\nAll Multica agent and skill configuration is version-controlled in the **`multica-agents` repository** (`github.com/tyrion70/multica-agents`, private). Changes to agents and skills must go through that repo — the sync autopilot pushes repo changes to the workspace and pulls any workspace-side edits back to the repo.\n\n## Repository layout\n\n```\nmultica-agents/\n  Chainlayer/            # Chainlayer workspace (0014efc5-f6fb-42bf-9616-4aaeb07ce237)\n    skills.json          # skill names owned by Chainlayer\n    agent-ids.json       # identity anchor: agent-dir → Multica UUID (Chainlayer)\n    <squad>/<agent>/agent.json\n  Private/               # Private workspace (9627be94-0c29-49f7-a104-dff19d11a089)\n    skills.json          # skill names owned by Private\n    agent-ids.json       # identity anchor: agent-dir → Multica UUID (Private)\n    <squad>/<agent>/agent.json\n  skills/\n    <name>/SKILL.md      # frontmatter (name, description) + body\n    <name>/<subdir>/...  # optional supporting files\n  scripts/\n    sync.sh              # entry point (thin wrapper)\n    sync.py              # bidirectional sync engine\n  .sync-state.json       # committed snapshot used for direction detection\n```\n\n## Making a change\n\n**To update an agent or skill**, edit the repo and open a pull request against `main`. The sync autopilot triggers on merge and applies the change. Never edit agents or skills directly in the Multica UI as the permanent state — the next sync will detect a conflict.\n\nIf you make an emergency edit directly in the workspace, the next sync writes it back to the repo automatically (pull direction).\n\n## Sync direction logic\n\n`sync.py` compares the current repo state and live Multica state against the last-committed `.sync-state.json` snapshot:\n\n| Repo changed | Multica changed | Action |\n|---|---|---|\n| yes | no | push repo → Multica (create or update) |\n| no | yes | pull Multica → repo (write files back, then commit) |\n| yes | yes | **conflict** — exit 2, file an issue, do not overwrite either side |\n| no | no | unchanged |\n\nOn first sync (no state file), repo wins.\n\n## Agent identity (why syncs no longer churn UUIDs)\n\nAgents are upserted **by UUID**, never by display name. Each workspace has an\n`agent-ids.json` sidecar mapping the agent's directory path (e.g.\n`_shared/maintainer`) to its Multica UUID. On every run sync:\n\n1. uses the stored UUID if it still resolves to a live agent → `agent update <id>`;\n2. else falls back to a one-time **name match** and adopts that UUID into the\n   sidecar (this re-anchors an identity that previously churned, on the first run\n   after the fix);\n3. else treats the agent as genuinely new and **refuses to create** unless\n   `--allow-create` is given.\n\nConsequences:\n\n- Renaming an agent's `name` updates the **same** agent (the directory key, not the\n  name, is the anchor) — no orphaned squad rosters, mentions, or assignments.\n- A transient or mis-scoped `agent list` can no longer silently re-create an agent\n  with a fresh UUID. Steady-state autopilot runs pass **no** `--allow-create`, so\n  they can only update — never mint.\n- A run is hard-capped at `--max-creates` creates (default 2) even with\n  `--allow-create`, so a mistake can never mass-mint the whole roster.\n\nCommit `agent-ids.json` along with `.sync-state.json` after any run that changes it.\n\n## Running the sync manually\n\n```bash\ngit clone git@github.com:tyrion70/multica-agents.git multica-agents\n# or refresh: git -C multica-agents pull --ff-only\n\ncd multica-agents\nscripts/sync.sh                             # agents + skills, all workspaces\nscripts/sync.sh --type skills               # skills only\nscripts/sync.sh --type agents               # agents only\nscripts/sync.sh --workspace Chainlayer      # Chainlayer workspace only\nscripts/sync.sh --workspace Private         # Private workspace only\nscripts/sync.sh --dry-run                   # preview without changes\nscripts/sync.sh --workspace Private --allow-create   # permit creating new agents (off by default)\n```\n\nCreating agents is **off by default**. A steady-state sync only updates existing\nagents; if a repo agent has no identity anchor and no name match, the run reports an\nerror rather than minting a UUID. To add a genuinely new agent, run once with\n`--allow-create` (and raise `--max-creates` only for a deliberate bulk bootstrap).\n\nAlways use SSH for cloning (consult the `ssh` skill). Never fall back to HTTPS.\n\n## Workspace IDs\n\nBoth workspaces live on the same Multica instance (`multica.252h.org`):\n\n| Workspace slug | UUID |\n|---|---|\n| Chainlayer | `0014efc5-f6fb-42bf-9616-4aaeb07ce237` |\n| Private | `9627be94-0c29-49f7-a104-dff19d11a089` |\n\nPassing `--workspace Chainlayer` or `--workspace Private` automatically sets `MULTICA_WORKSPACE_ID` to the correct UUID so all CLI calls target the right workspace.\n\n## Machine defaults\n\n| Host | Default workspace |\n|---|---|\n| multica-01 | Private |\n| multica-02 | Chainlayer |\n\nEach workspace directory is scoped to its own UUID (from the script's\n`WORKSPACE_IDS` map) for the duration of its sync — `agent list`/`create`/`update`\nalways target that workspace, never the host default. A run still **refuses** to\nsync agents for a directory whose name isn't a known workspace. The two production\nautopilots each pass `--workspace <slug>` explicitly anyway (one per workspace).\n\n## Autopilots\n\nThe sync autopilots run on schedule and on merges to `main`. Each:\n1. Clones (or pulls) the `multica-agents` repo via SSH\n2. Runs `sync.sh --workspace <slug>`\n3. Commits any pull-back files and the updated `.sync-state.json`\n4. Files conflict issues to the relevant squad on divergence\n\nmultica-02 runs Chainlayer sync; multica-01 runs Private sync.\n\n## Cross-workspace maintainers\n\nEvery squad in both workspaces has two maintainer agents as members:\n\n| Workspace | Local maintainer | Cross-workspace bridge |\n|---|---|---|\n| Chainlayer | DeepSeek / ChatGPT / Claude Maintainer (per-squad, runs on multica-02) | **Private Maintainer** (`_shared/maintainer-private`, runs on multica-01) |\n| Private | Per-squad Maintainer (runs on multica-01) | **Chainlayer Maintainer** (`_shared/maintainer-chainlayer`, runs on multica-02) |\n\n- The **local maintainer** handles workspace help and sync for its own workspace.\n- The **cross-workspace bridge** exists in the opposite workspace so squads can route work across. If a Chainlayer issue needs something done in Private, assign the **Private Maintainer**. If a Private issue needs something in Chainlayer, assign the **Chainlayer Maintainer**.\n\n## Conflict handling\n\nWhen both sides change independently, the script exits 2 and prints a JSON conflict report on stdout. The calling agent or autopilot must:\n1. File one issue per conflicting item\n2. For Chainlayer: assign to squad `610be128-4320-4ca1-8f1d-413c2657cd2c`\n3. For Private: assign to Peter (`997b06ce-c4e1-4ca9-b5e8-bcc0325749c9`)\n4. Leave both sides unchanged — do not pick a winner\n\n## Adding a new skill\n\n1. Create `skills/<name>/SKILL.md` with YAML frontmatter (`name:`, `description:`) and body.\n2. Add any supporting files under `skills/<name>/`.\n3. Add the skill name to `Chainlayer/skills.json` and/or `Private/skills.json`.\n4. Open a PR. Merge triggers the skill sync autopilot.\n\n## Adding a new agent\n\n1. Create `<workspace>/<squad>/<agent-slug>/agent.json` (see `schemas/agent.json`).\n2. Optionally add the agent to the squad's `squad.json` members list.\n3. Open a PR. After merge, create it with one deliberate run:\n   `scripts/sync.sh --workspace <ws> --allow-create`. The run writes the new UUID\n   into `<workspace>/agent-ids.json`; commit that file so later steady-state syncs\n   upsert the agent by id. (The scheduled autopilot does **not** pass\n   `--allow-create`, so it will not create the agent on its own.)\n\n## SSH access\n\nThe repo requires SSH auth to GitHub. The correct key and any needed SSH config are documented in the `ssh` skill. Identity: `git@github.com:tyrion70/multica-agents.git`.\n",
           "files": {}
         }
       },
