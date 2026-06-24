@@ -14,5 +14,20 @@
     "git-pr",
     "private-knowledge",
     "ssh"
-  ]
+  ],
+  "mcp_config": {
+    "mcpServers": {
+      "gdrive": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@piotr-agier/google-drive-mcp"
+        ],
+        "env": {
+          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "#Google Drive — OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#",
+          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "#Google Drive — OAuth token store path / GDOC_MCP_TOKEN_PATH#"
+        }
+      }
+    }
+  }
 }
