@@ -2293,6 +2293,7 @@
           "cloudflare",
           "company-k8s",
           "git-mr",
+          "git-pr",
           "haproxy",
           "linear-company",
           "ssh"
@@ -2315,6 +2316,7 @@
           "cloudflare",
           "company-k8s",
           "git-mr",
+          "git-pr",
           "haproxy",
           "linear-company",
           "ssh"
@@ -2337,6 +2339,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "git-pr",
           "linear-company"
         ]
       },
@@ -2354,6 +2357,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "git-pr",
           "linear-company"
         ]
       }
@@ -2376,6 +2380,7 @@
           "chainlayer-knowledge",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2396,6 +2401,7 @@
           "chainlayer-knowledge",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2421,6 +2427,7 @@
           "deploy-app",
           "deploy-verify-rollback",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2443,6 +2450,7 @@
           "deploy-app",
           "deploy-verify-rollback",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2465,6 +2473,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "company-k8s",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2484,6 +2493,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "company-k8s",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2506,6 +2516,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2525,6 +2536,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2549,6 +2561,7 @@
           "company-k8s",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "grafana-monitoring",
           "linear-company",
           "ssh"
@@ -2571,6 +2584,7 @@
           "company-k8s",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "grafana-monitoring",
           "linear-company",
           "ssh"
@@ -2594,6 +2608,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2613,6 +2628,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2637,6 +2653,7 @@
           "cloudflare",
           "company-k8s",
           "git-mr",
+          "git-pr",
           "haproxy",
           "linear-company",
           "ssh"
@@ -2659,6 +2676,7 @@
           "cloudflare",
           "company-k8s",
           "git-mr",
+          "git-pr",
           "haproxy",
           "linear-company",
           "ssh"
@@ -2681,6 +2699,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "git-pr",
           "linear-company"
         ]
       },
@@ -2698,6 +2717,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "git-pr",
           "linear-company"
         ]
       }
@@ -2720,6 +2740,7 @@
           "chainlayer-knowledge",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "linear-company",
           "new-repo-company",
           "ssh"
@@ -2741,6 +2762,7 @@
           "chainlayer-knowledge",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "linear-company",
           "new-repo-company",
           "ssh"
@@ -2767,6 +2789,7 @@
           "deploy-app",
           "deploy-verify-rollback",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2789,6 +2812,7 @@
           "deploy-app",
           "deploy-verify-rollback",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2811,6 +2835,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "company-k8s",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2830,6 +2855,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "company-k8s",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2852,6 +2878,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2871,6 +2898,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2895,6 +2923,7 @@
           "company-k8s",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "grafana-monitoring",
           "linear-company",
           "ssh"
@@ -2917,6 +2946,7 @@
           "company-k8s",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "grafana-monitoring",
           "linear-company",
           "ssh"
@@ -2940,6 +2970,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2959,6 +2990,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -2983,6 +3015,7 @@
           "cloudflare",
           "company-k8s",
           "git-mr",
+          "git-pr",
           "haproxy",
           "linear-company",
           "ssh"
@@ -3005,6 +3038,7 @@
           "cloudflare",
           "company-k8s",
           "git-mr",
+          "git-pr",
           "haproxy",
           "linear-company",
           "ssh"
@@ -3028,6 +3062,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -3047,6 +3082,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -3070,6 +3106,7 @@
           "chainlayer-knowledge",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "linear-company",
           "new-repo-company",
           "ssh"
@@ -3091,6 +3128,7 @@
           "chainlayer-knowledge",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "linear-company",
           "new-repo-company",
           "ssh"
@@ -3114,6 +3152,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -3133,6 +3172,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -3155,6 +3195,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -3174,6 +3215,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -3196,6 +3238,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -3215,6 +3258,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -3239,6 +3283,7 @@
           "company-k8s",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "grafana-monitoring",
           "linear-company",
           "ssh"
@@ -3261,6 +3306,7 @@
           "company-k8s",
           "company-proxmox",
           "git-mr",
+          "git-pr",
           "grafana-monitoring",
           "linear-company",
           "ssh"
@@ -3284,6 +3330,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -3303,6 +3350,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "linear-company",
           "ssh"
         ]
@@ -4554,6 +4602,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "multica-sync",
           "ssh"
         ]
@@ -4573,6 +4622,7 @@
           "bitwarden",
           "chainlayer-knowledge",
           "git-mr",
+          "git-pr",
           "multica-sync",
           "ssh"
         ]
