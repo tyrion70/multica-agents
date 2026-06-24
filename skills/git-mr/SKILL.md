@@ -14,6 +14,18 @@ one decides *how the change lands*. If no Linear issue exists yet, **invoke the
 `linear-company` skill first** — issue-before-code, no exceptions unless the
 user explicitly waives it (then note the waiver in the MR description).
 
+> **Documentation carve-out (`gitlab.com/chainlayer/documentation`).** Doc work
+> in the documentation repo is tracked in **Multica, not Linear** — the Multica
+> issue is the system of record. For doc MRs, follow every mechanic below
+> (identity, fetch/rebase, SSH-signed commits, no `Co-Authored-By`, the MR
+> template) **except** the Linear-issue-first requirement and the
+> `Closes OPS-XXXX` closing words: reference the Multica issue in the MR
+> description instead, and skip the Linear close step. The **only** exception is
+> a doc change that *derives from* an existing OPS/CLL/MAN issue — then keep the
+> normal Linear linkage and closing words. Use the **`chainlayer-docs`** skill
+> for the docs toolchain (templates, markdownlint + retype build, gitleaks,
+> the merge-to-`main` → Pages publish path, and the sensitive-page sign-off gate).
+
 ## Step 1 — confirm the remote is company
 
 ```bash
