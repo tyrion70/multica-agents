@@ -15,5 +15,20 @@
     "multica-sync",
     "private-knowledge",
     "ssh"
-  ]
+  ],
+  "mcp_config": {
+    "mcpServers": {
+      "gdrive": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@piotr-agier/google-drive-mcp"
+        ],
+        "env": {
+          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "#Google Drive \u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#",
+          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "#Google Drive \u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#"
+        }
+      }
+    }
+  }
 }
