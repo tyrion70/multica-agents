@@ -135,6 +135,23 @@ retype watch                                        # optional local preview at 
 Report failures honestly; a red lint/build means the doc isn't ready, not that the
 check is wrong.
 
+> **Retype gotcha — never name a page with a leading underscore.** Retype silently
+> excludes files and folders that start with `_` from the build: a page named
+> `_pipeline-test.md` (or anything under a `_dir/`) **never renders, produces no
+> error, and won't appear on docs.chainlayer.cloud** — `retype build` and CI stay
+> green while the page is simply missing. Name pages without a leading underscore.
+> (`_includes/` uses this on purpose for shared snippets that aren't standalone
+> pages.) If a freshly-added page doesn't show up after publish, check its filename
+> for a leading `_` first.
+
+> **Check CI synchronously, within your turn.** When you gate on the pipeline
+> (the Reviewer/Publisher does), poll its status in-turn — a short sleep-loop on the
+> MR pipeline until it resolves to success/failure — and act on the result before
+> the turn ends. **Never hand off to or wait on a background CI notification:** a
+> Multica turn that ends while "waiting for the pipeline" is over, and the
+> notification never arrives, so the relay stalls. Block in-turn or re-check on the
+> next turn; don't wait on a callback.
+
 ## Publishing = merge to main
 
 There is no separate deploy step or rollback runbook: **merging the MR to `main`
