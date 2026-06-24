@@ -13,9 +13,11 @@ All Multica agent and skill configuration is version-controlled in the **`multic
 multica-agents/
   Chainlayer/            # Chainlayer workspace (0014efc5-f6fb-42bf-9616-4aaeb07ce237)
     skills.json          # skill names owned by Chainlayer
+    agent-ids.json       # identity anchor: agent-dir → Multica UUID (Chainlayer)
     <squad>/<agent>/agent.json
   Private/               # Private workspace (9627be94-0c29-49f7-a104-dff19d11a089)
     skills.json          # skill names owned by Private
+    agent-ids.json       # identity anchor: agent-dir → Multica UUID (Private)
     <squad>/<agent>/agent.json
   skills/
     <name>/SKILL.md      # frontmatter (name, description) + body
@@ -45,6 +47,31 @@ If you make an emergency edit directly in the workspace, the next sync writes it
 
 On first sync (no state file), repo wins.
 
+## Agent identity (why syncs no longer churn UUIDs)
+
+Agents are upserted **by UUID**, never by display name. Each workspace has an
+`agent-ids.json` sidecar mapping the agent's directory path (e.g.
+`_shared/maintainer`) to its Multica UUID. On every run sync:
+
+1. uses the stored UUID if it still resolves to a live agent → `agent update <id>`;
+2. else falls back to a one-time **name match** and adopts that UUID into the
+   sidecar (this re-anchors an identity that previously churned, on the first run
+   after the fix);
+3. else treats the agent as genuinely new and **refuses to create** unless
+   `--allow-create` is given.
+
+Consequences:
+
+- Renaming an agent's `name` updates the **same** agent (the directory key, not the
+  name, is the anchor) — no orphaned squad rosters, mentions, or assignments.
+- A transient or mis-scoped `agent list` can no longer silently re-create an agent
+  with a fresh UUID. Steady-state autopilot runs pass **no** `--allow-create`, so
+  they can only update — never mint.
+- A run is hard-capped at `--max-creates` creates (default 2) even with
+  `--allow-create`, so a mistake can never mass-mint the whole roster.
+
+Commit `agent-ids.json` along with `.sync-state.json` after any run that changes it.
+
 ## Running the sync manually
 
 ```bash
@@ -58,7 +85,13 @@ scripts/sync.sh --type agents               # agents only
 scripts/sync.sh --workspace Chainlayer      # Chainlayer workspace only
 scripts/sync.sh --workspace Private         # Private workspace only
 scripts/sync.sh --dry-run                   # preview without changes
+scripts/sync.sh --workspace Private --allow-create   # permit creating new agents (off by default)
 ```
+
+Creating agents is **off by default**. A steady-state sync only updates existing
+agents; if a repo agent has no identity anchor and no name match, the run reports an
+error rather than minting a UUID. To add a genuinely new agent, run once with
+`--allow-create` (and raise `--max-creates` only for a deliberate bulk bootstrap).
 
 Always use SSH for cloning (consult the `ssh` skill). Never fall back to HTTPS.
 
@@ -80,7 +113,11 @@ Passing `--workspace Chainlayer` or `--workspace Private` automatically sets `MU
 | multica-01 | Private |
 | multica-02 | Chainlayer |
 
-Running `sync.sh` without `--workspace` targets all workspace directories in the repo but uses the host's default workspace ID for CLI calls. Always pass `--workspace` explicitly in autopilots and agents.
+Each workspace directory is scoped to its own UUID (from the script's
+`WORKSPACE_IDS` map) for the duration of its sync — `agent list`/`create`/`update`
+always target that workspace, never the host default. A run still **refuses** to
+sync agents for a directory whose name isn't a known workspace. The two production
+autopilots each pass `--workspace <slug>` explicitly anyway (one per workspace).
 
 ## Autopilots
 
@@ -123,7 +160,11 @@ When both sides change independently, the script exits 2 and prints a JSON confl
 
 1. Create `<workspace>/<squad>/<agent-slug>/agent.json` (see `schemas/agent.json`).
 2. Optionally add the agent to the squad's `squad.json` members list.
-3. Open a PR. Merge triggers the agent sync autopilot.
+3. Open a PR. After merge, create it with one deliberate run:
+   `scripts/sync.sh --workspace <ws> --allow-create`. The run writes the new UUID
+   into `<workspace>/agent-ids.json`; commit that file so later steady-state syncs
+   upsert the agent by id. (The scheduled autopilot does **not** pass
+   `--allow-create`, so it will not create the agent on its own.)
 
 ## SSH access
 

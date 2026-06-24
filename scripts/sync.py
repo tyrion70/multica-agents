@@ -56,7 +56,22 @@ REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 SCHEMA_PATH = REPO_ROOT / "schemas" / "agent.json"
 SKILLS_DIR = REPO_ROOT / "skills"
 DEFAULT_STATE_PATH = REPO_ROOT / ".sync-state.json"
-SKIP_DIRS = {"schemas", "scripts", ".git", "skills"}
+SKIP_DIRS = {"schemas", "scripts", ".git", "skills", "claude-config"}
+
+# Per-workspace agent UUID sidecar. Maps a stable, rename-proof key (the agent's
+# directory path relative to the workspace dir, e.g. "_shared/maintainer" or
+# "chainlayer-squad-claude/issue-coder") to the Multica agent UUID. Stored per
+# workspace because the same agent name (e.g. "Private Maintainer") resolves to a
+# different UUID in each workspace, so a single id field in agent.json won't do.
+# This is the identity anchor: as long as the directory exists, sync upserts the
+# same agent by id and never mints a fresh UUID on a name-lookup miss.
+AGENT_IDS_FILENAME = "agent-ids.json"
+
+# Default cap on how many agents a single run may create. A run that should be a
+# no-op never creates anything (creates require --allow-create); this is a second
+# safety net so a mis-scoped agent list can never mass-mint agents. Raise it with
+# --max-creates for a deliberate bulk bootstrap.
+DEFAULT_MAX_CREATES = 2
 
 MULTICA = os.environ.get("MULTICA", "multica")
 
@@ -217,6 +232,82 @@ def save_sync_state(state_path: pathlib.Path, state: Dict[str, Any]) -> None:
     with open(state_path, "w") as f:
         json.dump(state, f, indent=2, ensure_ascii=False)
         f.write("\n")
+
+
+# ---------------------------------------------------------------------------
+# Per-workspace agent UUID sidecar (the identity anchor — Option A)
+# ---------------------------------------------------------------------------
+
+def agent_ids_path(workspace_dir: pathlib.Path) -> pathlib.Path:
+    return workspace_dir / AGENT_IDS_FILENAME
+
+
+def load_agent_ids(workspace_dir: pathlib.Path) -> Dict[str, str]:
+    path = agent_ids_path(workspace_dir)
+    if not path.is_file():
+        return {}
+    try:
+        with open(path) as f:
+            data = json.load(f)
+        if isinstance(data, dict):
+            return {str(k): str(v) for k, v in data.items() if v}
+    except Exception as e:
+        print(f"WARNING: could not read {path}: {e}", file=sys.stderr)
+    return {}
+
+
+def save_agent_ids(workspace_dir: pathlib.Path, id_map: Dict[str, str], dry_run: bool) -> None:
+    path = agent_ids_path(workspace_dir)
+    if dry_run:
+        print(f"      [DRY-RUN] would write {path.relative_to(REPO_ROOT)}", file=sys.stderr)
+        return
+    with open(path, "w") as f:
+        json.dump(dict(sorted(id_map.items())), f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+
+def agent_key(agent_dir: pathlib.Path, workspace_dir: pathlib.Path) -> str:
+    """Stable, rename-proof identity key: the agent directory relative to its
+    workspace dir, as a POSIX path (e.g. '_shared/maintainer')."""
+    return agent_dir.relative_to(workspace_dir).as_posix()
+
+
+class CreateBudgetExceeded(RuntimeError):
+    """Raised to abort the whole run when the number of would-be creates exceeds
+    the configured threshold — the mass-mint safety net."""
+
+
+class CreateGuard:
+    """Gatekeeps agent creation. Creation requires an explicit opt-in
+    (--allow-create); even then it is capped at max_creates per run so a
+    mis-scoped agent list can never mass-mint agents."""
+
+    def __init__(self, allow_create: bool, max_creates: int):
+        self.allow_create = allow_create
+        self.max_creates = max_creates
+        self.used = 0
+
+    def authorize(self, label: str) -> None:
+        """Raise if a create is not permitted. Call immediately before creating.
+
+        - No --allow-create  → refuse (no silent mint on a name-lookup miss).
+        - Over the threshold → abort the entire run (mass-mint guard).
+        """
+        if not self.allow_create:
+            raise PermissionError(
+                f"refusing to create '{label}': identity anchor missing and "
+                f"--allow-create not set (no silent agent creation)"
+            )
+        if self.used >= self.max_creates:
+            raise CreateBudgetExceeded(
+                f"create threshold exceeded while creating '{label}': "
+                f"{self.used + 1} creates requested, limit is {self.max_creates}. "
+                f"Aborting to avoid mass-minting agents (raise --max-creates for a "
+                f"deliberate bulk bootstrap)."
+            )
+
+    def record(self) -> None:
+        self.used += 1
 
 
 # ---------------------------------------------------------------------------
@@ -479,6 +570,8 @@ def sync_agents_workspace(
     live_agents: Dict[str, Dict[str, Any]],
     skill_map: Dict[str, str],
     state: Dict[str, Any],
+    id_map: Dict[str, str],
+    create_guard: CreateGuard,
     dry_run: bool,
 ) -> Tuple[Dict[str, int], List[Dict[str, Any]]]:
     workspace_name = workspace_dir.name
@@ -487,8 +580,14 @@ def sync_agents_workspace(
     counts: Dict[str, int] = defaultdict(int)
     conflicts: List[Dict[str, Any]] = []
     state_agents = state.setdefault("agents", {})
+    live_by_id = {a["id"]: a for a in live_agents.values()}
 
     known_agent_names: set = set()
+    # Live agent UUIDs already consumed by a repo file (matched by id-anchor or by
+    # name). The discovery phase skips these so a renamed agent — whose live name
+    # still differs from the repo until it's updated — isn't re-processed as a
+    # phantom orphan under its stale name.
+    handled_ids: set = set()
 
     for squad_dir in sorted(workspace_dir.iterdir()):
         if not squad_dir.is_dir() or squad_dir.name.startswith("."):
@@ -517,8 +616,32 @@ def sync_agents_workspace(
                 continue
 
             known_agent_names.add(agent_name)
+            key = agent_key(agent_dir, workspace_dir)
 
-            live_agent = live_agents.get(agent_name)
+            # --- Identity resolution (Option A: anchor on the per-workspace id map) ---
+            # 1. Stored UUID that still resolves to a live agent → the anchor.
+            # 2. Otherwise fall back to a name match and ADOPT its UUID into the
+            #    id map (one-time re-anchor / self-heal of a churned identity).
+            # 3. Otherwise the agent is genuinely absent → a create (guarded).
+            live_agent: Optional[Dict[str, Any]] = None
+            stored_id = id_map.get(key)
+            if stored_id and stored_id in live_by_id:
+                live_agent = live_by_id[stored_id]
+            else:
+                by_name = live_agents.get(agent_name)
+                if by_name is not None:
+                    live_agent = by_name
+                    if id_map.get(key) != by_name["id"]:
+                        print(
+                            f"    ⚑ anchoring id map: {key} → {by_name['id']}"
+                            + (" (re-anchored)" if stored_id else ""),
+                            file=sys.stderr,
+                        )
+                        id_map[key] = by_name["id"]
+
+            if live_agent is not None:
+                handled_ids.add(live_agent["id"])
+
             state_key = f"{workspace_name}~{agent_name}"
             last = state_agents.get(state_key)
             repo_norm = normalize_agent(repo_data)
@@ -541,13 +664,27 @@ def sync_agents_workspace(
                 try:
                     mcp_args = ["--mcp-config-file", mcp_file] if mcp_file else []
                     if live_agent is None:
+                        # No identity anchor and no name match → genuine create.
+                        # Gated by CreateGuard so a name-lookup miss can never
+                        # silently mint a fresh UUID (AC5 / mass-mint guard).
+                        try:
+                            create_guard.authorize(f"{workspace_name}/{key}")
+                        except CreateBudgetExceeded:
+                            raise
+                        except PermissionError as e:
+                            print(f"    ✗ NOT CREATING: {e}", file=sys.stderr)
+                            counts["errors"] += 1
+                            continue
                         print(f"    → creating in Multica", file=sys.stderr)
                         try:
                             if not dry_run:
                                 result = _multica(["agent", "create"] + build_create_args(repo_data) + mcp_args)
                                 agent_id = result["id"]
+                                id_map[key] = agent_id
+                                print(f"    ✓ created (id={agent_id}) — anchored {key}", file=sys.stderr)
                             else:
                                 _multica(["agent", "create"] + build_create_args(repo_data) + mcp_args, dry_run=True)
+                            create_guard.record()
                             counts["created"] += 1
                         except Exception as e:
                             print(f"    ✗ CREATE FAILED: {e}", file=sys.stderr)
@@ -614,6 +751,9 @@ def sync_agents_workspace(
     for live_name, live_agent in sorted(live_agents.items()):
         if live_name in known_agent_names:
             continue
+        if live_agent.get("id") in handled_ids:
+            # Already upserted via a repo file (e.g. matched by id after a rename).
+            continue
 
         state_key = f"{workspace_name}~{live_name}"
         last = state_agents.get(state_key)
@@ -668,6 +808,10 @@ def sync_agents_workspace(
                 print(f"    ✗ REPO WRITE FAILED: {e}", file=sys.stderr)
                 counts["errors"] += 1
                 continue
+
+            # Anchor the freshly written agent so future runs upsert it by id.
+            if agent_id:
+                id_map[agent_key(agent_dir, workspace_dir)] = agent_id
 
             state_agents[state_key] = {
                 "repo_file": str(rel_path),
@@ -1017,22 +1161,24 @@ def main() -> None:
         default=str(DEFAULT_STATE_PATH),
         help=f"Path to the sync-state snapshot file (default: {DEFAULT_STATE_PATH})",
     )
+    parser.add_argument(
+        "--allow-create",
+        action="store_true",
+        help="Permit creating new agents. Without this, a repo agent with no "
+             "live identity anchor is reported as an error instead of being "
+             "minted (prevents silent re-creation on a name-lookup miss).",
+    )
+    parser.add_argument(
+        "--max-creates",
+        type=int,
+        default=DEFAULT_MAX_CREATES,
+        help=f"Abort the run if creates exceed this threshold, even with "
+             f"--allow-create (mass-mint safety net; default {DEFAULT_MAX_CREATES}). "
+             f"Raise it for a deliberate bulk bootstrap.",
+    )
     args = parser.parse_args()
 
-    # Resolve workspace slug to UUID and forward as --workspace-id to every
-    # multica CLI call via the module-level _workspace_id variable.
     global _workspace_id
-    if args.workspace:
-        workspace_id = WORKSPACE_IDS.get(args.workspace)
-        if workspace_id:
-            _workspace_id = workspace_id
-            print(f"==> Workspace: {args.workspace} ({workspace_id})", file=sys.stderr)
-        else:
-            print(
-                f"WARNING: workspace '{args.workspace}' not in WORKSPACE_IDS — "
-                f"multica will use the host default workspace. Known slugs: {list(WORKSPACE_IDS)}",
-                file=sys.stderr,
-            )
 
     state_path = pathlib.Path(args.sync_state)
     sync_agents = args.type in ("agents", "all")
@@ -1043,21 +1189,6 @@ def main() -> None:
 
     print(f"==> Loading sync state from {state_path}", file=sys.stderr)
     state = load_sync_state(state_path)
-
-    live_agents: Dict[str, Dict[str, Any]] = {}
-    skill_map: Dict[str, str] = {}
-    live_skills_detail: Dict[str, Dict[str, Any]] = {}
-
-    if sync_agents:
-        print("==> Fetching live agents from Multica", file=sys.stderr)
-        live_agents = fetch_live_agents(args.dry_run)
-        print("==> Fetching skill catalog from Multica", file=sys.stderr)
-        skill_map = fetch_live_agent_skills(args.dry_run)
-
-    if sync_skills:
-        print("==> Fetching live skills from Multica", file=sys.stderr)
-        skills_list = _multica(["skill", "list"], dry_run=False)
-        live_skills_detail = {s["name"]: s for s in skills_list}
 
     if args.workspace:
         ws_dir = REPO_ROOT / args.workspace
@@ -1072,25 +1203,58 @@ def main() -> None:
         print("No workspace directories found.", file=sys.stderr)
         sys.exit(0)
 
+    create_guard = CreateGuard(args.allow_create, args.max_creates)
     totals: Dict[str, int] = defaultdict(int)
     all_conflicts: List[Dict[str, Any]] = []
+    aborted: Optional[str] = None
 
-    for ws in workspaces:
-        if sync_agents:
-            counts, conflicts = sync_agents_workspace(
-                ws, schema, live_agents, skill_map, state, args.dry_run
-            )
-            for k, v in counts.items():
-                totals[k] += v
-            all_conflicts.extend(conflicts)
+    try:
+        for ws in workspaces:
+            # Resolve and pin this workspace's UUID for the duration of its sync,
+            # so every list/create/update CLI call is scoped to the same
+            # workspace — never relying on the host default or the invocation
+            # mode for correctness.
+            ws_id = WORKSPACE_IDS.get(ws.name)
+            _workspace_id = ws_id
 
-        if sync_skills:
-            counts, conflicts = sync_skills_workspace(
-                ws, live_skills_detail, state, args.dry_run
-            )
-            for k, v in counts.items():
-                totals[k] += v
-            all_conflicts.extend(conflicts)
+            if sync_agents:
+                if ws_id is None:
+                    print(
+                        f"\n── Agents: {ws.name} ──\n"
+                        f"  ✗ unknown workspace '{ws.name}' (not in WORKSPACE_IDS) — "
+                        f"refusing to sync agents (cannot scope safely). Known: {list(WORKSPACE_IDS)}",
+                        file=sys.stderr,
+                    )
+                    totals["errors"] += 1
+                else:
+                    print(f"\n==> Workspace: {ws.name} ({ws_id})", file=sys.stderr)
+                    print(f"==> Fetching live agents (scoped to {ws.name})", file=sys.stderr)
+                    live_agents = fetch_live_agents(args.dry_run)
+                    skill_map = fetch_live_agent_skills(args.dry_run)
+                    id_map = load_agent_ids(ws)
+
+                    counts, conflicts = sync_agents_workspace(
+                        ws, schema, live_agents, skill_map, state, id_map,
+                        create_guard, args.dry_run,
+                    )
+                    save_agent_ids(ws, id_map, args.dry_run)
+                    for k, v in counts.items():
+                        totals[k] += v
+                    all_conflicts.extend(conflicts)
+
+            if sync_skills:
+                live_skills_detail = {
+                    s["name"]: s for s in _multica(["skill", "list"], dry_run=False)
+                }
+                counts, conflicts = sync_skills_workspace(
+                    ws, live_skills_detail, state, args.dry_run
+                )
+                for k, v in counts.items():
+                    totals[k] += v
+                all_conflicts.extend(conflicts)
+    except CreateBudgetExceeded as e:
+        aborted = str(e)
+        print(f"\n✗ ABORTED: {e}", file=sys.stderr)
 
     mode = "DRY-RUN" if args.dry_run else "SYNC"
     print(f"\n==> {mode} COMPLETE", file=sys.stderr)
@@ -1100,6 +1264,14 @@ def main() -> None:
         f"unchanged={totals['unchanged']} conflicts={totals['conflicts']} errors={totals['errors']}",
         file=sys.stderr,
     )
+
+    if aborted:
+        print(
+            "==> Run aborted before completion — sync state NOT saved. "
+            "Fix the cause (likely a mis-scoped agent list) and re-run.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     if not args.dry_run:
         save_sync_state(state_path, state)

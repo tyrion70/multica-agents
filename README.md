@@ -8,6 +8,7 @@ Version-controlled agent configuration for Multica workspaces.
 multica-agents/
   <workspace-slug>/           # "Chainlayer", "Private", etc.
     skills.json               # list of skill names owned by this workspace
+    agent-ids.json            # identity anchor: agent-dir → Multica UUID (per workspace)
     <squad>/                  # e.g. "chainlayer-squad-deepseek"
       squad.json              # optional squad-level config
       <agent-slug>/           # e.g. "tech-lead"
@@ -51,7 +52,11 @@ Example:
 1. Create the folder: `<workspace>/<squad>/<agent-slug>/`
 2. Add `agent.json` conforming to `schemas/agent.json`
 3. Open a PR to this repo
-4. Merge triggers the sync autopilot (or run `scripts/sync.sh` manually)
+4. Merge triggers the sync autopilot. Because creating agents is off by default,
+   a brand-new agent must be created with one deliberate run:
+   `scripts/sync.sh --workspace <ws> --allow-create`. The run records the new
+   UUID into `<workspace>/agent-ids.json` — commit it so steady-state syncs
+   upsert the agent by id from then on.
 
 ### Adding a new squad
 
@@ -72,14 +77,32 @@ Example:
 
 On the **first sync** (no state file), repo wins.
 
-After a pull-to-repo run, the autopilot must commit and push the updated files and `.sync-state.json`.
+After a pull-to-repo run, the autopilot must commit and push the updated files, `.sync-state.json`, and any updated `<workspace>/agent-ids.json`.
+
+### Agent identity is anchored, not name-matched
+
+Each agent is upserted **by UUID**, never by display name. The UUID lives in a
+per-workspace `<workspace>/agent-ids.json` sidecar keyed by the agent's directory
+path (e.g. `_shared/maintainer`). On every run sync:
+
+1. uses the stored UUID if it still resolves to a live agent (`agent update <id>`);
+2. otherwise falls back to a one-time **name match** and adopts that UUID into the
+   sidecar (re-anchoring an identity that previously churned);
+3. otherwise treats the agent as genuinely new — and **refuses to create it**
+   unless `--allow-create` is passed.
+
+This is why renaming an agent's `name` updates the same agent instead of minting a
+new UUID, and why a transient/mis-scoped `agent list` can no longer orphan squads,
+mentions, and assignments by silently re-creating agents.
 
 **Flags:**
 ```
 scripts/sync.sh --type agents|skills|all   # default: all
-scripts/sync.sh --workspace Chainlayer     # one workspace; sets MULTICA_WORKSPACE_ID automatically
+scripts/sync.sh --workspace Chainlayer     # one workspace; scopes every CLI call to its UUID
 scripts/sync.sh --workspace Private        # Private workspace (9627be94-...)
 scripts/sync.sh --dry-run                  # print what would happen
+scripts/sync.sh --allow-create             # permit creating new agents (off by default)
+scripts/sync.sh --max-creates N            # abort if creates exceed N (default 2; mass-mint guard)
 ```
 
 Always clone the repo via SSH — never use `multica repo checkout`:

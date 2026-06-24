@@ -1,0 +1,21 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  sync-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: pip install jsonschema pytest
+      - name: Run sync regression tests
+        # Encodes the AC1 identity invariant: a double-run never mints a fresh
+        # UUID, plus rename-survival, no-silent-create, and the mass-mint guard.
+        run: python3 -m pytest scripts/test_sync.py -v
