@@ -503,6 +503,108 @@ def _write_mcp_config_tempfile(agent_data: Dict[str, Any]) -> Optional[str]:
     return path
 
 
+def _get_mcp_server_keys(mcp_config: Any) -> Optional[set]:
+    """Extract the set of MCP server names from an mcp_config value.
+
+    The mcp_config may be a dict, a JSON string (from normalization), or None.
+    Returns None if there's no meaningful MCP config (e.g. both null/missing).
+    """
+    if mcp_config is None:
+        return None
+    if isinstance(mcp_config, str):
+        try:
+            mcp_config = json.loads(mcp_config)
+        except (json.JSONDecodeError, TypeError):
+            return None
+    if isinstance(mcp_config, dict):
+        servers = mcp_config.get("mcpServers")
+        if isinstance(servers, dict):
+            return set(servers.keys())
+        return set()
+    return None
+
+
+def _try_reconcile_agent_conflict(
+    repo_norm: Dict[str, Any],
+    multica_norm: Dict[str, Any],
+) -> Optional[Dict[str, Any]]:
+    """Try to reconcile a both-sides-changed agent conflict.
+
+    For MCP configs, compares the server *structure* (which MCP servers exist)
+    rather than resolved vs placeholder token values.
+
+    For skills, merges both side's lists (union).
+
+    Returns the merged normalized state if reconcilable, or None if the
+    conflict is genuine (non-MCP/non-skills fields diverged, or MCP server
+    sets differ).
+    """
+    # If any non-MCP/non-skills fields differ, it's a genuine conflict
+    structural_fields = set(COMPARABLE_FIELDS) - {"skills", "mcp_config"}
+    for field in structural_fields:
+        if repo_norm.get(field) != multica_norm.get(field):
+            return None
+
+    # MCP config: compare server keys only (ignore placeholder vs resolved)
+    repo_servers = _get_mcp_server_keys(repo_norm.get("mcp_config"))
+    multica_servers = _get_mcp_server_keys(multica_norm.get("mcp_config"))
+
+    if repo_servers is not None and multica_servers is not None:
+        if repo_servers != multica_servers:
+            return None
+    elif repo_servers != multica_servers:
+        # One side has servers, the other doesn't
+        return None
+
+    # Merge: start from repo norm, override skills (union)
+    merged = dict(repo_norm)
+    merged["skills"] = sorted(
+        set(repo_norm.get("skills") or []) |
+        set(multica_norm.get("skills") or [])
+    )
+    return merged
+
+
+def _apply_reconciled_to_repo_data(
+    repo_data: Dict[str, Any],
+    reconciled: Dict[str, Any],
+) -> Dict[str, Any]:
+    """Apply the reconciled state to repo_data for pushing to Multica.
+
+    Merges skills, keeps other fields and MCP config from repo_data.
+    """
+    result = dict(repo_data)
+    result["skills"] = reconciled.get("skills", [])
+    return result
+
+
+def _write_reconciled_agent_json(
+    agent_json_path: pathlib.Path,
+    reconciled: Dict[str, Any],
+    repo_data: Dict[str, Any],
+    dry_run: bool,
+) -> None:
+    """Write the reconciled state to the repo agent.json.
+
+    Merges skills from the reconciled state, keeps MCP config from the
+    existing repo file (preserving placeholder tokens).
+    """
+    existing: Optional[Dict[str, Any]] = None
+    if agent_json_path.is_file():
+        with open(agent_json_path) as f:
+            existing = json.load(f)
+
+    new_data = dict(existing or repo_data)
+    new_data["skills"] = reconciled.get("skills", [])
+
+    if dry_run:
+        print(f"      [DRY-RUN] would write {agent_json_path}", file=sys.stderr)
+        return
+    with open(agent_json_path, "w") as f:
+        json.dump(new_data, f, indent=2, ensure_ascii=False)
+        f.write("\n")
+
+
 # ---------------------------------------------------------------------------
 # Direction detection (shared by agents and skills)
 # ---------------------------------------------------------------------------
@@ -759,17 +861,61 @@ def sync_agents_workspace(
                 }
 
             elif action == "conflict":
-                print(f"    ✗ CONFLICT: both sides changed", file=sys.stderr)
-                conflicts.append({
-                    "type": "agent",
-                    "name": agent_name,
-                    "repo_file": str(rel_path),
-                    "repo_state": repo_norm,
-                    "multica_state": multica_norm,
-                    "last_synced_repo": last.get("repo_state") if last else None,
-                    "last_synced_multica": last.get("multica_state") if last else None,
-                })
-                counts["conflicts"] += 1
+                reconciled = _try_reconcile_agent_conflict(repo_norm, multica_norm)
+                if reconciled is not None:
+                    print(f"    → reconciling: merging both sides' changes", file=sys.stderr)
+                    # 1. Push merged state to Multica
+                    merged_repo_data = _apply_reconciled_to_repo_data(repo_data, reconciled)
+                    mcp_file = _write_mcp_config_tempfile(merged_repo_data)
+                    try:
+                        mcp_args = ["--mcp-config-file", mcp_file] if mcp_file else []
+                        _multica(
+                            ["agent", "update"] + build_update_args(agent_id, merged_repo_data) + mcp_args,
+                            dry_run=dry_run,
+                        )
+                        counts["updated"] += 1
+                    except Exception as e:
+                        print(f"    ✗ MULTICA UPDATE FAILED: {e}", file=sys.stderr)
+                        counts["errors"] += 1
+                        continue
+                    finally:
+                        if mcp_file:
+                            os.unlink(mcp_file)
+
+                    desired_skills = reconciled.get("skills") or []
+                    if desired_skills and agent_id:
+                        try:
+                            ensure_agent_skills(agent_id, desired_skills, skill_map, dry_run)
+                        except Exception as e:
+                            print(f"    ✗ SKILLS FAILED: {e}", file=sys.stderr)
+                            counts["errors"] += 1
+
+                    # 2. Write merged state to repo
+                    try:
+                        _write_reconciled_agent_json(agent_json_path, reconciled, repo_data, dry_run)
+                        counts["repo_updated"] += 1
+                    except Exception as e:
+                        print(f"    ✗ REPO WRITE FAILED: {e}", file=sys.stderr)
+                        counts["errors"] += 1
+                        continue
+
+                    state_agents[state_key] = {
+                        "repo_file": str(rel_path),
+                        "repo_state": reconciled,
+                        "multica_state": reconciled,
+                    }
+                else:
+                    print(f"    ✗ CONFLICT: both sides changed irreconcilably", file=sys.stderr)
+                    conflicts.append({
+                        "type": "agent",
+                        "name": agent_name,
+                        "repo_file": str(rel_path),
+                        "repo_state": repo_norm,
+                        "multica_state": multica_norm,
+                        "last_synced_repo": last.get("repo_state") if last else None,
+                        "last_synced_multica": last.get("multica_state") if last else None,
+                    })
+                    counts["conflicts"] += 1
 
     # --- Discovery phase: Multica agents not in the repo ---
     agent_squad_map: Optional[Dict[str, str]] = None
