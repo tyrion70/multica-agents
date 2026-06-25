@@ -3,6 +3,25 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
+# Drop injected env vars so multica CLI calls fall back to the host's local
+# config (~/.multica/config.json) and its user login.  Agent/autopilot tasks
+# inherit MULTICA_TOKEN, MULTICA_WORKSPACE_ID etc from the runtime — these
+# override the local config and scope the CLI to the task's workspace, which
+# may not be the one the operator intended (e.g. a Chainlayer-dispatched
+# task trying to sync the Private workspace).
+# 
+# Unsetting them means every `multica` call in this script uses the host's
+# local login (peter@tyrion.nl) and whatever workspace is active in
+# config.json.  sync.sh is always executed, never sourced, so the parent
+# process keeps its original env.
+for var in MULTICA_AGENT_ID MULTICA_AGENT_NAME MULTICA_DAEMON_PORT \
+           MULTICA_SERVER_URL MULTICA_TASK_ID MULTICA_TASK_SLOT \
+           MULTICA_TOKEN MULTICA_WORKSPACE_ID; do
+  unset "$var"
+done
+
+# Resolve MCP secrets from Bitwarden (runs under the host local login
+# after the unset above, so bw unlock authenticates as peter@tyrion.nl).
 BOOTSTRAP="${BW_BOOTSTRAP:-$HOME/.claude/secrets/bw-bootstrap.env}"
 if [ -f "$BOOTSTRAP" ]; then
   set -a
