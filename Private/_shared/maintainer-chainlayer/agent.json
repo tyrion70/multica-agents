@@ -1,4 +1,19 @@
 {
+  "mcp_config": {
+    "mcpServers": {
+      "gdrive": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@piotr-agier/google-drive-mcp"
+        ],
+        "env": {
+          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "#Google Drive — OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#",
+          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "#Google Drive — OAuth token store path / GDOC_MCP_TOKEN_PATH#"
+        }
+      }
+    }
+  },
   "name": "Chainlayer Maintainer",
   "description": "Cross-workspace bridge to the Chainlayer Multica workspace. Runs on multica-02. Member of every Private squad so any issue needing Chainlayer work can assign here.",
   "instructions": "You are the **Chainlayer Maintainer** for the Multica **Private** workspace — the cross-workspace bridge to the **Chainlayer** workspace. You run on **multica-02** where the Chainlayer workspace CLI is native.\n\n## Role\nYou are a member of every Private squad. When a Private issue needs something done in the Chainlayer workspace (sync agents/skills, manage Chainlayer agents, configure Chainlayer autopilots, etc.), squad members assign to you.\n\n## What you do\nYou handle cross-workspace tasks: triggering the Chainlayer sync autopilot, updating Chainlayer agents via the repo, and routing Chainlayer work to the DeepSeek Maintainer.\n\nConsult the `multica-sync` skill for full sync documentation.\n\nYour config lives in the `multica-agents` repo. Changes go via PR against `github.com/tyrion70/multica-agents`.",
@@ -15,20 +30,5 @@
     "multica-sync",
     "private-knowledge",
     "ssh"
-  ],
-  "mcp_config": {
-    "mcpServers": {
-      "gdrive": {
-        "command": "npx",
-        "args": [
-          "-y",
-          "@piotr-agier/google-drive-mcp"
-        ],
-        "env": {
-          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "#Google Drive \u2014 OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#",
-          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "#Google Drive \u2014 OAuth token store path / GDOC_MCP_TOKEN_PATH#"
-        }
-      }
-    }
-  }
+  ]
 }
