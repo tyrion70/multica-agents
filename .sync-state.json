@@ -21,7 +21,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Private Maintainer",
@@ -41,7 +41,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Chainlayer Maintainer": {
@@ -64,7 +64,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Chainlayer Maintainer",
@@ -84,7 +84,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Cancer Game Artist": {
@@ -109,7 +109,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Cancer Game Artist",
@@ -131,7 +131,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Cancer Game Coder": {
@@ -156,7 +156,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Cancer Game Coder",
@@ -178,7 +178,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Cancer Game Evidence Reviewer": {
@@ -202,7 +202,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Cancer Game Evidence Reviewer",
@@ -223,7 +223,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Cancer Game Lead": {
@@ -248,7 +248,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Cancer Game Lead",
@@ -270,7 +270,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Cancer Game Refiner": {
@@ -293,7 +293,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Cancer Game Refiner",
@@ -313,7 +313,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Cancer Game Maintainer": {
@@ -336,7 +336,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Cancer Game Maintainer",
@@ -356,7 +356,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~ChatGPT CF/HAProxy Expert": {
@@ -1454,7 +1454,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "DeepSeek Game Dev Deployer",
@@ -1473,7 +1473,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~DeepSeek Infrastructure Agent": {
@@ -1496,7 +1496,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "DeepSeek Infrastructure Agent",
@@ -1516,7 +1516,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~DeepSeek Game Dev Artist": {
@@ -1557,7 +1557,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "DeepSeek Game Dev Coder",
@@ -1574,7 +1574,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~DeepSeek Game Dev Designer": {
@@ -1594,7 +1594,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "DeepSeek Game Dev Designer",
@@ -1611,7 +1611,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~DeepSeek Game Dev Lead": {
@@ -1631,7 +1631,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "DeepSeek Game Dev Lead",
@@ -1648,7 +1648,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~DeepSeek Game Dev QA": {
@@ -1668,7 +1668,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "DeepSeek Game Dev QA",
@@ -1685,7 +1685,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~DeepSeek Game Dev Refiner": {
@@ -1705,7 +1705,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "DeepSeek Game Dev Refiner",
@@ -1722,7 +1722,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~DeepSeek Game Dev Maintainer": {
@@ -1769,7 +1769,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Eryndal Art Director",
@@ -1789,7 +1789,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Eryndal Audiobook Producer": {
@@ -1811,7 +1811,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Eryndal Audiobook Producer",
@@ -1830,7 +1830,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Eryndal Card Designer": {
@@ -1853,7 +1853,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Eryndal Card Designer",
@@ -1873,7 +1873,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Eryndal Chapter Writer": {
@@ -1896,7 +1896,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Eryndal Chapter Writer",
@@ -1916,7 +1916,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Eryndal Loremaster": {
@@ -1938,7 +1938,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Eryndal Loremaster",
@@ -1957,7 +1957,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Eryndal Showrunner": {
@@ -1977,7 +1977,7 @@
           "eryndal-lore",
           "eryndal-universe"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Eryndal Showrunner",
@@ -1994,7 +1994,7 @@
           "eryndal-lore",
           "eryndal-universe"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Eryndal Social Producer": {
@@ -2017,7 +2017,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Eryndal Social Producer",
@@ -2037,7 +2037,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Eryndal Story Editor": {
@@ -2060,7 +2060,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Eryndal Story Editor",
@@ -2080,7 +2080,7 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Eryndal Maintainer": {
@@ -2103,7 +2103,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Eryndal Maintainer",
@@ -2123,7 +2123,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Home Assistant Helper": {
@@ -2146,7 +2146,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Home Assistant Helper",
@@ -2166,7 +2166,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Homeassistant Maintainer": {
@@ -2189,7 +2189,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Homeassistant Maintainer",
@@ -2209,7 +2209,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Millionaire Builder": {
@@ -2231,7 +2231,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Millionaire Builder",
@@ -2250,7 +2250,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Millionaire Scout": {
@@ -2271,7 +2271,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Millionaire Scout",
@@ -2289,7 +2289,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Tremor Maintainer": {
@@ -2312,7 +2312,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Tremor Maintainer",
@@ -2332,7 +2332,7 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Tremor Coder": {
@@ -2356,7 +2356,7 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Tremor Coder",
@@ -2377,7 +2377,7 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Tremor Deployer": {
@@ -2401,7 +2401,7 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Tremor Deployer",
@@ -2422,7 +2422,7 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Tremor QA": {
@@ -2445,7 +2445,7 @@
           "tremor",
           "tremor-testing"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Tremor QA",
@@ -2465,7 +2465,7 @@
           "tremor",
           "tremor-testing"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Tremor Refiner": {
@@ -2486,7 +2486,7 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Tremor Refiner",
@@ -2504,7 +2504,7 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Private~Tremor Tech Lead": {
@@ -2527,7 +2527,7 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       },
       "multica_state": {
         "name": "Tremor Tech Lead",
@@ -2547,7 +2547,7 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": null
+        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
       }
     },
     "Chainlayer~Chainlayer Maintainer": {
