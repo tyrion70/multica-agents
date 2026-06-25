@@ -32,8 +32,14 @@ if [ $rc -eq 0 ]; then
     esac
     if [ -n "$md" ] && [ -f "$REPO_ROOT/$md" ]; then
       mkdir -p "$HOME/.claude"
-      ln -sf "$REPO_ROOT/$md" "$HOME/.claude/CLAUDE.md"
-      echo "  → symlinked ~/.claude/CLAUDE.md → $REPO_ROOT/$md"
+      # Copy, don't symlink: the repo checkout lives in an ephemeral Multica
+      # workdir, so a symlink into it dangles once that workdir is reaped.
+      # rm -f first so we replace any pre-existing symlink (from older runs)
+      # with a regular file — otherwise cp would follow it and write through to
+      # the symlink's (now-stale) target instead. Last sync wins.
+      rm -f "$HOME/.claude/CLAUDE.md"
+      cp "$REPO_ROOT/$md" "$HOME/.claude/CLAUDE.md"
+      echo "  → copied ~/.claude/CLAUDE.md ← $REPO_ROOT/$md"
     fi
   fi
 fi
