@@ -3,14 +3,14 @@
     "mcpServers": {
       "incidentio": {
         "headers": {
-          "Authorization": "Bearer #ChainLayer · incident.io — API key / INCIDENT_IO_API_KEY#"
+          "Authorization": "Bearer #ChainLayer · incident.io — API key#"
         },
         "type": "http",
         "url": "https://mcp.incident.io/mcp"
       },
       "linear": {
         "headers": {
-          "Authorization": "Bearer #ChainLayer · Linear — API key / LINEAR_API_KEY#"
+          "Authorization": "Bearer #ChainLayer · Linear — API key#"
         },
         "type": "http",
         "url": "https://mcp.linear.app/mcp"
@@ -25,7 +25,7 @@
         "env": {
           "SLACK_MCP_ADD_MESSAGE_TOOL": "true",
           "SLACK_MCP_REACTION_TOOL": "true",
-          "SLACK_MCP_XOXP_TOKEN": "#ChainLayer · Slack — personal token (xoxp) / SLACK_MCP_XOXP_TOKEN#"
+          "SLACK_MCP_XOXP_TOKEN": "#ChainLayer · Slack — personal token (xoxp)#"
         }
       },
       "gdrive": {
@@ -35,8 +35,8 @@
           "@piotr-agier/google-drive-mcp"
         ],
         "env": {
-          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "#Google Drive — OAuth client credentials file (JSON) / GDOC_MCP_OAUTH_CREDENTIALS_PATH#",
-          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "#Google Drive — OAuth token store path / GDOC_MCP_TOKEN_PATH#"
+          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json",
+          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "/home/peter/.config/google-drive-mcp/tokens.json"
         }
       }
     }

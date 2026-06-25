@@ -3,12 +3,18 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
-ENV_FILE="${MCP_SECRETS_ENV:-/etc/multica/mcp-secrets.env}"
-if [ -f "$ENV_FILE" ]; then
+BOOTSTRAP="${BW_BOOTSTRAP:-$HOME/.claude/secrets/bw-bootstrap.env}"
+if [ -f "$BOOTSTRAP" ]; then
   set -a
   # shellcheck disable=SC1090
-  source "$ENV_FILE"
+  source "$BOOTSTRAP"
   set +a
+  export NODE_TLS_REJECT_UNAUTHORIZED=0
+  if BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw 2>/dev/null)"; then
+    export BW_SESSION
+  else
+    echo "  WARNING: bw unlock failed — mcp placeholders will not be resolved" >&2
+  fi
 fi
 
 python3 "$SCRIPT_DIR/sync.py" "$@"

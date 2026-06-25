@@ -442,13 +442,39 @@ def build_update_args(agent_id: str, agent_data: Dict[str, Any]) -> List[str]:
     return args
 
 
-_PLACEHOLDER_RE = re.compile(r"#[^#]*/\s*([A-Z_][A-Z0-9_]*)\s*#")
+_PLACEHOLDER_RE = re.compile(r"#([^#]+)#")
+
+
+def _bw_get_secret(item_name: str) -> Optional[str]:
+    """Resolve a single Bitwarden item name to its secret value.
+    Uses BW_SESSION from the environment (set by sync.sh after unlock).
+    For items with hidden custom fields (type 1), returns the first field's value.
+    Otherwise falls back to the notes field.
+    Returns None if the item can't be resolved or the session is expired.
+    """
+    bw_session = os.environ.get("BW_SESSION")
+    if not bw_session:
+        return None
+    try:
+        result = subprocess.run(
+            ["bw", "get", "item", item_name, "--session", bw_session],
+            capture_output=True, text=True, timeout=15,
+        )
+        if result.returncode != 0:
+            return None
+        data = json.loads(result.stdout)
+        for field in (data.get("fields") or []):
+            if field.get("type") == 1:
+                return field.get("value")
+        notes = (data.get("notes") or "").strip()
+        return notes if notes else None
+    except Exception:
+        return None
 
 
 def _resolve_mcp_secrets(mcp_config: Any) -> Any:
-    """Walk mcp_config recursively, replacing #description / KEY_NAME# placeholders
-    with values from environment variables (sourced by sync.sh from the host-local
-    /etc/multica/mcp-secrets.env file).
+    """Walk mcp_config recursively, replacing #Item Name# placeholders
+    with real secrets fetched live from Bitwarden via bw CLI.
     """
     if isinstance(mcp_config, dict):
         return {k: _resolve_mcp_secrets(v) for k, v in mcp_config.items()}
@@ -456,10 +482,10 @@ def _resolve_mcp_secrets(mcp_config: Any) -> Any:
         return [_resolve_mcp_secrets(v) for v in mcp_config]
     if isinstance(mcp_config, str):
         def _replace(m: re.Match) -> str:
-            key = m.group(1)
-            val = os.environ.get(key)
+            item_name = m.group(1).strip()
+            val = _bw_get_secret(item_name)
             if val is None:
-                print(f"      WARNING: mcp placeholder key {key} not found in environment — leaving as-is", file=sys.stderr)
+                print(f"      WARNING: could not resolve Bitwarden item '{item_name}' — leaving placeholder as-is", file=sys.stderr)
                 return m.group(0)
             return val
         return _PLACEHOLDER_RE.sub(_replace, mcp_config)
