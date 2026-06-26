@@ -102,11 +102,20 @@ all 3 peers — write to any one, read from any one.
 
 ## API access
 
-- Service-account token: `~/claude/.mcp.json` →
-  `mcpServers.grafana.env.GRAFANA_SERVICE_ACCOUNT_TOKEN` (`glsa_…`). Works for
-  MCP and direct curl (`Authorization: Bearer`). If missing/expired → the
-  **bitwarden** skill (`company` folder); read-only hosts have a Viewer token
-  at `/etc/claude-readonly/creds/grafana-token`.
+- Service-account token: stored in Bitwarden as item **`readonly chainlayer credentials`**
+  in the `company` folder, field `GRAFANA_VIEWER_TOKEN` (`glsa_…`). Works for
+  direct curl (`Authorization: Bearer $TOKEN`). Previous locations
+  (`~/claude/.mcp.json`, `/etc/claude-readonly/creds/grafana-token`) do not exist
+  on Multica runtime hosts — always use the Bitwarden item.
+- Unlock Bitwarden and retrieve the token:
+
+  ```bash
+  set -a && . ~/.claude/secrets/bw-bootstrap.env && set +a
+  export NODE_TLS_REJECT_UNAUTHORIZED=0
+  export BW_SESSION=$(bw unlock --raw --passwordenv BW_PASSWORD 2>/dev/null)
+  GRAFANA_TOKEN=$(bw get item "readonly chainlayer credentials" --session "$BW_SESSION" \
+    | python3 -c "import json,sys; d=json.load(sys.stdin); print({f['name']:f['value'] for f in d.get('fields',[])}.get('GRAFANA_VIEWER_TOKEN',''))")
+  ```
 - Base `https://chained.grafana.net/api`:
   - `GET /datasources` · `GET /dashboards/uid/<uid>` ·
     `POST /dashboards/db` (`{"dashboard": …, "overwrite": true, "message": "…"}`)
@@ -116,6 +125,8 @@ all 3 peers — write to any one, read from any one.
 
 ### Stable datasource UIDs
 
+#### Prometheus / Thanos
+
 | UID | Name |
 |---|---|
 | `deexgsum1bz7ka` | prometheus-nl-oven |
@@ -123,6 +134,55 @@ all 3 peers — write to any one, read from any one.
 | `beexh7l99aq68b` | prometheus-no-fryer |
 | `cepbu6izhi3nke` / `aepc7djwfjeo0d` / `fepc79v1myg3ke` | thanos-de2 / nl2 / no1 |
 | `grafanacloud-prom` | Cloud's own scrape |
+
+#### Loki (log aggregation)
+
+| UID | Name | Contains |
+|---|---|---|
+| `loki-nl-spud` | loki-nl-spud | k8s pod logs from nl-oven and nl-spud clusters |
+| `grafanacloud-chained-logs` | grafanacloud-chained-logs | Synthetic monitoring logs (Grafana Cloud's own internal log collection) |
+
+### Loki queries via datasource proxy
+
+Loki datasources are queried through the same `/api/datasources/proxy/uid/<uid>/`
+endpoint as Prometheus. The Loki HTTP API is at `/loki/api/v1/` below the proxy.
+
+**Query recent pod logs for a specific container:**
+
+```bash
+TOKEN="$(bw get item 'readonly chainlayer credentials' --session "$BW_SESSION" \
+  | python3 -c "import json,sys; d=json.load(sys.stdin); print({f['name']:f['value'] for f in d.get('fields',[])}.get('GRAFANA_VIEWER_TOKEN',''))")"
+
+# LogQL query: filter by namespace + container, search for a string
+curl -s -H "Authorization: Bearer $TOKEN" \
+  --data-urlencode 'query={namespace="chainlink-data-feeds", container="node"} |= "TrackConfig"' \
+  "https://chained.grafana.net/api/datasources/proxy/uid/loki-nl-spud/loki/api/v1/query_range?limit=50&start=$(date -d '1 hour ago' +%s)000000000&end=$(date +%s)000000000"
+```
+
+**Key Loki endpoints:**
+
+| Endpoint | Use |
+|---|---|
+| `/loki/api/v1/query_range?query=…&start=…&end=…&limit=N` | Time-range log search |
+| `/loki/api/v1/query?query=…&time=…&limit=N` | Instant log query |
+| `/loki/api/v1/label` | List available label names |
+| `/loki/api/v1/label/<name>/values` | List values for a label |
+
+**Common LogQL patterns:**
+
+```logql
+# Filter by k8s namespace + container, grep for a string
+{namespace="chainlink-data-feeds", container="node"} |= "TrackConfig: error"
+
+# Multi-container, regex match
+{namespace=~"chainlink-.*", container=~"node|sidecar"} |~ "429|rate limit"
+
+# Exclude noise
+{namespace="chainlink-data-feeds"} != "debug" |~ "error|fail"
+
+# Count errors over time (metric query — requires range aggregation)
+sum by (pod) (count_over_time({namespace="chainlink-data-feeds"} |= "error" [5m]))
+```
 
 ## Metric semantics worth knowing before you query
 
