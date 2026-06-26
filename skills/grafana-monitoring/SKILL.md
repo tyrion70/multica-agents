@@ -102,15 +102,15 @@ all 3 peers — write to any one, read from any one.
 
 ## API access
 
-- Service-account token: `~/claude/.mcp.json` →
-  `mcpServers.grafana.env.GRAFANA_SERVICE_ACCOUNT_TOKEN` (`glsa_…`). Works for
-  MCP and direct curl (`Authorization: Bearer`). If missing/expired → the
-  **bitwarden** skill (`company` folder); read-only hosts have a Viewer token
-  at `/etc/claude-readonly/creds/grafana-token`.
+- Service-account token: look up the **bitwarden** skill → `company` folder →
+  item **"readonly chainlayer credentials"**, field `GRAFANA_VIEWER_TOKEN`
+  (`glsa_…`). Works for MCP and direct curl (`Authorization: Bearer`).
 - Base `https://chained.grafana.net/api`:
   - `GET /datasources` · `GET /dashboards/uid/<uid>` ·
     `POST /dashboards/db` (`{"dashboard": …, "overwrite": true, "message": "…"}`)
   - Ad-hoc PromQL: `GET /api/datasources/proxy/uid/<ds>/api/v1/query?query=…`
+  - Ad-hoc LogQL: `GET /api/datasources/proxy/uid/<ds>/loki/api/v1/query_range?query=…&start=…&end=…&limit=…`
+    Example: `/api/datasources/proxy/uid/loki-nl-spud/loki/api/v1/query_range?query={namespace="chainlink"}&start=1719500000000000000&end=1719503600000000000&limit=100`
   - Panel PNG: `GET /render/d-solo/<uid>/<slug>?panelId=N&width=W&height=H&from=…&to=…&_=<ts>`
     (`&_=` busts the render cache).
 
@@ -123,6 +123,8 @@ all 3 peers — write to any one, read from any one.
 | `beexh7l99aq68b` | prometheus-no-fryer |
 | `cepbu6izhi3nke` / `aepc7djwfjeo0d` / `fepc79v1myg3ke` | thanos-de2 / nl2 / no1 |
 | `grafanacloud-prom` | Cloud's own scrape |
+| `grafanacloud-chained-logs` | Loki — synthetic monitoring |
+| `loki-nl-spud` | Loki — k8s pod logs |
 
 ## Metric semantics worth knowing before you query
 
