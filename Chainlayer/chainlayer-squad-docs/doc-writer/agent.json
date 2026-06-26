@@ -16,5 +16,20 @@
     "git-mr",
     "grafana-monitoring",
     "ssh"
-  ]
+  ],
+  "mcp_config": {
+    "mcpServers": {
+      "rag": {
+        "type": "http",
+        "url": "http://100.69.200.97:8041/sse"
+      },
+      "linear": {
+        "type": "http",
+        "url": "https://mcp.linear.app/mcp",
+        "headers": {
+          "Authorization": "Bearer #ChainLayer · Linear — API key#"
+        }
+      }
+    }
+  }
 }

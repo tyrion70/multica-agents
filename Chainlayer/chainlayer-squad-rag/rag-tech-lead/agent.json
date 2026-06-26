@@ -15,7 +15,24 @@
     "git-mr",
     "git-pr",
     "linear-company",
+    "rag-consumer",
     "rag-ops",
+    "skill-index",
     "ssh"
-  ]
+  ],
+  "mcp_config": {
+    "mcpServers": {
+      "rag": {
+        "type": "sse",
+        "url": "http://100.69.200.97:8041/sse"
+      },
+      "linear": {
+        "type": "http",
+        "url": "https://mcp.linear.app/mcp",
+        "headers": {
+          "Authorization": "Bearer #ChainLayer · Linear — API key#"
+        }
+      }
+    }
+  }
 }

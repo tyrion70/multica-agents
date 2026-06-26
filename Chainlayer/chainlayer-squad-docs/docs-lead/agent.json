@@ -11,6 +11,22 @@
   "max_concurrent_tasks": 6,
   "skills": [
     "chainlayer-knowledge",
-    "git-mr"
-  ]
+    "git-mr",
+    "skill-index"
+  ],
+  "mcp_config": {
+    "mcpServers": {
+      "rag": {
+        "type": "sse",
+        "url": "http://100.69.200.97:8041/sse"
+      },
+      "linear": {
+        "type": "http",
+        "url": "https://mcp.linear.app/mcp",
+        "headers": {
+          "Authorization": "Bearer #ChainLayer · Linear — API key#"
+        }
+      }
+    }
+  }
 }
