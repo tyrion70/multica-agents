@@ -40,7 +40,7 @@
         }
       },
       "rag": {
-        "type": "http",
+        "type": "sse",
         "url": "http://100.69.200.97:8041/sse"
       }
     }

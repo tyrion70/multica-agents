@@ -23,6 +23,7 @@ apply the config to it. Don't spray it across every agent.
 | incident.io | http `https://mcp.incident.io/mcp` | `Authorization: Bearer <key>` |
 | Atlassian | http `https://mcp.atlassian.com/v1/mcp` | `Authorization: Basic base64(email:token)` — Teamwork Graph toolset |
 | Slack | stdio `npx @modelcontextprotocol/server-slack` | env `SLACK_BOT_TOKEN=<xoxb>`, `SLACK_TEAM_ID` |
+| RAG (internal docs) | sse `http://100.69.200.97:8041/sse` | None (Tailscale-only) |
 
 Secrets come from the Bitwarden **company** folder (never hardcode):
 `linear`, `incident.io`, `jira key`, `slack bot`. Host also needs `node`/`npx`
