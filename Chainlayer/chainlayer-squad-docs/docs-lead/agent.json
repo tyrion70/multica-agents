@@ -11,7 +11,6 @@
   "max_concurrent_tasks": 6,
   "skills": [
     "chainlayer-knowledge",
-    "git-mr",
-    "skill-index"
+    "git-mr"
   ]
 }
