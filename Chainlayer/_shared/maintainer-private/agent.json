@@ -11,6 +11,10 @@
           "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json",
           "GOOGLE_DRIVE_MCP_TOKEN_PATH": "/home/peter/.config/google-drive-mcp/tokens.json"
         }
+      },
+      "rag": {
+        "type": "sse",
+        "url": "http://100.69.200.97:8041/sse"
       }
     }
   },
@@ -28,6 +32,7 @@
     "bitwarden",
     "git-pr",
     "multica-sync",
+    "rag-consumer",
     "ssh"
   ]
 }
