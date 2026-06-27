@@ -524,6 +524,18 @@ def _get_mcp_server_keys(mcp_config: Any) -> Optional[set]:
     return None
 
 
+def _sanitize_mcp_for_state(mcp_norm: Any) -> Any:
+    """Replace mcp_config values with just the server key names.
+
+    Avoids committing resolved secret tokens to the sync state file.
+    The server key set is enough for change detection (server structure).
+    """
+    servers = _get_mcp_server_keys(mcp_norm)
+    if servers is not None:
+        return json.dumps({"mcpServers": sorted(servers)}, sort_keys=True)
+    return None
+
+
 def _try_reconcile_agent_conflict(
     repo_norm: Dict[str, Any],
     multica_norm: Dict[str, Any],
@@ -553,8 +565,9 @@ def _try_reconcile_agent_conflict(
         if repo_servers != multica_servers:
             return None
     elif repo_servers != multica_servers:
-        # One side has servers, the other doesn't
-        return None
+        # One side has servers, the other doesn't — allow repo to win
+        # (repo adds MCP servers; Multica may have none due to redaction)
+        pass
 
     # Merge: start from repo norm, override skills (union)
     merged = dict(repo_norm)
@@ -614,6 +627,10 @@ def _decide_action(
     multica_norm: Any,
     last: Optional[Dict[str, Any]],
 ) -> str:
+    # Treat legacy state entries (no repo_state/multica_state) as never-synced
+    if last is not None and ("repo_state" not in last or "multica_state" not in last):
+        last = None
+
     if last is None:
         if multica_norm is None:
             return "push_to_multica"
@@ -783,8 +800,8 @@ def sync_agents_workspace(
                 counts["unchanged"] += 1
                 state_agents[state_key] = {
                     "repo_file": str(rel_path),
-                    "repo_state": repo_norm,
-                    "multica_state": multica_norm,
+                    "repo_state": {**repo_norm, "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config"))},
+                    "multica_state": {**multica_norm, "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config"))},
                 }
 
             elif action == "push_to_multica":
@@ -841,8 +858,8 @@ def sync_agents_workspace(
 
                 state_agents[state_key] = {
                     "repo_file": str(rel_path),
-                    "repo_state": repo_norm,
-                    "multica_state": repo_norm,
+                    "repo_state": {**repo_norm, "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config"))},
+                    "multica_state": {**repo_norm, "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config"))},
                 }
 
             elif action == "pull_to_repo":
@@ -856,8 +873,8 @@ def sync_agents_workspace(
                     continue
                 state_agents[state_key] = {
                     "repo_file": str(rel_path),
-                    "repo_state": multica_norm,
-                    "multica_state": multica_norm,
+                    "repo_state": {**multica_norm, "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config"))},
+                    "multica_state": {**multica_norm, "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config"))},
                 }
 
             elif action == "conflict":
@@ -901,8 +918,8 @@ def sync_agents_workspace(
 
                     state_agents[state_key] = {
                         "repo_file": str(rel_path),
-                        "repo_state": reconciled,
-                        "multica_state": reconciled,
+                        "repo_state": {**reconciled, "mcp_config": _sanitize_mcp_for_state(reconciled.get("mcp_config"))},
+                        "multica_state": {**reconciled, "mcp_config": _sanitize_mcp_for_state(reconciled.get("mcp_config"))},
                     }
                 else:
                     print(f"    ✗ CONFLICT: both sides changed irreconcilably", file=sys.stderr)
@@ -985,10 +1002,11 @@ def sync_agents_workspace(
             if agent_id:
                 id_map[agent_key(agent_dir, workspace_dir)] = agent_id
 
+            disc_norm = normalize_agent(live_agent)
             state_agents[state_key] = {
                 "repo_file": str(rel_path),
-                "repo_state": normalize_agent(live_agent),
-                "multica_state": normalize_agent(live_agent),
+                "repo_state": {**disc_norm, "mcp_config": _sanitize_mcp_for_state(disc_norm.get("mcp_config"))},
+                "multica_state": {**disc_norm, "mcp_config": _sanitize_mcp_for_state(disc_norm.get("mcp_config"))},
             }
 
         elif action == "conflict":
