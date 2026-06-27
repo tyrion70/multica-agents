@@ -80,6 +80,19 @@
                   },
                   {
                     "type": "object",
+                    "description": "SSE-based MCP server",
+                    "properties": {
+                      "type": { "type": "string", "const": "sse" },
+                      "url": { "type": "string" },
+                      "headers": {
+                        "type": "object",
+                        "additionalProperties": { "type": "string" }
+                      }
+                    },
+                    "required": ["type", "url"]
+                  },
+                  {
+                    "type": "object",
                     "description": "Stdio-based MCP server",
                     "properties": {
                       "command": { "type": "string" },
