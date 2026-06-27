@@ -32,6 +32,7 @@ and `Chainlayer/skills.json`.
 | **linear-company** | ChainLayer Linear workspace (OPS/CLL/MAN): issue-first rule before any code change. | All lifecycle agents except Maintainer. *Not bound:* Docs squad, Maintainer, Maintainer Private. |
 | **multica-sync** | Bidirectional agent/skill sync between multica-agents repo and workspace. | Maintainer, Maintainer Private. |
 | **new-repo-company** | Create new GitLab chainlayer/* repos via Terraform. | Issue Coder (Claude, DeepSeek). |
+| **rag-consumer** | Query the RAG MCP server for grounded, cited answers about ChainLayer infra, operations, and codebase history. | Every agent with the RAG MCP server bound (all Claude/ChatGPT/DeepSeek lifecycle agents, Tech Leads, Communicators, domain specialists, Maintainers, Docs squad, RAG Tech Lead). |
 | **rag-ops** | Operate/extend the in-house RAG ops assistant: ingestion, secret filter, retrieval, eval, deploy. | Issue Coder (DeepSeek), Issue Refiner (DeepSeek), Issue QA (Claude), Issue Deployer (Claude), RAG Tech Lead. |
 | **ssh** | SSH keys, git auth (GitHub/GitLab), commit signing, tailnet host access. | Most lifecycle agents. *Not bound:* Docs squad, Communicator (ChatGPT). |
 

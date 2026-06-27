@@ -61,6 +61,8 @@
     "git-mr",
     "git-pr",
     "linear-company",
+    "rag-consumer",
+    "skill-index",
     "ssh"
   ]
 }

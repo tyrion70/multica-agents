@@ -64,6 +64,7 @@
     "git-pr",
     "grafana-monitoring",
     "linear-company",
+    "rag-consumer",
     "ssh"
   ]
 }

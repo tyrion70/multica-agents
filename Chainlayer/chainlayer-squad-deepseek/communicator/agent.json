@@ -61,6 +61,7 @@
     "git-mr",
     "git-pr",
     "linear-company",
+    "rag-consumer",
     "ssh"
   ]
 }

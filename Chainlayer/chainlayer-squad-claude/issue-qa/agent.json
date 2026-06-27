@@ -61,6 +61,7 @@
     "company-k8s",
     "git-pr",
     "linear-company",
+    "rag-consumer",
     "rag-ops",
     "ssh"
   ]
