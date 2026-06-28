@@ -798,10 +798,17 @@ def sync_agents_workspace(
             if action == "unchanged":
                 print(f"    ✓ unchanged", file=sys.stderr)
                 counts["unchanged"] += 1
+                # multica_norm is None when the live list transiently omitted an
+                # anchored agent (AC5): we deliberately don't re-mint, so preserve
+                # the last-known multica_state rather than clobbering it with the miss.
+                if multica_norm is not None:
+                    multica_state = {**multica_norm, "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config"))}
+                else:
+                    multica_state = last.get("multica_state") if last else None
                 state_agents[state_key] = {
                     "repo_file": str(rel_path),
                     "repo_state": {**repo_norm, "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config"))},
-                    "multica_state": {**multica_norm, "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config"))},
+                    "multica_state": multica_state,
                 }
 
             elif action == "push_to_multica":
