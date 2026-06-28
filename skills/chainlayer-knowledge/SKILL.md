@@ -72,3 +72,19 @@ Endpoints are `https://<prefix>.<network>.quiknode.pro/<token>`:
 - `<token>` = the credential — store ONLY this, in **GCP Secret Manager project
   `mythic-fulcrum-424015-f9`** (surfaced via the `k8s-shared` ClusterSecretStore on
   nl-oven), secret name `quiknode-rpc-key`. Prefix + slug are non-secret (chart values).
+
+## Co-authored-by commit hook — disabled at the workspace setting
+The Multica daemon installs a git `prepare-commit-msg` hook (in each bare repo's
+`hooks/` dir under `.repos/<workspace_id>/<repo>.git/hooks/`) that injects a
+`Co-authored-by: multica-agent <github@multica.ai>` trailer on every agent commit —
+which violates our no-`Co-Authored-By` rule. **The toggle is a server-side workspace
+setting, `co_authored_by_enabled`, NOT a daemon binary flag or env var.** It is
+**disabled (`false`) for the Chainlayer workspace** — Peter set it via the Multica web
+UI workspace settings (admin/owner). The daemon reads it at `multica repo checkout`
+time and skips the hook when it's off. Verify with `multica workspace get` →
+`settings.co_authored_by_enabled` (the `multica workspace update` CLI does not expose
+this flag — it's UI-only). This reconciles the CHA-175 finding that no config flag
+existed in the daemon binary: the control was never daemon-local, it's the workspace
+record the daemon queries. With it off, a fresh checkout no longer reinstalls the hook
+and agent commits carry no trailer and stay SSH-signed (verified Good). If the trailer
+ever reappears, first check `co_authored_by_enabled` is still `false`. (CHA-175/CHA-177)
