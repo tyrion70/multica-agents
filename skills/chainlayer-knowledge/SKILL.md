@@ -11,7 +11,7 @@ stuff worth carrying between issues. **HOW-TO lives in the domain skills**
 `grafana-monitoring`, …); this skill is durable *knowledge and decisions*, not a
 runbook, and not day-to-day status (don't put "N of M done as of <date>" here —
 that rots). When something durable changes, update this file via a PR against
-`tyrion70/claude-skills` and tell the user.
+`tyrion70/multica-agents` and tell the user.
 
 ## chainlink-tools platform (dynamic node registry)
 Three apps under `chainlink-tools/`, all deploying to the `chainlink` namespace in
