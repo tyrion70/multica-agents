@@ -86,6 +86,77 @@ ChainID = "<id>"
   otherwise the ArgoCD-UI secret-delete dance. Peter's RBAC on `chainlink` ns
   cannot patch externalsecrets directly.
 
+## Pre-escalation investigation runbook
+
+When a data feed looks wrong (stale, deviating, flapping), run this **before**
+escalating to Chainlink: confirm whether the problem is the node's jobspec, the
+external adapter, or the upstream data provider. Verified end-to-end live in
+CHA-193 — every step below is a **non-mutating read**.
+
+### Gate: ask Peter first
+
+🛑 **Do not start a Chainlink investigation autonomously.** This runbook touches
+live revenue oracles, so the fleet's job is to **ask Peter whether to run it**,
+not to launch it on its own. Surface what you're seeing (which feed, what's off)
+and wait for an explicit go-ahead before running any step below. *(Exact shape
+of this gate — who asks, how the go-ahead is recorded — is a proposal for Peter
+to confirm on the PR.)*
+
+### Where to run it
+
+The Chainlink node + EAs run on k8s cluster **`nl-oven`**: node in ns
+`chainlink-data-feeds`, external adapters in ns `chainlink-ea` (each EA exposes
+`:8080` http / `:9080` metrics; provider keys are in per-adapter k8s secrets via
+`envFrom`).
+
+- **Write-RBAC host required** (e.g. `claude-workstation-01`, ctx `nl-oven`):
+  the active steps need `exec` / `port-forward` / `secrets`.
+- **Readonly hosts** (`tag:claude-readonly`, e.g. `multica-02`) can only `get` /
+  `logs` — `exec`, `port-forward`, and `secrets` are denied, so they cannot run
+  steps 1–3.
+
+### Steps
+
+```bash
+# 1) literal jobspec (requestData / observationSource) — node API via in-pod authenticated curl
+kubectl exec <chainlink-data-feeds-*-pod> -n chainlink-data-feeds -c node -- sh -c '
+  E=$(sed -n 1p /mount/.api); P=$(sed -n 2p /mount/.api); CJ=$(mktemp)
+  curl -s -c $CJ -X POST localhost:6688/sessions -H "Content-Type: application/json" -d "{\"email\":\"$E\",\"password\":\"$P\"}" >/dev/null
+  curl -s -b $CJ localhost:6688/v2/jobs/<jobID>; rm -f $CJ'        # parse .data.attributes.pipelineSpec.dotDagSource
+
+# 2) active EA query (EA pods have no curl → port-forward + curl locally); use the EXACT requestData from step 1
+kubectl port-forward -n chainlink-ea svc/<ea> 18080:8080 &
+curl -s -X POST localhost:18080 -H 'Content-Type: application/json' -d '<exact requestData>'
+
+# 3) provider coverage — Coin Metrics (safe REST, check market max_time recency)
+API_KEY=$(kubectl get secret <ea-secret> -n chainlink-ea -o json | jq -r '.data.API_KEY|@base64d')
+curl -s "https://api.coinmetrics.io/v4/catalog/markets?base=<sym>&api_key=$API_KEY"
+```
+
+### Safety caveats
+
+- **GSR direct provider hit is NOT routine.** The only direct path reuses the
+  live node's single shared prod credential (`WS_USER_ID` + `secret/gsr`
+  `WS_PRIVATE_KEY`) on `wss://oracle.prod.gsr.io/oracle`; a second concurrent
+  session can knock the live EA off its (already-flapping) socket on a revenue
+  feed. Treat as a **coordinated test only**, or ask GSR support instead — never
+  open it ad-hoc during an investigation.
+- The runbook is **read-only by default**. Steps 1–3 mutate nothing. Anything
+  that would mutate (restarts, job edits, the GSR socket above) is out of scope
+  here and falls under the 🛑 ask-first rules in *Permission model* below.
+- **Never print secret values** (`API_KEY`, GSR creds, node `.api`) into issues,
+  comments, or logs — pipe them only into the live request, never into output.
+
+### Hand-off (manual for now)
+
+After the investigation, the report is **hand-delivered manually**:
+
+1. **Slack** — post the findings to the relevant `chainlink-nodes` channel.
+2. **Jira** — file / update the corresponding ticket with the same findings.
+
+There is no automated bridge yet; the operator does both by hand and links them
+back to the Multica issue.
+
 ## Credentials
 
 Machine-consumed secrets live in **GCP Secret Manager** (`mythic-fulcrum-424015-f9`
