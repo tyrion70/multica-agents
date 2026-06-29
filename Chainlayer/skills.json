@@ -5,6 +5,7 @@
   "chainlink-ops",
   "company-k8s",
   "company-proxmox",
+  "datafeeds-health-findings",
   "deploy-app",
   "deploy-verify-rollback",
   "fortigate",
