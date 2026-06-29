@@ -106,3 +106,73 @@ Helm lists replace, not merge — include all sidecars when overriding per-node.
 (especially OCR1 and keystone), job deletions, adapter removals (show the
 dual-metric evidence first), secret pushes to GCP, ESO secret deletes, anything
 in `chainlink-database`.
+
+## Chainlink pre-escalation investigation
+
+**Gate — ask Peter first.** Before running any Chainlink investigation steps,
+explicitly confirm with Peter (via issue comment or Slack) that an investigation
+is warranted. Do not self-start — these steps touch live node APIs and adapter
+endpoints on revenue feeds.
+
+This section documents the verified procedure from CHA-193 for investigating
+datafeed anomalies **before escalating to Chainlink support**. The pattern:
+query the node for the exact jobspec → replay that requestData against the
+external adapter → check data provider coverage for gaps.
+
+### Topology
+
+- **Cluster**: `nl-oven` (k8s)
+- **Node ns**: `chainlink-data-feeds`
+- **Adapter ns**: `chainlink-ea` (each EA :8080 http / :9080 metrics)
+- **Provider keys**: k8s secrets per-adapter, wired via `envFrom`
+
+**Host RBAC**: readonly hosts (`tag:claude-readonly`, e.g. `multica-02`) can
+`get`/`logs` only — `exec`/`port-forward`/`secrets` denied. Run from a
+write-RBAC host (e.g. `claude-workstation-01`), ctx `nl-oven`.
+
+### Procedure
+
+All steps are **non-mutating reads**. Secret values must never be printed into
+issues, comments, or logs.
+
+```bash
+# 1) Fetch jobspec — requestData / observationSource via node API
+kubectl exec <chainlink-data-feeds-*-pod> -n chainlink-data-feeds -c node -- sh -c '
+  E=$(sed -n 1p /mount/.api); P=$(sed -n 2p /mount/.api); CJ=$(mktemp)
+  curl -s -c $CJ -X POST localhost:6688/sessions \
+    -H "Content-Type: application/json" \
+    -d "{\"email\":\"$E\",\"password\":\"$P\"}" >/dev/null
+  curl -s -b $CJ localhost:6688/v2/jobs/<jobID>; rm -f $CJ'
+# Parse .data.attributes.pipelineSpec.dotDagSource for the bridge request body
+
+# 2) Replay exact requestData against the EA
+kubectl port-forward -n chainlink-ea svc/<ea> 18080:8080 &
+curl -s -X POST localhost:18080 \
+  -H 'Content-Type: application/json' \
+  -d '<exact requestData from step 1>'
+# kill %1 after to clean up port-forward
+
+# 3) Provider coverage — Coin Metrics (safe REST catalog endpoint)
+API_KEY=$(kubectl get secret <ea-secret> -n chainlink-ea -o json |
+  jq -r '.data.API_KEY|@base64d')
+curl -s \
+  "https://api.coinmetrics.io/v4/catalog/markets?base=<sym>&api_key=$API_KEY"
+# Check market max_time recency
+```
+
+### GSR safety caveat
+
+**The GSR direct provider hit is NOT routine.** The only direct path reuses
+the live node's single shared prod credential (`WS_USER_ID` + `secret/gsr`
+`WS_PRIVATE_KEY`) on `wss://oracle.prod.gsr.io/oracle`. A second concurrent
+session can knock the live EA off its (already-flapping) socket on a revenue
+feed. Treat as a coordinated test only, or ask GSR support instead.
+
+### Hand-off
+
+After collecting investigation results:
+1. **Post a summary to Slack** (#chainlink-ops or the relevant channel) so the
+   team has context.
+2. **File a Jira issue** (project OPS or CLL) with the findings, or add them
+   to the existing issue.
+These steps are manual — no automation wraps them yet.
