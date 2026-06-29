@@ -81,6 +81,16 @@ bites hard and has caught us before, so know it up front:
   must be pre-synced). Surface this as a blocker rather than burning time on key
   permutations — none of them defeat SSO.
 
+**Rule (Peter):** IF you encounter `Cannot find valid SSO session`, prompt Peter
+with the precise url so he can login UNLESS you have a different way to
+circumvent the SSO issue.
+
+The "precise url" is the `https://gitlab.com/groups/chainlayer/-/saml/sso?token=…`
+link printed in the `remote:` error — surface that exact URL to Peter, don't
+paraphrase it. (A "different way to circumvent" means something that gets the
+work done without his login, e.g. reading the file you need via the REST API
+above — not another SSH-key/PAT permutation, which won't work.)
+
 (GitHub `tyrion70/*` repos have no such enforcement — clone/push works with
 `id_ed25519_peter` directly.)
 
