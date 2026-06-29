@@ -23,6 +23,7 @@ and `Chainlayer/skills.json`.
 | **chainlink-ops** | Operate Chainlink node fleet: RPC config, adapter lifecycle, token refresh, topup. | *(No agent currently bound — gap)* |
 | **company-k8s** | Operate k8s clusters (nl-oven, nl-spud, no-fryer): kubectl, manifests, ArgoCD, storage. | CF/HAProxy expert (all squads), Monitoring Operator (all squads), Issue Deployer (Claude/ChatGPT), Issue QA (all squads), Doc Reviewer/Publisher, Doc Writer. |
 | **company-proxmox** | Operate Proxmox clusters (Prox7, Prox9): VM migrations, restores, TF IaC. | Issue Coder (all squads), Monitoring Operator (all squads). |
+| **datafeeds-health-findings** | Run the chainlink-datafeeds-health report read-only and turn findings into deduped Multica issues (mapping, dedup keys, lifecycle, zero-mutation guardrail). | *(Bound in Stage 3 — the periodic datafeeds-health findings sweep agent)* |
 | **deploy-app** | Deploy new apps to k8s GitOps pipeline: repo, CI, secrets, ArgoCD, Renovate. | Issue Deployer (Claude/ChatGPT). |
 | **deploy-verify-rollback** | Generic deploy/verify/rollback for approved changes. | Issue Deployer (Claude/ChatGPT). |
 | **fortigate** | Operate Fortigate firewalls (nl2, no1): address objects, allowlisting, API. | *(No agent currently bound — gap)* |
