@@ -23,8 +23,8 @@ CHA-165) — see the guardrail at the bottom.
   **"Datafeeds health — open findings"** project (created and wired in Stage 3).
   Get its id once with `multica project list --output json` and reuse it; this
   skill refers to it as `$PROJECT`.
-- **Squad assignee.** Issues are assigned to the **Chainlayer Squad** (the
-  permanent assignee), id `610be128-4320-4ca1-8f1d-413c2657cd2c`.
+- **Squad assignee.** Issues are assigned to the **Chainlayer Squad DeepSeek** (the
+  permanent assignee), id `6cb3a5fe-fd11-4ddd-8f06-395d3b82ef11`.
 - Bitwarden access (`bitwarden` skill) for the Grafana viewer token.
 
 ---
@@ -206,7 +206,7 @@ the project**.
 
 - **New** — key present in this run, **no** open issue with it →
   `multica issue create` with the body from §2, `--project "$PROJECT"`,
-  `--assignee-id 610be128-4320-4ca1-8f1d-413c2657cd2c`, `--status todo`, then
+  `--assignee-id 6cb3a5fe-fd11-4ddd-8f06-395d3b82ef11`, `--status todo`, then
   pin the dedup metadata key. **For `DEGRADED_ADAPTER` (per-adapter) issues this
   step is gated by the debounce in §4a — open the new issue only once the adapter
   has been over threshold for `N` consecutive windows.** The per-feed buckets
