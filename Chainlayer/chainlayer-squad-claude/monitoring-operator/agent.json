@@ -62,6 +62,7 @@
     "company-proxmox",
     "git-mr",
     "git-pr",
+    "chainlink-ops",
     "grafana-monitoring",
     "linear-company",
     "rag-consumer",

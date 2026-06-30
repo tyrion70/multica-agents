@@ -152,21 +152,34 @@ curl -s -X POST localhost:18080 \
   -d '<exact requestData from step 1>'
 # kill %1 after to clean up port-forward
 
-# 3) Provider coverage — Coin Metrics (safe REST catalog endpoint)
-API_KEY=$(kubectl get secret <ea-secret> -n chainlink-ea -o json |
-  jq -r '.data.API_KEY|@base64d')
-curl -s \
-  "https://api.coinmetrics.io/v4/catalog/markets?base=<sym>&api_key=$API_KEY"
-# Check market max_time recency
+# 3) Provider coverage — generic pattern
+# Resolve the adapter's provider credential from its k8s secret,
+# then hit that provider's read-only API and check recency/coverage.
+# The env var name and API endpoint vary per provider — inspect the
+# adapter's deployment/envFrom to discover them.
+PROVIDER_KEY=$(kubectl get secret <ea-secret> -n chainlink-ea -o json |
+  jq -r '.data.<ENV_VAR>|@base64d')
+curl -s "<provider-api-endpoint>?api_key=$PROVIDER_KEY"
+# Check response timestamps for recency and gap coverage
 ```
 
-### GSR safety caveat
+### Provider safety caveats
 
-**The GSR direct provider hit is NOT routine.** The only direct path reuses
-the live node's single shared prod credential (`WS_USER_ID` + `secret/gsr`
-`WS_PRIVATE_KEY`) on `wss://oracle.prod.gsr.io/oracle`. A second concurrent
-session can knock the live EA off its (already-flapping) socket on a revenue
-feed. Treat as a coordinated test only, or ask GSR support instead.
+**Some providers expose only a single shared prod credential** reused by
+every EA session. A second concurrent query using that same credential can
+knock the live EA off its (already-flapping) socket on a revenue feed —
+treat coordinated tests against these providers as exceptional and ask
+Peter first, or contact the provider's support directly.
+
+The examples below illustrate the pattern; adapt to the specific EA:
+
+- **Coin Metrics**: read-only REST catalog endpoint
+  (`api.coinmetrics.io/v4/catalog/markets`). Safe for routine use —
+  API key is per-integration, not shared across sessions.
+- **GSR**: direct WebSocket hit reuses the live node's single shared prod
+  credential (`WS_USER_ID` + `secret/gsr` `WS_PRIVATE_KEY`) on
+  `wss://oracle.prod.gsr.io/oracle`. NOT routine — see the shared-credential
+  warning above.
 
 ### Hand-off
 
