@@ -73,6 +73,20 @@ Endpoints are `https://<prefix>.<network>.quiknode.pro/<token>`:
   `mythic-fulcrum-424015-f9`** (surfaced via the `k8s-shared` ClusterSecretStore on
   nl-oven), secret name `quiknode-rpc-key`. Prefix + slug are non-secret (chart values).
 
+## Chainlink node job spec retrieval — use the operator UI / API
+
+Job specs for data-feeds (and other `FeedsManager = true`) nodes live in the
+**node DB**, not k8s configmaps. Retrieve via the REST API — no `kubectl exec`
+or port-forward needed:
+
+```
+GET https://{chain}.chainlink-data-feeds.nl-oven.chainlayer.cloud/v2/jobs/{id}
+```
+
+The `observationSource` field in the response is the full TOML pipeline spec
+(bridge task names, ds1/ds2/ds3, task graph). Full how-to including auth and
+credential location: **`chainlink-ops` skill**, "Chainlink node API" section.
+
 ## Co-authored-by commit hook — disabled at the workspace setting
 The Multica daemon installs a git `prepare-commit-msg` hook (in each bare repo's
 `hooks/` dir under `.repos/<workspace_id>/<repo>.git/hooks/`) that injects a
