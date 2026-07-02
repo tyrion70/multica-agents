@@ -10,8 +10,8 @@
   "visibility": "private",
   "max_concurrent_tasks": 6,
   "skills": [
-    "datafeeds-health-findings",
     "bitwarden",
+    "datafeeds-health-findings",
     "grafana-monitoring"
   ]
 }
