@@ -41,15 +41,32 @@ cd chainlink-datafeeds-health
 #    — via the bitwarden skill.
 export GRAFANA_VIEWER_TOKEN="<token from Bitwarden>"
 
-# 3. Run with --json — the machine-readable source of truth.
+# 3. Fetch the READ-ONLY DSN (the known-issue suppression source, CHA-320/CHA-331).
+#    Bitwarden item "DATAFEEDS_HEALTH_DSN", field DATAFEEDS_HEALTH_DSN_READONLY —
+#    the least-privilege `datafeeds_readonly` role (SELECT-only; granted read on
+#    known_issue by CHA-326 / migration 0009). NOT the datafeed_ingest owner DSN —
+#    the report only reads. Never commit or echo it.
+export DATAFEEDS_HEALTH_DSN="<readonly DSN from Bitwarden>"
+
+# 4. Run with --json AND the DSN — the machine-readable source of truth.
 python3 chainlink-datafeeds-report.py --json > run.json
 ```
 
 `--json` emits the **same** findings and thresholds as the text report but with
 **full, untruncated** contract ids, and it **subsumes `--by-adapter`** (the
 per-bridge rollup is always included), so you never need a second invocation.
-stdlib-only Python 3, no `pip install`. Do not change detection thresholds —
+stdlib Python 3 plus `psycopg` (v3) for the DB read — no `pip install` beyond that
+dep, which the ingester already carries. Do not change detection thresholds —
 file against the defaults the tool ships with.
+
+**The DSN is what turns suppression on.** With `DATAFEEDS_HEALTH_DSN` set, the
+report reads the `known_issue` table and the run shows `known_source=db`; matched
+`(bridge, contract)` pairs move into the `KNOWN` bucket and stop paging (e.g.
+BSW/USD on bridge-gsr). With no DSN the report **fails open** —
+`known_source='unavailable — suppression skipped, failing open'`, empty known set,
+so every known issue pages. Use the **read-only** DSN here; the `datafeed_ingest`
+owner DSN is only for the persistence step (`sweep-ingest.sh`) and the §4a streak
+query. Do **not** pass `--known-issues` (that is the offline/test JSON override).
 
 ### The JSON you consume (`v3` shape)
 
