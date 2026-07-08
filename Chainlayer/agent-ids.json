@@ -1,5 +1,4 @@
 {
-  "chainlayer-squad-datafeeds/datafeeds-health-monitor": "25c1c1a0-d1e6-481d-977a-995659f54b3c",
   "_shared/maintainer": "a5ac100a-182a-44a4-9d35-ae82f9992f87",
   "_shared/maintainer-private": "c2f1744e-9749-424e-903c-1c2d01866f98",
   "chainlayer-squad-chatgpt/cfhaproxy-expert": "ab0d04cd-0a2a-41bf-a81b-33253232a924",
@@ -18,6 +17,7 @@
   "chainlayer-squad-claude/issue-refiner": "410e7d30-fc44-4af6-8f2c-18d3c6c59040",
   "chainlayer-squad-claude/monitoring-operator": "c8be3850-a490-4577-9b9a-101e1b24270a",
   "chainlayer-squad-claude/tech-lead": "763083c9-7494-4bc0-9f57-41c3870bbc8d",
+  "chainlayer-squad-datafeeds/datafeeds-health-monitor": "25c1c1a0-d1e6-481d-977a-995659f54b3c",
   "chainlayer-squad-datafeeds/datafeeds-healthcheck-coder": "f46353a4-2722-4857-8ce2-a8ac45c291e6",
   "chainlayer-squad-datafeeds/datafeeds-healthcheck-deployer": "be49ae1e-cb04-44d2-804c-3bb1078dd164",
   "chainlayer-squad-datafeeds/datafeeds-healthcheck-qa": "3716c6ae-fab9-4e30-82e0-e18680ed4069",

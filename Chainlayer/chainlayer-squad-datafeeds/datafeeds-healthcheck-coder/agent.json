@@ -9,6 +9,9 @@
   "runtime_config": {},
   "visibility": "private",
   "max_concurrent_tasks": 6,
+  "custom_env": {
+    "DATAFEEDS_HEALTH_DSN": "#DATAFEEDS_HEALTH_DSN#"
+  },
   "skills": [
     "bitwarden",
     "chainlayer-knowledge",
