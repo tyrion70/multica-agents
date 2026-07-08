@@ -10,13 +10,21 @@ roles separate — auth/login is one key, signing is another.
 
 | Key | Role | Used for |
 |---|---|---|
-| `~/.ssh/id_ed25519_peter` (`peter@chainlayer`) | **auth + login** | SSH login to machines (private homelab + company), and git auth to GitHub (tyrion70) + GitLab (gitlab.com/chainlayer) |
-| `~/.ssh/id_ed25519_signing` (`git-signing`) | **signing** | SSH-format git commit/tag signing. (Also accepted for GitHub/GitLab auth, but its job is signing.) |
+| `~/.ssh/id_ed25519_peter` (`peter@chainlayer`) | **auth + login** | SSH login to machines (private homelab + company), and git auth to **GitHub** (tyrion70) |
+| `~/.ssh/id_ed25519_signing` (`git-signing`) | **signing** (+ GitLab auth) | SSH-format git commit/tag signing. **Also the key GitLab accepts for auth** (see note below). |
 | `~/.ssh/id_ed25519_sk_yk_*` | fallback | FIDO2 YubiKey keys for other/ad-hoc hosts (PIN-gated) |
 
-Both git keys are registered on GitHub **and** GitLab. Confirmed working:
-`id_ed25519_peter` → GitHub/GitLab auth + machine login (private + company);
-`id_ed25519_signing` → produces a Good commit signature.
+Confirmed working (multica-02 runtime, 2026-06-29):
+- **GitHub** auth → `id_ed25519_peter` (`ssh -T git@github.com` → "Hi tyrion70!").
+- **GitLab** auth → `id_ed25519_signing` only. `id_ed25519_peter` is **rejected**
+  by gitlab.com (`Permission denied (publickey)`) — it is not (or no longer)
+  registered there. Don't assume the auth key works for both forges.
+- `id_ed25519_signing` → produces a Good commit signature.
+
+> **GitLab auth ≠ GitLab repo access for the `chainlayer` group.** Authenticating
+> is necessary but not sufficient — the group enforces SAML SSO on git transport.
+> See "Git over SSO-enforced GitLab groups" below before trying to clone/fetch a
+> `gitlab.com/chainlayer/*` repo.
 
 ## Reaching machines
 
@@ -35,10 +43,56 @@ Host *.chosts.io
     IdentityFile ~/.ssh/id_ed25519_peter
     IdentitiesOnly yes
 
-Host github.com gitlab.com
+Host github.com
     IdentityFile ~/.ssh/id_ed25519_peter
     IdentitiesOnly yes
+
+# GitLab accepts the signing key for auth, NOT id_ed25519_peter.
+Host gitlab.com
+    IdentityFile ~/.ssh/id_ed25519_signing
+    IdentitiesOnly yes
 ```
+
+## Git over SSO-enforced GitLab groups (chainlayer)
+
+The `gitlab.com/chainlayer` group enforces **SAML SSO on git transport**. This
+bites hard and has caught us before, so know it up front:
+
+- A fresh `git clone`/`git fetch` of any `chainlayer/*` repo over **SSH _or_
+  HTTPS** fails with `remote: Cannot find valid SSO session. Please login via
+  your group's SSO at …` (HTTP 403) **unless there is an active browser SSO
+  session** for the account behind the credential. A valid SSH key or a valid
+  group PAT is **not** enough on its own.
+- This applies to **every credential available headlessly**: the SSH keys, the
+  vault group PAT (`ChainLayer · GitLab — group PAT`), and even
+  `multica repo checkout` — they all resolve to the same SSO-gated GitLab
+  account. An agent cannot complete the browser SAML flow, so it cannot
+  establish the session itself.
+- `multica repo checkout` only succeeds for repos that were **already synced**
+  into the workspace's bare mirrors while a session was live. Adding a new repo
+  (`multica repo add`) and then checking it out triggers a fresh fetch → SSO
+  403. So "SSH-clone any repo regardless of workspace config" is **false** for
+  this group.
+- **What still works headlessly:** the GitLab **REST API** with the group PAT
+  (e.g. `GET /projects/:id/repository/files/<path>/raw`). Use it to *read*
+  source when you only need to inspect a repo you can't clone.
+- **To actually clone/push** a `chainlayer/*` repo from an agent runtime, a human
+  must refresh the group's SSO session for the workspace credential (or the repo
+  must be pre-synced). Surface this as a blocker rather than burning time on key
+  permutations — none of them defeat SSO.
+
+**Rule (Peter):** IF you encounter `Cannot find valid SSO session`, prompt Peter
+with the precise url so he can login UNLESS you have a different way to
+circumvent the SSO issue.
+
+The "precise url" is the `https://gitlab.com/groups/chainlayer/-/saml/sso?token=…`
+link printed in the `remote:` error — surface that exact URL to Peter, don't
+paraphrase it. (A "different way to circumvent" means something that gets the
+work done without his login, e.g. reading the file you need via the REST API
+above — not another SSH-key/PAT permutation, which won't work.)
+
+(GitHub `tyrion70/*` repos have no such enforcement — clone/push works with
+`id_ed25519_peter` directly.)
 
 ## Git commit signing
 
