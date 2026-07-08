@@ -4305,7 +4305,9 @@
           "ssh"
         ],
         "mcp_config": null,
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       },
       "multica_state": {
         "name": "Datafeeds Healthcheck Refiner",
@@ -4326,7 +4328,9 @@
           "ssh"
         ],
         "mcp_config": null,
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       }
     },
     "Chainlayer~Datafeeds Healthcheck Tech Lead": {
@@ -4350,7 +4354,9 @@
           "ssh"
         ],
         "mcp_config": null,
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       },
       "multica_state": {
         "name": "Datafeeds Healthcheck Tech Lead",
@@ -4371,7 +4377,9 @@
           "ssh"
         ],
         "mcp_config": null,
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       }
     }
   },
