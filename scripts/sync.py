@@ -464,12 +464,21 @@ _PLACEHOLDER_RE = re.compile(r"#([^#]+)#")
 
 
 def _bw_get_secret(item_name: str) -> Optional[str]:
-    """Resolve a single Bitwarden item name to its secret value.
+    """Resolve a Bitwarden secret.
+
+    Supports two formats:
+      #Item Name#              — fetch the item by name, return the first hidden field.
+      #Item Name:Field Name#   — fetch the item by name, return the named field.
+
     Uses BW_SESSION from the environment (set by sync.sh after unlock).
-    For items with hidden custom fields (type 1), returns the first field's value.
-    Otherwise falls back to the notes field.
     Returns None if the item can't be resolved or the session is expired.
     """
+    field_name: Optional[str] = None
+    if ":" in item_name:
+        item_name, field_name = item_name.split(":", 1)
+        item_name = item_name.strip()
+        field_name = field_name.strip()
+
     bw_session = os.environ.get("BW_SESSION")
     if not bw_session:
         return None
@@ -481,12 +490,18 @@ def _bw_get_secret(item_name: str) -> Optional[str]:
         if result.returncode != 0:
             return None
         data = json.loads(result.stdout)
+        if field_name:
+            for field in (data.get("fields") or []):
+                if field.get("name") == field_name:
+                    return field.get("value")
+            return None
         for field in (data.get("fields") or []):
             if field.get("type") == 1:
                 return field.get("value")
         notes = (data.get("notes") or "").strip()
         return notes if notes else None
-    except Exception:
+    except Exception as e:
+        print(f"      WARNING: _bw_get_secret error for '{item_name}': {e}", file=sys.stderr)
         return None
 
 
