@@ -105,6 +105,7 @@ COMPARABLE_FIELDS = (
     "max_concurrent_tasks",
     "skills",
     "mcp_config",
+    "custom_env",
 )
 
 
@@ -193,6 +194,17 @@ def _norm_agent_field(key: str, val: Any) -> Any:
                 names.append(item.get("name") or item.get("slug") or "")
         return sorted(names)
     if key == "mcp_config":
+        if val is None:
+            return None
+        if isinstance(val, str):
+            try:
+                val = json.loads(val)
+            except (json.JSONDecodeError, TypeError):
+                return val
+        if isinstance(val, dict):
+            return json.dumps(val, sort_keys=True)
+        return val
+    if key == "custom_env":
         if val is None:
             return None
         if isinstance(val, str):
@@ -323,6 +335,10 @@ def multica_to_agent_json(
         for key in ("custom_env", "mcp_config"):
             if key in existing:
                 result[key] = existing[key]
+    # If custom_env is present on the live agent data (e.g. fetched via env get),
+    # use it instead of the stale existing value
+    if live.get("custom_env") is not None:
+        result["custom_env"] = live["custom_env"]
     for field in COMPARABLE_FIELDS:
         if field == "skills":
             result["skills"] = _norm_agent_field("skills", live.get("skills"))
@@ -331,6 +347,8 @@ def multica_to_agent_json(
             result[field] = val if val != "" else None
         elif field == "mcp_config":
             pass
+        elif field == "custom_env":
+            pass  # handled above
         else:
             val = live.get(field)
             if val is not None:
@@ -503,6 +521,35 @@ def _write_mcp_config_tempfile(agent_data: Dict[str, Any]) -> Optional[str]:
     return path
 
 
+def _write_custom_env_tempfile(agent_data: Dict[str, Any]) -> Optional[str]:
+    """Resolve #Item Name# placeholders in custom_env and write to a temp file.
+
+    Returns the temp file path, or None if custom_env is not set.
+    """
+    custom_env = agent_data.get("custom_env")
+    if custom_env is None:
+        return None
+    resolved = _resolve_mcp_secrets(custom_env)
+    fd, path = tempfile.mkstemp(suffix=".json", prefix="custom-env-")
+    with os.fdopen(fd, "w") as f:
+        json.dump(resolved, f)
+    return path
+
+
+def _fetch_agent_custom_env(agent_id: str) -> Optional[Dict[str, str]]:
+    """Fetch the current custom_env for an agent via 'agent env get'.
+
+    Returns the env dict, or None if not set or the call fails.
+    """
+    try:
+        result = _multica(["agent", "env", "get", agent_id], dry_run=False)
+        if isinstance(result, dict):
+            return result
+        return None
+    except Exception:
+        return None
+
+
 def _get_mcp_server_keys(mcp_config: Any) -> Optional[set]:
     """Extract the set of MCP server names from an mcp_config value.
 
@@ -536,6 +583,23 @@ def _sanitize_mcp_for_state(mcp_norm: Any) -> Any:
     return None
 
 
+def _sanitize_custom_env_for_state(custom_env_norm: Any) -> Any:
+    """Replace custom_env values with just the sorted key names.
+
+    Avoids committing resolved secret values to the sync state file.
+    The key set is enough for change detection (env var structure).
+    """
+    if custom_env_norm is None:
+        return None
+    try:
+        env = json.loads(custom_env_norm) if isinstance(custom_env_norm, str) else custom_env_norm
+        if isinstance(env, dict):
+            return sorted(env.keys())
+    except Exception:
+        pass
+    return None
+
+
 def _try_reconcile_agent_conflict(
     repo_norm: Dict[str, Any],
     multica_norm: Dict[str, Any],
@@ -545,17 +609,30 @@ def _try_reconcile_agent_conflict(
     For MCP configs, compares the server *structure* (which MCP servers exist)
     rather than resolved vs placeholder token values.
 
+    For custom_env, compares the key set only (not resolved vs placeholder values).
+
     For skills, merges both side's lists (union).
 
     Returns the merged normalized state if reconcilable, or None if the
-    conflict is genuine (non-MCP/non-skills fields diverged, or MCP server
-    sets differ).
+    conflict is genuine (non-MCP/non-skills/custom_env fields diverged, or MCP
+    server sets differ).
     """
-    # If any non-MCP/non-skills fields differ, it's a genuine conflict
-    structural_fields = set(COMPARABLE_FIELDS) - {"skills", "mcp_config"}
+    # If any non-MCP/non-skills/non-custom_env fields differ, it's a genuine conflict
+    structural_fields = set(COMPARABLE_FIELDS) - {"skills", "mcp_config", "custom_env"}
     for field in structural_fields:
         if repo_norm.get(field) != multica_norm.get(field):
             return None
+
+    # custom_env: compare key sets only (ignore placeholder vs resolved values).
+    # If one side has keys and the other doesn't, allow the side with keys to win
+    # (repo adds custom_env; Multica may have none because it was never set).
+    repo_env_keys = _sanitize_custom_env_for_state(repo_norm.get("custom_env"))
+    multica_env_keys = _sanitize_custom_env_for_state(multica_norm.get("custom_env"))
+    if repo_env_keys is not None and multica_env_keys is not None:
+        if repo_env_keys != multica_env_keys:
+            return None
+    elif repo_env_keys != multica_env_keys:
+        pass
 
     # MCP config: compare server keys only (ignore placeholder vs resolved)
     repo_servers = _get_mcp_server_keys(repo_norm.get("mcp_config"))
@@ -569,7 +646,7 @@ def _try_reconcile_agent_conflict(
         # (repo adds MCP servers; Multica may have none due to redaction)
         pass
 
-    # Merge: start from repo norm, override skills (union)
+    # Merge: start from repo norm, override skills (union), keep repo custom_env
     merged = dict(repo_norm)
     merged["skills"] = sorted(
         set(repo_norm.get("skills") or []) |
@@ -802,19 +879,29 @@ def sync_agents_workspace(
                 # anchored agent (AC5): we deliberately don't re-mint, so preserve
                 # the last-known multica_state rather than clobbering it with the miss.
                 if multica_norm is not None:
-                    multica_state = {**multica_norm, "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config"))}
+                    multica_state = {
+                        **multica_norm,
+                        "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config")),
+                        "custom_env": _sanitize_custom_env_for_state(multica_norm.get("custom_env")),
+                    }
                 else:
                     multica_state = last.get("multica_state") if last else None
                 state_agents[state_key] = {
                     "repo_file": str(rel_path),
-                    "repo_state": {**repo_norm, "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config"))},
+                    "repo_state": {
+                        **repo_norm,
+                        "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config")),
+                        "custom_env": _sanitize_custom_env_for_state(repo_norm.get("custom_env")),
+                    },
                     "multica_state": multica_state,
                 }
 
             elif action == "push_to_multica":
                 mcp_file = _write_mcp_config_tempfile(repo_data)
+                custom_env_file = _write_custom_env_tempfile(repo_data)
                 try:
                     mcp_args = ["--mcp-config-file", mcp_file] if mcp_file else []
+                    custom_env_args = ["--custom-env-file", custom_env_file] if custom_env_file else []
                     if live_agent is None:
                         # No identity anchor and no name match → genuine create.
                         # Gated by CreateGuard so a name-lookup miss can never
@@ -830,12 +917,12 @@ def sync_agents_workspace(
                         print(f"    → creating in Multica", file=sys.stderr)
                         try:
                             if not dry_run:
-                                result = _multica(["agent", "create"] + build_create_args(repo_data) + mcp_args)
+                                result = _multica(["agent", "create"] + build_create_args(repo_data) + mcp_args + custom_env_args)
                                 agent_id = result["id"]
                                 id_map[key] = agent_id
                                 print(f"    ✓ created (id={agent_id}) — anchored {key}", file=sys.stderr)
                             else:
-                                _multica(["agent", "create"] + build_create_args(repo_data) + mcp_args, dry_run=True)
+                                _multica(["agent", "create"] + build_create_args(repo_data) + mcp_args + custom_env_args, dry_run=True)
                             create_guard.record()
                             counts["created"] += 1
                         except Exception as e:
@@ -851,9 +938,19 @@ def sync_agents_workspace(
                             print(f"    ✗ UPDATE FAILED: {e}", file=sys.stderr)
                             counts["errors"] += 1
                             continue
+                    # Set custom_env separately via env set (not supported on agent update)
+                    if custom_env_file and live_agent is not None:
+                        try:
+                            _multica(["agent", "env", "set", agent_id, "--custom-env-file", custom_env_file], dry_run=dry_run)
+                        except Exception as e:
+                            print(f"    ✗ CUSTOM_ENV SET FAILED: {e}", file=sys.stderr)
+                            counts["errors"] += 1
+                            continue
                 finally:
                     if mcp_file:
                         os.unlink(mcp_file)
+                    if custom_env_file:
+                        os.unlink(custom_env_file)
 
                 desired_skills = repo_norm.get("skills") or []
                 if desired_skills and agent_id:
@@ -865,12 +962,26 @@ def sync_agents_workspace(
 
                 state_agents[state_key] = {
                     "repo_file": str(rel_path),
-                    "repo_state": {**repo_norm, "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config"))},
-                    "multica_state": {**repo_norm, "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config"))},
+                    "repo_state": {
+                        **repo_norm,
+                        "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config")),
+                        "custom_env": _sanitize_custom_env_for_state(repo_norm.get("custom_env")),
+                    },
+                    "multica_state": {
+                        **repo_norm,
+                        "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config")),
+                        "custom_env": _sanitize_custom_env_for_state(repo_norm.get("custom_env")),
+                    },
                 }
 
             elif action == "pull_to_repo":
                 print(f"    → writing repo (Multica changed)", file=sys.stderr)
+                # Fetch custom_env from Multica for write-back
+                if live_agent:
+                    live_custom_env = _fetch_agent_custom_env(live_agent["id"])
+                    if live_custom_env:
+                        live_agent = dict(live_agent)
+                        live_agent["custom_env"] = live_custom_env
                 try:
                     write_agent_json(agent_json_path, live_agent, dry_run)
                     counts["repo_updated"] += 1
@@ -880,8 +991,16 @@ def sync_agents_workspace(
                     continue
                 state_agents[state_key] = {
                     "repo_file": str(rel_path),
-                    "repo_state": {**multica_norm, "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config"))},
-                    "multica_state": {**multica_norm, "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config"))},
+                    "repo_state": {
+                        **multica_norm,
+                        "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config")),
+                        "custom_env": _sanitize_custom_env_for_state(multica_norm.get("custom_env")),
+                    },
+                    "multica_state": {
+                        **multica_norm,
+                        "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config")),
+                        "custom_env": _sanitize_custom_env_for_state(multica_norm.get("custom_env")),
+                    },
                 }
 
             elif action == "conflict":
@@ -891,6 +1010,7 @@ def sync_agents_workspace(
                     # 1. Push merged state to Multica
                     merged_repo_data = _apply_reconciled_to_repo_data(repo_data, reconciled)
                     mcp_file = _write_mcp_config_tempfile(merged_repo_data)
+                    custom_env_file = _write_custom_env_tempfile(merged_repo_data)
                     try:
                         mcp_args = ["--mcp-config-file", mcp_file] if mcp_file else []
                         _multica(
@@ -898,6 +1018,10 @@ def sync_agents_workspace(
                             dry_run=dry_run,
                         )
                         counts["updated"] += 1
+
+                        # Set custom_env after update (env set, not supported on agent update)
+                        if custom_env_file:
+                            _multica(["agent", "env", "set", agent_id, "--custom-env-file", custom_env_file], dry_run=dry_run)
                     except Exception as e:
                         print(f"    ✗ MULTICA UPDATE FAILED: {e}", file=sys.stderr)
                         counts["errors"] += 1
@@ -905,6 +1029,8 @@ def sync_agents_workspace(
                     finally:
                         if mcp_file:
                             os.unlink(mcp_file)
+                        if custom_env_file:
+                            os.unlink(custom_env_file)
 
                     desired_skills = reconciled.get("skills") or []
                     if desired_skills and agent_id:
@@ -925,8 +1051,16 @@ def sync_agents_workspace(
 
                     state_agents[state_key] = {
                         "repo_file": str(rel_path),
-                        "repo_state": {**reconciled, "mcp_config": _sanitize_mcp_for_state(reconciled.get("mcp_config"))},
-                        "multica_state": {**reconciled, "mcp_config": _sanitize_mcp_for_state(reconciled.get("mcp_config"))},
+                        "repo_state": {
+                            **reconciled,
+                            "mcp_config": _sanitize_mcp_for_state(reconciled.get("mcp_config")),
+                            "custom_env": _sanitize_custom_env_for_state(reconciled.get("custom_env")),
+                        },
+                        "multica_state": {
+                            **reconciled,
+                            "mcp_config": _sanitize_mcp_for_state(reconciled.get("mcp_config")),
+                            "custom_env": _sanitize_custom_env_for_state(reconciled.get("custom_env")),
+                        },
                     }
                 else:
                     print(f"    ✗ CONFLICT: both sides changed irreconcilably", file=sys.stderr)
@@ -997,6 +1131,12 @@ def sync_agents_workspace(
 
             print(f"  {rel_path}")
             print(f"    → writing repo (new agent discovered in Multica)", file=sys.stderr)
+            # Fetch custom_env from Multica for write-back
+            if agent_id:
+                live_custom_env = _fetch_agent_custom_env(agent_id)
+                if live_custom_env:
+                    live_agent = dict(live_agent)
+                    live_agent["custom_env"] = live_custom_env
             try:
                 write_agent_json(agent_json_path, live_agent, dry_run)
                 counts["repo_updated"] += 1
@@ -1012,8 +1152,16 @@ def sync_agents_workspace(
             disc_norm = normalize_agent(live_agent)
             state_agents[state_key] = {
                 "repo_file": str(rel_path),
-                "repo_state": {**disc_norm, "mcp_config": _sanitize_mcp_for_state(disc_norm.get("mcp_config"))},
-                "multica_state": {**disc_norm, "mcp_config": _sanitize_mcp_for_state(disc_norm.get("mcp_config"))},
+                "repo_state": {
+                    **disc_norm,
+                    "mcp_config": _sanitize_mcp_for_state(disc_norm.get("mcp_config")),
+                    "custom_env": _sanitize_custom_env_for_state(disc_norm.get("custom_env")),
+                },
+                "multica_state": {
+                    **disc_norm,
+                    "mcp_config": _sanitize_mcp_for_state(disc_norm.get("mcp_config")),
+                    "custom_env": _sanitize_custom_env_for_state(disc_norm.get("custom_env")),
+                },
             }
 
         elif action == "conflict":

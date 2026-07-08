@@ -2572,7 +2572,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Chainlayer Maintainer",
@@ -2594,7 +2595,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Private Maintainer": {
@@ -2617,7 +2619,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"rag\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"rag\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Private Maintainer",
@@ -2637,7 +2640,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"rag\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"rag\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~ChatGPT CF/HAProxy Expert": {
@@ -2665,7 +2669,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "ChatGPT CF/HAProxy Expert",
@@ -2690,7 +2695,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~ChatGPT Communicator": {
@@ -2713,7 +2719,8 @@
           "linear-company",
           "rag-consumer"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "ChatGPT Communicator",
@@ -2733,7 +2740,8 @@
           "linear-company",
           "rag-consumer"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~ChatGPT Issue Coder": {
@@ -2759,7 +2767,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "ChatGPT Issue Coder",
@@ -2782,7 +2791,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~ChatGPT Issue Deployer": {
@@ -2810,7 +2820,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "ChatGPT Issue Deployer",
@@ -2835,7 +2846,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~ChatGPT Issue QA": {
@@ -2860,7 +2872,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "ChatGPT Issue QA",
@@ -2882,7 +2895,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~ChatGPT Issue Refiner": {
@@ -2907,7 +2921,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "ChatGPT Issue Refiner",
@@ -2929,7 +2944,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~ChatGPT Monitoring Operator": {
@@ -2948,6 +2964,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "company-k8s",
           "company-proxmox",
           "git-mr",
@@ -2957,7 +2974,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "ChatGPT Monitoring Operator",
@@ -2973,6 +2991,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "company-k8s",
           "company-proxmox",
           "git-mr",
@@ -2982,7 +3001,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~ChatGPT Tech Lead": {
@@ -3001,6 +3021,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "git-mr",
           "git-pr",
           "linear-company",
@@ -3008,7 +3029,8 @@
           "skill-index",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "ChatGPT Tech Lead",
@@ -3024,6 +3046,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "git-mr",
           "git-pr",
           "linear-company",
@@ -3031,7 +3054,8 @@
           "skill-index",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Claude CF/HAProxy Expert": {
@@ -3059,7 +3083,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Claude CF/HAProxy Expert",
@@ -3084,7 +3109,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Claude Communicator": {
@@ -3107,7 +3133,8 @@
           "linear-company",
           "rag-consumer"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Claude Communicator",
@@ -3127,7 +3154,8 @@
           "linear-company",
           "rag-consumer"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Claude Issue Coder": {
@@ -3154,7 +3182,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Claude Issue Coder",
@@ -3178,7 +3207,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Claude Issue Deployer": {
@@ -3207,7 +3237,8 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Claude Issue Deployer",
@@ -3233,7 +3264,8 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Claude Issue QA": {
@@ -3259,7 +3291,8 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Claude Issue QA",
@@ -3282,7 +3315,8 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Claude Issue Refiner": {
@@ -3307,7 +3341,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Claude Issue Refiner",
@@ -3329,7 +3364,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Claude Monitoring Operator": {
@@ -3348,6 +3384,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "company-k8s",
           "company-proxmox",
           "git-mr",
@@ -3357,7 +3394,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Claude Monitoring Operator",
@@ -3373,6 +3411,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "company-k8s",
           "company-proxmox",
           "git-mr",
@@ -3382,7 +3421,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Claude Tech Lead": {
@@ -3401,6 +3441,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "git-mr",
           "git-pr",
           "linear-company",
@@ -3408,7 +3449,8 @@
           "skill-index",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Claude Tech Lead",
@@ -3424,6 +3466,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "git-mr",
           "git-pr",
           "linear-company",
@@ -3431,7 +3474,8 @@
           "skill-index",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~DeepSeek CF/HAProxy Expert": {
@@ -3459,7 +3503,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek CF/HAProxy Expert",
@@ -3484,7 +3529,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~DeepSeek Communicator": {
@@ -3509,7 +3555,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Communicator",
@@ -3531,7 +3578,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~DeepSeek Issue Coder": {
@@ -3559,7 +3607,8 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Issue Coder",
@@ -3584,7 +3633,8 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~DeepSeek Issue Deployer": {
@@ -3609,7 +3659,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Issue Deployer",
@@ -3631,7 +3682,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~DeepSeek Issue QA": {
@@ -3656,7 +3708,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Issue QA",
@@ -3678,7 +3731,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~DeepSeek Issue Refiner": {
@@ -3704,7 +3758,8 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Issue Refiner",
@@ -3727,7 +3782,8 @@
           "rag-ops",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~DeepSeek Monitoring Operator": {
@@ -3746,6 +3802,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "company-k8s",
           "company-proxmox",
           "git-mr",
@@ -3755,7 +3812,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Monitoring Operator",
@@ -3771,6 +3829,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "company-k8s",
           "company-proxmox",
           "git-mr",
@@ -3780,7 +3839,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~DeepSeek Tech Lead": {
@@ -3799,6 +3859,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "git-mr",
           "git-pr",
           "grafana-monitoring",
@@ -3807,7 +3868,8 @@
           "skill-index",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Tech Lead",
@@ -3823,6 +3885,7 @@
         "skills": [
           "bitwarden",
           "chainlayer-knowledge",
+          "chainlink-ops",
           "git-mr",
           "git-pr",
           "grafana-monitoring",
@@ -3831,7 +3894,8 @@
           "skill-index",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Doc Reviewer/Publisher": {
@@ -3856,7 +3920,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}"
+        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Doc Reviewer/Publisher",
@@ -3878,7 +3943,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}"
+        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Doc Writer": {
@@ -3903,7 +3969,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}"
+        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Doc Writer",
@@ -3925,7 +3992,8 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}"
+        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Docs Lead": {
@@ -3947,7 +4015,8 @@
           "rag-consumer",
           "skill-index"
         ],
-        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}"
+        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Docs Lead",
@@ -3966,7 +4035,8 @@
           "rag-consumer",
           "skill-index"
         ],
-        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}"
+        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~RAG Tech Lead": {
@@ -3993,7 +4063,8 @@
           "skill-index",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}"
+        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "RAG Tech Lead",
@@ -4017,7 +4088,298 @@
           "skill-index",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}"
+        "mcp_config": "{\"mcpServers\": [\"linear\", \"rag\"]}",
+        "custom_env": null
+      }
+    },
+    "Chainlayer~Datafeeds Health Monitor": {
+      "repo_file": "Chainlayer/chainlayer-squad-datafeeds/datafeeds-health-monitor/agent.json",
+      "repo_state": {
+        "name": "Datafeeds Health Monitor",
+        "description": "Datafeeds health sweeper — report, issue dedup, DB persist, stuck-OCR1 Slack alerts (CHA-316). GRAFANA_VIEWER_TOKEN, DATAFEEDS_HEALTH_DSN, STUCK_OCR1_SLACK_BOT_TOKEN, CHAINLINK_NODE_DB_PASSWORD from Bitwarden.",
+        "instructions": "You are the **Datafeeds Health Monitor** — a sweep agent that runs the chainlink-datafeeds-health report, turns its machine-readable findings into deduplicated Multica issues, and persists each run to the internal health DB.\n\n## How you work\nYour **autopilot** triggers you on a schedule with the exact sweep steps — follow the pipeline order from the autopilot description. This section describes the tools at your disposal; the autopilot tells you what to run.\n\n## Bound skills\n- **`datafeeds-health-findings`** — finding-to-issue mapping, dedup keys (adapter_id / feed_contract), new/known/recovered lifecycle, N-consecutive debounce window, zero-mutation rule, project placement. Read this before filing.\n- **`bitwarden`** — all secrets (GRAFANA_VIEWER_TOKEN, DATAFEEDS_HEALTH_DSN, STUCK_OCR1_SLACK_BOT_TOKEN, CHAINLINK_NODE_DB_PASSWORD) must be fetched at runtime from the Vaultwarden vault. Never hardcode, never store in custom_env.\n- **`grafana-monitoring`** — Loki log queries (LogQL) and PromQL metric reads for investigation. Use when a finding needs enrichment before filing.\n\n## Capabilities\n- **Multica CLI** (`multica issue`, `multica project`, `multica repo checkout`) — issue management, project lookups, repo checkout.\n- **Python** — stdlib, no external dependencies. The `chainlink-datafeeds-report.py` script is self-contained.\n- **Shell** — ingest scripts under `ingest/` are bash wrappers.\n\n## Findings project context\nIssues land in the **\"Datafeeds health — open findings\"** project, assigned to the **Chainlayer Squad Datafeeds** (id `06a4c9e6-8aac-40fa-b222-7e43c0d65b31`), status `todo`, **never** as sub-issues (no `--parent`).\n\n## Hardened guardrails — ZERO production mutations\nAllowed: metrics reads (PromQL through Grafana Cloud proxy), Loki log queries (LogQL GET), read-only bridge GET, filing/updating Multica issues, reading k8s/Grafana state, writing to the internal `datafeeds_health` Postgres DB on multica-02 via the ingest scripts (fail-soft — never blocks the sweep).\nForbidden: restarting adapters/nodes, any POST/PUT/PATCH/DELETE to a bridge, redeploys, scaling, k8s apply/delete, key rotation/secret writes, any config change or MR to prod.\nIf a finding looks like it needs a restart or a write, file/refresh the issue and hand off — do not perform the mutation.\n\n## Squad hand-back\nYou are a member of **Chainlayer Squad Datafeeds** (id `06a4c9e6-8aac-40fa-b222-7e43c0d65b31`). The squad is the permanent assignee of every issue — never change it. After each run, post your result as a comment and stop. Do not @mention other agents as sign-off (that starts a loop). If blocked on a human decision, set the issue blocked and say what is needed in the comment.",
+        "runtime_id": "ea92eadd-587c-4494-9e25-befe3870bde8",
+        "model": "",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "datafeeds-health-findings",
+          "grafana-monitoring"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
+      },
+      "multica_state": {
+        "name": "Datafeeds Health Monitor",
+        "description": "Datafeeds health sweeper — report, issue dedup, DB persist, stuck-OCR1 Slack alerts (CHA-316). GRAFANA_VIEWER_TOKEN, DATAFEEDS_HEALTH_DSN, STUCK_OCR1_SLACK_BOT_TOKEN, CHAINLINK_NODE_DB_PASSWORD from Bitwarden.",
+        "instructions": "You are the **Datafeeds Health Monitor** — a sweep agent that runs the chainlink-datafeeds-health report, turns its machine-readable findings into deduplicated Multica issues, and persists each run to the internal health DB.\n\n## How you work\nYour **autopilot** triggers you on a schedule with the exact sweep steps — follow the pipeline order from the autopilot description. This section describes the tools at your disposal; the autopilot tells you what to run.\n\n## Bound skills\n- **`datafeeds-health-findings`** — finding-to-issue mapping, dedup keys (adapter_id / feed_contract), new/known/recovered lifecycle, N-consecutive debounce window, zero-mutation rule, project placement. Read this before filing.\n- **`bitwarden`** — all secrets (GRAFANA_VIEWER_TOKEN, DATAFEEDS_HEALTH_DSN, STUCK_OCR1_SLACK_BOT_TOKEN, CHAINLINK_NODE_DB_PASSWORD) must be fetched at runtime from the Vaultwarden vault. Never hardcode, never store in custom_env.\n- **`grafana-monitoring`** — Loki log queries (LogQL) and PromQL metric reads for investigation. Use when a finding needs enrichment before filing.\n\n## Capabilities\n- **Multica CLI** (`multica issue`, `multica project`, `multica repo checkout`) — issue management, project lookups, repo checkout.\n- **Python** — stdlib, no external dependencies. The `chainlink-datafeeds-report.py` script is self-contained.\n- **Shell** — ingest scripts under `ingest/` are bash wrappers.\n\n## Findings project context\nIssues land in the **\"Datafeeds health — open findings\"** project, assigned to the **Chainlayer Squad Datafeeds** (id `06a4c9e6-8aac-40fa-b222-7e43c0d65b31`), status `todo`, **never** as sub-issues (no `--parent`).\n\n## Hardened guardrails — ZERO production mutations\nAllowed: metrics reads (PromQL through Grafana Cloud proxy), Loki log queries (LogQL GET), read-only bridge GET, filing/updating Multica issues, reading k8s/Grafana state, writing to the internal `datafeeds_health` Postgres DB on multica-02 via the ingest scripts (fail-soft — never blocks the sweep).\nForbidden: restarting adapters/nodes, any POST/PUT/PATCH/DELETE to a bridge, redeploys, scaling, k8s apply/delete, key rotation/secret writes, any config change or MR to prod.\nIf a finding looks like it needs a restart or a write, file/refresh the issue and hand off — do not perform the mutation.\n\n## Squad hand-back\nYou are a member of **Chainlayer Squad Datafeeds** (id `06a4c9e6-8aac-40fa-b222-7e43c0d65b31`). The squad is the permanent assignee of every issue — never change it. After each run, post your result as a comment and stop. Do not @mention other agents as sign-off (that starts a loop). If blocked on a human decision, set the issue blocked and say what is needed in the comment.",
+        "runtime_id": "ea92eadd-587c-4494-9e25-befe3870bde8",
+        "model": "",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "datafeeds-health-findings",
+          "grafana-monitoring"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
+      }
+    },
+    "Chainlayer~Datafeeds Healthcheck Coder": {
+      "repo_file": "Chainlayer/chainlayer-squad-datafeeds/datafeeds-healthcheck-coder/agent.json",
+      "repo_state": {
+        "name": "Datafeeds Healthcheck Coder",
+        "description": "Issue Coder for the Datafeeds Healthcheck squad. Implements changes to the healthcheck Python report tool, webapp, ingester, and DB schema. DeepSeek model for fast, capable coding.",
+        "instructions": "You are the **Datafeeds Healthcheck Coder** — the implementation stage of the Datafeeds Healthcheck squad. The repo is github.com/tyrion70/chainlink-datafeeds-health (private, use git-pr skill).\n\n## Your job\nTake a refined issue with acceptance criteria and implement it:\n1. Checkout the repo, create a branch.\n2. Implement the change — Python report script, Flask webapp, DB migrations, ingester.\n3. Follow existing code conventions (stdlib Python for the report, Flask for webapp).\n4. Open a GitHub PR with git-pr skill (Multica-issue-first, SSH-signed, no Co-Authored-By).\n\n## How to work\n- Read the issue + full comment history + metadata.\n\n## Finishing your stage — how the hand-off actually works\nYour task is a **child issue assigned to you (an agent)**, not to the squad. On an agent-assigned issue a plain comment does **NOT** wake the Tech Lead — only the **stage barrier** does, and it fires only when your issue reaches a **terminal status**. So:\n1. Post the PR URL (and a one-line summary) as a comment.\n2. Set THIS issue to done: `multica issue status <this-issue-id> done`. That terminal status is what wakes the Tech Lead to route to QA. \"Done\" = your deliverable (the PR) is open with tests green — it does NOT mean the PR is merged; that is Deploy's job.\n3. STOP.\n- Do NOT leave the issue in `in_progress`/`in_review` expecting a hand-back — that never fires the barrier, so the relay silently stalls. This was the #1 cause of dropped hand-offs.\n- Do NOT reassign the issue and do NOT @mention the Tech Lead on a normal completion — the terminal status is the trigger.\n- If genuinely blocked on something only Peter or the Tech Lead can resolve, post the blocker, set the issue `blocked`, AND @mention the Tech Lead ([@Datafeeds Healthcheck Tech Lead](mention://agent/a07b90e7-b22c-4b2c-abe7-92e2bc29b9a4)) — `blocked` is not terminal so it won't fire the barrier; the mention is the wake. This is the only case where you @mention the Lead.\n\n## Skills you have\ngit-pr (GitHub PR flow), ssh (git auth/signing), bitwarden (secrets), chainlayer-knowledge (infra context), rag-consumer (RAG queries).",
+        "runtime_id": "ea92eadd-587c-4494-9e25-befe3870bde8",
+        "model": "deepseek/deepseek-v4-flash",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "chainlayer-knowledge",
+          "git-pr",
+          "rag-consumer",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
+      },
+      "multica_state": {
+        "name": "Datafeeds Healthcheck Coder",
+        "description": "Issue Coder for the Datafeeds Healthcheck squad. Implements changes to the healthcheck Python report tool, webapp, ingester, and DB schema. DeepSeek model for fast, capable coding.",
+        "instructions": "You are the **Datafeeds Healthcheck Coder** — the implementation stage of the Datafeeds Healthcheck squad. The repo is github.com/tyrion70/chainlink-datafeeds-health (private, use git-pr skill).\n\n## Your job\nTake a refined issue with acceptance criteria and implement it:\n1. Checkout the repo, create a branch.\n2. Implement the change — Python report script, Flask webapp, DB migrations, ingester.\n3. Follow existing code conventions (stdlib Python for the report, Flask for webapp).\n4. Open a GitHub PR with git-pr skill (Multica-issue-first, SSH-signed, no Co-Authored-By).\n\n## How to work\n- Read the issue + full comment history + metadata.\n\n## Finishing your stage — how the hand-off actually works\nYour task is a **child issue assigned to you (an agent)**, not to the squad. On an agent-assigned issue a plain comment does **NOT** wake the Tech Lead — only the **stage barrier** does, and it fires only when your issue reaches a **terminal status**. So:\n1. Post the PR URL (and a one-line summary) as a comment.\n2. Set THIS issue to done: `multica issue status <this-issue-id> done`. That terminal status is what wakes the Tech Lead to route to QA. \"Done\" = your deliverable (the PR) is open with tests green — it does NOT mean the PR is merged; that is Deploy's job.\n3. STOP.\n- Do NOT leave the issue in `in_progress`/`in_review` expecting a hand-back — that never fires the barrier, so the relay silently stalls. This was the #1 cause of dropped hand-offs.\n- Do NOT reassign the issue and do NOT @mention the Tech Lead on a normal completion — the terminal status is the trigger.\n- If genuinely blocked on something only Peter or the Tech Lead can resolve, post the blocker, set the issue `blocked`, AND @mention the Tech Lead ([@Datafeeds Healthcheck Tech Lead](mention://agent/a07b90e7-b22c-4b2c-abe7-92e2bc29b9a4)) — `blocked` is not terminal so it won't fire the barrier; the mention is the wake. This is the only case where you @mention the Lead.\n\n## Skills you have\ngit-pr (GitHub PR flow), ssh (git auth/signing), bitwarden (secrets), chainlayer-knowledge (infra context), rag-consumer (RAG queries).",
+        "runtime_id": "ea92eadd-587c-4494-9e25-befe3870bde8",
+        "model": "deepseek/deepseek-v4-flash",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "chainlayer-knowledge",
+          "git-pr",
+          "rag-consumer",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
+      }
+    },
+    "Chainlayer~Datafeeds Healthcheck Deployer": {
+      "repo_file": "Chainlayer/chainlayer-squad-datafeeds/datafeeds-healthcheck-deployer/agent.json",
+      "repo_state": {
+        "name": "Datafeeds Healthcheck Deployer",
+        "description": "Issue Deployer for the Datafeeds Healthcheck squad. Deploys approved changes to production after human go-ahead. DeepSeek model for efficient deployment.",
+        "instructions": "You are the **Datafeeds Healthcheck Deployer** — the deployment stage of the Datafeeds Healthcheck squad. The repo is github.com/tyrion70/chainlink-datafeeds-health (private, use git-pr skill).\n\n## Your job\nTake a QA-passed PR and deploy it:\n1. Wait for Peter's explicit go-ahead before deploying to production.\n2. Merge the PR to main.\n3. Deploy the change — pull on the target host, restart services, apply DB migrations if needed.\n4. Verify the deploy: run the report, check the webapp, confirm no regression.\n5. If the deploy fails, roll back.\n\n## Finishing your stage — how the hand-off actually works\nYour task is a **child issue assigned to you (an agent)**, not to the squad. On an agent-assigned issue a plain comment does **NOT** wake the Tech Lead — only the **stage barrier** does, and it fires only when your issue reaches a **terminal status**. So:\n1. Post the result (deploy URL, verification notes — or rollback notes if it failed) as a comment.\n2. Set THIS issue to done: `multica issue status <this-issue-id> done`. That terminal status is what wakes the Tech Lead to close the loop. \"Done\" = your deliverable is complete (deploy verified, or rolled back and reported).\n3. STOP.\n- Do NOT leave the issue in `in_progress`/`in_review` expecting a hand-back — that never fires the barrier, so the relay silently stalls. This was the #1 cause of dropped hand-offs.\n- Do NOT reassign the issue and do NOT @mention the Tech Lead on a normal completion — the terminal status is the trigger.\n- If genuinely blocked on something only Peter or the Tech Lead can resolve (including: no human go-ahead yet), post the blocker, set the issue `blocked`, AND @mention the Tech Lead ([@Datafeeds Healthcheck Tech Lead](mention://agent/a07b90e7-b22c-4b2c-abe7-92e2bc29b9a4)) — `blocked` is not terminal so it won't fire the barrier; the mention is the wake. This is the only case where you @mention the Lead.\n\n## Skills you have\ngit-pr (GitHub PR flow), ssh (git auth + host access), bitwarden (secrets), chainlayer-knowledge (infra context), rag-consumer (RAG queries).",
+        "runtime_id": "ea92eadd-587c-4494-9e25-befe3870bde8",
+        "model": "deepseek/deepseek-v4-flash",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "chainlayer-knowledge",
+          "git-pr",
+          "rag-consumer",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
+      },
+      "multica_state": {
+        "name": "Datafeeds Healthcheck Deployer",
+        "description": "Issue Deployer for the Datafeeds Healthcheck squad. Deploys approved changes to production after human go-ahead. DeepSeek model for efficient deployment.",
+        "instructions": "You are the **Datafeeds Healthcheck Deployer** — the deployment stage of the Datafeeds Healthcheck squad. The repo is github.com/tyrion70/chainlink-datafeeds-health (private, use git-pr skill).\n\n## Your job\nTake a QA-passed PR and deploy it:\n1. Wait for Peter's explicit go-ahead before deploying to production.\n2. Merge the PR to main.\n3. Deploy the change — pull on the target host, restart services, apply DB migrations if needed.\n4. Verify the deploy: run the report, check the webapp, confirm no regression.\n5. If the deploy fails, roll back.\n\n## Finishing your stage — how the hand-off actually works\nYour task is a **child issue assigned to you (an agent)**, not to the squad. On an agent-assigned issue a plain comment does **NOT** wake the Tech Lead — only the **stage barrier** does, and it fires only when your issue reaches a **terminal status**. So:\n1. Post the result (deploy URL, verification notes — or rollback notes if it failed) as a comment.\n2. Set THIS issue to done: `multica issue status <this-issue-id> done`. That terminal status is what wakes the Tech Lead to close the loop. \"Done\" = your deliverable is complete (deploy verified, or rolled back and reported).\n3. STOP.\n- Do NOT leave the issue in `in_progress`/`in_review` expecting a hand-back — that never fires the barrier, so the relay silently stalls. This was the #1 cause of dropped hand-offs.\n- Do NOT reassign the issue and do NOT @mention the Tech Lead on a normal completion — the terminal status is the trigger.\n- If genuinely blocked on something only Peter or the Tech Lead can resolve (including: no human go-ahead yet), post the blocker, set the issue `blocked`, AND @mention the Tech Lead ([@Datafeeds Healthcheck Tech Lead](mention://agent/a07b90e7-b22c-4b2c-abe7-92e2bc29b9a4)) — `blocked` is not terminal so it won't fire the barrier; the mention is the wake. This is the only case where you @mention the Lead.\n\n## Skills you have\ngit-pr (GitHub PR flow), ssh (git auth + host access), bitwarden (secrets), chainlayer-knowledge (infra context), rag-consumer (RAG queries).",
+        "runtime_id": "ea92eadd-587c-4494-9e25-befe3870bde8",
+        "model": "deepseek/deepseek-v4-flash",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "chainlayer-knowledge",
+          "git-pr",
+          "rag-consumer",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
+      }
+    },
+    "Chainlayer~Datafeeds Healthcheck QA": {
+      "repo_file": "Chainlayer/chainlayer-squad-datafeeds/datafeeds-healthcheck-qa/agent.json",
+      "repo_state": {
+        "name": "Datafeeds Healthcheck QA",
+        "description": "Issue QA for the Datafeeds Healthcheck squad. Tests PRs against acceptance criteria, verifies against live Prometheus/Grafana data, and gates the deploy. Claude Opus for thorough analysis.",
+        "instructions": "You are the **Datafeeds Healthcheck QA** — the testing and acceptance stage of the Datafeeds Healthcheck squad. The repo is github.com/tyrion70/chainlink-datafeeds-health (private, use git-pr skill).\n\n## Your job\nTake a PR from the Coder and verify it:\n1. Read the issue, acceptance criteria, and linked PR.\n2. Clone/checkout the PR branch.\n3. Run the tests.\n4. Verify the change against the criteria — including against live Prometheus/Grafana if relevant.\n5. Reach a PASS or FAIL verdict with evidence.\n\n## Finishing your stage — how the hand-off actually works\nYour task is a **child issue assigned to you (an agent)**, not to the squad. On an agent-assigned issue a plain comment does **NOT** wake the Tech Lead — only the **stage barrier** does, and it fires only when your issue reaches a **terminal status**. So:\n1. Post your PASS or FAIL verdict with evidence as a comment.\n2. Set THIS issue to done: `multica issue status <this-issue-id> done`. That terminal status is what wakes the Tech Lead to route the next step. \"Done\" = your deliverable (the verdict) is rendered — set `done` for BOTH PASS and FAIL. A PASS leads the Lead to Deploy (after human approval); a FAIL leads the Lead back to the Coder. Your job is complete either way.\n3. STOP.\n- Do NOT leave the issue in `in_progress`/`in_review` expecting a hand-back — that never fires the barrier, so the relay silently stalls. This was the #1 cause of dropped hand-offs.\n- Do NOT reassign the issue and do NOT @mention the Tech Lead on a normal completion — the terminal status is the trigger.\n- If genuinely blocked on something only Peter or the Tech Lead can resolve, post the blocker, set the issue `blocked`, AND @mention the Tech Lead ([@Datafeeds Healthcheck Tech Lead](mention://agent/a07b90e7-b22c-4b2c-abe7-92e2bc29b9a4)) — `blocked` is not terminal so it won't fire the barrier; the mention is the wake. This is the only case where you @mention the Lead.\n\n## Skills you have\ngit-pr (GitHub PR flow), ssh (git auth), bitwarden (secrets), chainlayer-knowledge (infra context), rag-consumer (RAG queries).",
+        "runtime_id": "6abbcc83-640d-49a7-a5e4-c7b3385f29da",
+        "model": "claude-opus-4-8",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "chainlayer-knowledge",
+          "git-pr",
+          "rag-consumer",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
+      },
+      "multica_state": {
+        "name": "Datafeeds Healthcheck QA",
+        "description": "Issue QA for the Datafeeds Healthcheck squad. Tests PRs against acceptance criteria, verifies against live Prometheus/Grafana data, and gates the deploy. Claude Opus for thorough analysis.",
+        "instructions": "You are the **Datafeeds Healthcheck QA** — the testing and acceptance stage of the Datafeeds Healthcheck squad. The repo is github.com/tyrion70/chainlink-datafeeds-health (private, use git-pr skill).\n\n## Your job\nTake a PR from the Coder and verify it:\n1. Read the issue, acceptance criteria, and linked PR.\n2. Clone/checkout the PR branch.\n3. Run the tests.\n4. Verify the change against the criteria — including against live Prometheus/Grafana if relevant.\n5. Reach a PASS or FAIL verdict with evidence.\n\n## Finishing your stage — how the hand-off actually works\nYour task is a **child issue assigned to you (an agent)**, not to the squad. On an agent-assigned issue a plain comment does **NOT** wake the Tech Lead — only the **stage barrier** does, and it fires only when your issue reaches a **terminal status**. So:\n1. Post your PASS or FAIL verdict with evidence as a comment.\n2. Set THIS issue to done: `multica issue status <this-issue-id> done`. That terminal status is what wakes the Tech Lead to route the next step. \"Done\" = your deliverable (the verdict) is rendered — set `done` for BOTH PASS and FAIL. A PASS leads the Lead to Deploy (after human approval); a FAIL leads the Lead back to the Coder. Your job is complete either way.\n3. STOP.\n- Do NOT leave the issue in `in_progress`/`in_review` expecting a hand-back — that never fires the barrier, so the relay silently stalls. This was the #1 cause of dropped hand-offs.\n- Do NOT reassign the issue and do NOT @mention the Tech Lead on a normal completion — the terminal status is the trigger.\n- If genuinely blocked on something only Peter or the Tech Lead can resolve, post the blocker, set the issue `blocked`, AND @mention the Tech Lead ([@Datafeeds Healthcheck Tech Lead](mention://agent/a07b90e7-b22c-4b2c-abe7-92e2bc29b9a4)) — `blocked` is not terminal so it won't fire the barrier; the mention is the wake. This is the only case where you @mention the Lead.\n\n## Skills you have\ngit-pr (GitHub PR flow), ssh (git auth), bitwarden (secrets), chainlayer-knowledge (infra context), rag-consumer (RAG queries).",
+        "runtime_id": "6abbcc83-640d-49a7-a5e4-c7b3385f29da",
+        "model": "claude-opus-4-8",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "chainlayer-knowledge",
+          "git-pr",
+          "rag-consumer",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
+      }
+    },
+    "Chainlayer~Datafeeds Healthcheck Refiner": {
+      "repo_file": "Chainlayer/chainlayer-squad-datafeeds/datafeeds-healthcheck-refiner/agent.json",
+      "repo_state": {
+        "name": "Datafeeds Healthcheck Refiner",
+        "description": "Issue Refiner for the Datafeeds Healthcheck squad. Takes raw/underspecified issues, investigates, and produces falsifiable acceptance criteria. DeepSeek model for thorough analysis.",
+        "instructions": "You are the **Datafeeds Healthcheck Refiner** — the scope-and-investigation stage of the Datafeeds Healthcheck squad. The repo is github.com/tyrion70/chainlink-datafeeds-health (private, use git-pr skill).\n\n## Your job\nTake a raw or under-specified issue, investigate the codebase and live data, and produce:\n1. A clear problem statement.\n2. Falsifiable acceptance criteria.\n3. A concrete implementation plan.\n\n## How to work\n- Read the issue body + full comment history + metadata.\n- Explore the repo: report script, webapp, ingest, DB schema.\n- Check live Prometheus/Grafana if relevant.\n\n## Finishing your stage — how the hand-off actually works\nYour task is a **child issue assigned to you (an agent)**, not to the squad. On an agent-assigned issue a plain comment does **NOT** wake the Tech Lead — only the **stage barrier** does, and it fires only when your issue reaches a **terminal status**. So:\n1. Post your findings + acceptance criteria as a comment.\n2. Set THIS issue to done: `multica issue status <this-issue-id> done`. That terminal status is what wakes the Tech Lead to route the next stage. \"Done\" = your deliverable (the refined scope) is complete.\n3. STOP.\n- Do NOT leave the issue in `in_progress`/`in_review` expecting a hand-back — that never fires the barrier, so the relay silently stalls. This was the #1 cause of dropped hand-offs.\n- Do NOT reassign the issue and do NOT @mention the Tech Lead on a normal completion — the terminal status is the trigger.\n- If genuinely blocked on something only Peter or the Tech Lead can resolve, post the blocker, set the issue `blocked`, AND @mention the Tech Lead ([@Datafeeds Healthcheck Tech Lead](mention://agent/a07b90e7-b22c-4b2c-abe7-92e2bc29b9a4)) — `blocked` is not terminal so it won't fire the barrier; the mention is the wake. This is the only case where you @mention the Lead.\n\n## Skills you have\ngit-pr (GitHub PRs for private repos), ssh (git auth), bitwarden (secrets), chainlayer-knowledge (infra context), rag-consumer (RAG queries).",
+        "runtime_id": "ea92eadd-587c-4494-9e25-befe3870bde8",
+        "model": "deepseek/deepseek-v4-pro",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "chainlayer-knowledge",
+          "git-pr",
+          "rag-consumer",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
+      },
+      "multica_state": {
+        "name": "Datafeeds Healthcheck Refiner",
+        "description": "Issue Refiner for the Datafeeds Healthcheck squad. Takes raw/underspecified issues, investigates, and produces falsifiable acceptance criteria. DeepSeek model for thorough analysis.",
+        "instructions": "You are the **Datafeeds Healthcheck Refiner** — the scope-and-investigation stage of the Datafeeds Healthcheck squad. The repo is github.com/tyrion70/chainlink-datafeeds-health (private, use git-pr skill).\n\n## Your job\nTake a raw or under-specified issue, investigate the codebase and live data, and produce:\n1. A clear problem statement.\n2. Falsifiable acceptance criteria.\n3. A concrete implementation plan.\n\n## How to work\n- Read the issue body + full comment history + metadata.\n- Explore the repo: report script, webapp, ingest, DB schema.\n- Check live Prometheus/Grafana if relevant.\n\n## Finishing your stage — how the hand-off actually works\nYour task is a **child issue assigned to you (an agent)**, not to the squad. On an agent-assigned issue a plain comment does **NOT** wake the Tech Lead — only the **stage barrier** does, and it fires only when your issue reaches a **terminal status**. So:\n1. Post your findings + acceptance criteria as a comment.\n2. Set THIS issue to done: `multica issue status <this-issue-id> done`. That terminal status is what wakes the Tech Lead to route the next stage. \"Done\" = your deliverable (the refined scope) is complete.\n3. STOP.\n- Do NOT leave the issue in `in_progress`/`in_review` expecting a hand-back — that never fires the barrier, so the relay silently stalls. This was the #1 cause of dropped hand-offs.\n- Do NOT reassign the issue and do NOT @mention the Tech Lead on a normal completion — the terminal status is the trigger.\n- If genuinely blocked on something only Peter or the Tech Lead can resolve, post the blocker, set the issue `blocked`, AND @mention the Tech Lead ([@Datafeeds Healthcheck Tech Lead](mention://agent/a07b90e7-b22c-4b2c-abe7-92e2bc29b9a4)) — `blocked` is not terminal so it won't fire the barrier; the mention is the wake. This is the only case where you @mention the Lead.\n\n## Skills you have\ngit-pr (GitHub PRs for private repos), ssh (git auth), bitwarden (secrets), chainlayer-knowledge (infra context), rag-consumer (RAG queries).",
+        "runtime_id": "ea92eadd-587c-4494-9e25-befe3870bde8",
+        "model": "deepseek/deepseek-v4-pro",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "chainlayer-knowledge",
+          "git-pr",
+          "rag-consumer",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
+      }
+    },
+    "Chainlayer~Datafeeds Healthcheck Tech Lead": {
+      "repo_file": "Chainlayer/chainlayer-squad-datafeeds/datafeeds-healthcheck-tech-lead/agent.json",
+      "repo_state": {
+        "name": "Datafeeds Healthcheck Tech Lead",
+        "description": "Tech Lead for the Datafeeds Healthcheck squad. Coordinates the Refine → Code → QA → Deploy relay for healthcheck issues. Routes by @mention, never reassigns. Single human interface for the squad.",
+        "instructions": "You are the **Datafeeds Healthcheck Tech Lead** — the coordination point for ChainLayer's datafeeds healthcheck work in the Multica workspace. The repo is github.com/tyrion70/chainlink-datafeeds-health (private, use git-pr skill).\n\n## Your job\n1. Triage every issue: read body + full comment history + metadata before deciding.\n2. Decompose the parent request into per-stage child issues and route each stage to the right member.\n3. Escalate to Peter when genuinely unclear.\n\n## How work flows — staged child issues\nYou split each parent request into **child issues, one per stage** (Refine → Code → QA → Deploy). Create each child with `--parent <parent>`, `--stage N`, assigned to the member who owns that stage, `--status todo` (which fires that member). Parallel work in the same stage shares one `--stage N`; later stages start `--status backlog` and are promoted (or auto-promoted by the stage barrier).\n\n## The wake contract — read this, it is where hand-offs were failing\nYou are woken by the **stage barrier**: when every child in a stage reaches a **terminal status** (`done`/`cancelled`), the parent wakes you once to review and route the next stage. That is the ONLY reliable wake for children assigned to individual agents — **a plain comment on an agent-assigned child does NOT wake you** (comment-wake only fires on issues assigned to the squad itself). So:\n- NEVER create a follow-up as a loose, unstaged agent-assigned child. An unstaged child left non-terminal is a guaranteed dead-end (this is exactly what stalled the CHA-414 integration fix). Every follow-up is a **staged child**.\n- Members are instructed to finish by setting their child `done`. If you find a child sitting in `in_review`/`in_progress` that is actually finished, that is the stalled hand-off: read its result, flip it terminal yourself if needed, and route the next stage.\n- A **blocked** child does NOT fire the barrier, so members @mention you when they block. When you get such a mention, escalate or reroute.\n\n## Lifecycle relay\nRefine → Code → QA → Deploy:\n- **Issue Refiner** — scope + falsifiable acceptance criteria.\n- **Issue Coder** — implement + open the PR.\n- **Issue QA** (Claude Opus) — test against criteria; verdict gates deploy.\n- **Issue Deployer** — deploy after human approval + verify.\n\nAt each hop you review the finished stage's result and create/promote the next stage's child. Record every evaluation with `multica squad activity`.\n\n## Escalation\nWhen only Peter can decide (production go/no-go, a judgment call), @mention him with one specific ask and set the parent `blocked`. Never assign the issue to Peter.\n\n## Squad context\nYou are a member of every Chainlayer squad. The squad is the permanent assignee of the parent issue — never change it.",
+        "runtime_id": "6abbcc83-640d-49a7-a5e4-c7b3385f29da",
+        "model": "claude-opus-4-8",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "chainlayer-knowledge",
+          "git-pr",
+          "rag-consumer",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
+      },
+      "multica_state": {
+        "name": "Datafeeds Healthcheck Tech Lead",
+        "description": "Tech Lead for the Datafeeds Healthcheck squad. Coordinates the Refine → Code → QA → Deploy relay for healthcheck issues. Routes by @mention, never reassigns. Single human interface for the squad.",
+        "instructions": "You are the **Datafeeds Healthcheck Tech Lead** — the coordination point for ChainLayer's datafeeds healthcheck work in the Multica workspace. The repo is github.com/tyrion70/chainlink-datafeeds-health (private, use git-pr skill).\n\n## Your job\n1. Triage every issue: read body + full comment history + metadata before deciding.\n2. Decompose the parent request into per-stage child issues and route each stage to the right member.\n3. Escalate to Peter when genuinely unclear.\n\n## How work flows — staged child issues\nYou split each parent request into **child issues, one per stage** (Refine → Code → QA → Deploy). Create each child with `--parent <parent>`, `--stage N`, assigned to the member who owns that stage, `--status todo` (which fires that member). Parallel work in the same stage shares one `--stage N`; later stages start `--status backlog` and are promoted (or auto-promoted by the stage barrier).\n\n## The wake contract — read this, it is where hand-offs were failing\nYou are woken by the **stage barrier**: when every child in a stage reaches a **terminal status** (`done`/`cancelled`), the parent wakes you once to review and route the next stage. That is the ONLY reliable wake for children assigned to individual agents — **a plain comment on an agent-assigned child does NOT wake you** (comment-wake only fires on issues assigned to the squad itself). So:\n- NEVER create a follow-up as a loose, unstaged agent-assigned child. An unstaged child left non-terminal is a guaranteed dead-end (this is exactly what stalled the CHA-414 integration fix). Every follow-up is a **staged child**.\n- Members are instructed to finish by setting their child `done`. If you find a child sitting in `in_review`/`in_progress` that is actually finished, that is the stalled hand-off: read its result, flip it terminal yourself if needed, and route the next stage.\n- A **blocked** child does NOT fire the barrier, so members @mention you when they block. When you get such a mention, escalate or reroute.\n\n## Lifecycle relay\nRefine → Code → QA → Deploy:\n- **Issue Refiner** — scope + falsifiable acceptance criteria.\n- **Issue Coder** — implement + open the PR.\n- **Issue QA** (Claude Opus) — test against criteria; verdict gates deploy.\n- **Issue Deployer** — deploy after human approval + verify.\n\nAt each hop you review the finished stage's result and create/promote the next stage's child. Record every evaluation with `multica squad activity`.\n\n## Escalation\nWhen only Peter can decide (production go/no-go, a judgment call), @mention him with one specific ask and set the parent `blocked`. Never assign the issue to Peter.\n\n## Squad context\nYou are a member of every Chainlayer squad. The squad is the permanent assignee of the parent issue — never change it.",
+        "runtime_id": "6abbcc83-640d-49a7-a5e4-c7b3385f29da",
+        "model": "claude-opus-4-8",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "private",
+        "max_concurrent_tasks": 6,
+        "skills": [
+          "bitwarden",
+          "chainlayer-knowledge",
+          "git-pr",
+          "rag-consumer",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       }
     }
   },
@@ -4257,13 +4619,13 @@
         "repo_state": {
           "name": "chainlink-ops",
           "description": "Operate ChainLayer's Chainlink node fleet — RPC config changes, node debugging, adapter lifecycle, token refreshes, topup, and the chainlink-ops/jira-sync/delete-jobs services. Use whenever touching anything in the chainlink-* namespaces, editing node TOML configs in k8s-apps, decommissioning external adapters, or refreshing Slack/registry credentials. These are live oracle nodes earning revenue — strictest ask-first rules of any domain.",
-          "body": "# Chainlink operations\n\n**Blast-radius warning:** everything here serves live oracle jobs. A bad config\nmerge crashloops nodes; a wrongly deleted adapter breaks feeds. Mutations get\nexplicit confirmation; config changes go through k8s-apps MRs (see `git-mr`).\n\n## Fleet layout\n\n- **Namespaces**: `chainlink` (shared svcs) plus `chainlink-{automation,bootstrap,ccip,cre,cre-df,data-feeds,data-streams,keystone,streams[-experimental],database,vpn}` and `chainlink-ea`, `chainlink-ea-data-streams-{production,staging}` (external adapters). `chainlink-database` = Zalando postgres.\n- **Pod containers**: `node` (the chainlink binary — `kubectl logs <pod> -c node`),\n  sidecars `auto-approve`, `registry`. Init: `init-config`, `init-secrets`.\n  Rendered config inside the pod: `/mount/config.toml`.\n- **Node configs in git**: `k8s-apps/appsets/chainlink/decentralized-oracle-network/{bootstrap,cre,cre-df,data-feeds,automation,ccip,keystone,data-streams}/nodes/<chain|capability>.yaml`\n  — a multi-line **TOML-in-YAML string**. Watch for commented-out reference\n  blocks (filter `#` lines when grepping for active URLs) and mixed quote styles.\n\n## RPC config rules\n\nPer-chain TOML shape:\n\n```toml\n[[EVM]]\nChainID = \"<id>\"\n\n  [[EVM.Nodes]]\n  Name = \"<label>\"\n  WSURL = \"ws://...\"\n  HTTPURL = \"http://...\"\n  IsLoadBalancedRPC = true   # REQUIRED for any *.rpc.cinternal.com URL\n  Order = 1\n```\n\n- **`IsLoadBalancedRPC = true` for every HAProxy URL** (`*.rpc.cinternal.com`).\n  It makes the node declare a sole stale LB endpoint dead and reconnect\n  (next TCP lands on a healthier upstream). `false` (default) = \"dedicated RPC,\n  never give up on it\" — wrong for an LB.\n- **One `<chain>.rpc.cinternal.com` entry is enough** — the normal backend\n  already round-robins full-node + archive. Don't add `<chain>-archive` as a\n  second `[[EVM.Nodes]]`. Exception: `eth-main-execution` + `-archive` are\n  genuinely separate pools — keep both.\n- **Strict TOML decoder**: unknown keys hard-crash old images. Known too-old:\n  `2.9.1-automation-20240304`, `v2.20.0-0.0.5-tron`, `v2.24.0-starknet-plugins`,\n  `2.26.1-aptos-hotfix8a/8b`. `2.39.x+` is safe for `IsLoadBalancedRPC`. Check\n  the product's image tag before adding new TOML keys.\n- **OCR1 fragility**: OCR1 bootstraps via one-shot `ConfigFromLogs`; if the pod\n  restarts after its `ConfigSet` block left the RPC's log window, the job won't\n  start. Don't casually restart OCR1 pods.\n- LogPoller backfill of pruned ranges needs the **archive RPC URL directly**\n  — a full node's `--rollup.historicalrpc` does NOT forward pruned receipts.\n\n## Adapter lifecycle (chainlink-ea)\n\n- **Decommission check needs TWO metrics over 24h** (datasource\n  `deexgsum1bz7ka` / prometheus-nl-oven):\n  `http_request_duration_seconds_sum{namespace=\"chainlink-ea\"}` (HTTP) AND\n  `bg_execute_total{namespace=\"chainlink-ea\"}` (WebSocket bg execute). HTTP\n  alone falsely flags ~29 WS-driven adapters as idle. Zero on both → candidate;\n  even then watch for infrequent runners (PoR sub-adapters).\n- **Composite adapters** are marked `app.chainlayer.io/composite-adapter: \"true\"`\n  on the Service, optional `bridge-alias`/`bridge-aliases` annotations.\n  Composite = `*_ADAPTER_URL`/`*_DATA_PROVIDER_URL` pointing at data sources;\n  pointing at other adapters = orchestrator, NOT composite.\n- Adapter images: `public.ecr.aws/chainlink/adapters/` (tracked by Renovate semver).\n\n## Shared services\n\n- **chainlink-ops** (deployment, `chainlink` ns): jira_sync + jd_processor loops\n  every 5 min; PVC `chainlink-jira-sync-state`; HTTP :8080 `/health` `/status`.\n- **chainlink-topup** (svc :8080): `GET /api/v1/{config,status,history,balances}`.\n  The live API is authoritative — the repo `topup.json` can be stale. The\n  `description` field drives alert-exclusion labels; canonical values: `Safe`,\n  `Admin`, `Topup Caller`, `Excluded`, `Automation` (NOT `Keeper`).\n- **Slack token refresh** (when jd_processor 401s): grab `xoxc-…` from the POST\n  body field `token` of any authenticated api.slack.com call in Slack **web**\n  (not desktop), workspace `chainlink-nodes`; `xoxd-…` is the `d` cookie (keep\n  URL-encoded). Push both:\n  `gcloud secrets versions add chainlink-delete-jobs-slack-{token,cookie} --project=mythic-fulcrum-424015-f9 --data-file=-`\n  Then force ESO: delete `Secret/chainlink-delete-jobs-secrets` via **ArgoCD\n  UI** (Background) → recreated in ~5 s → `kubectl -n chainlink rollout restart deploy/chainlink-ops`.\n- **ESO refresh in general**: annotate `force-sync=$(date +%s)` if RBAC allows;\n  otherwise the ArgoCD-UI secret-delete dance. Peter's RBAC on `chainlink` ns\n  cannot patch externalsecrets directly.\n\n## Credentials\n\nMachine-consumed secrets live in **GCP Secret Manager** (`mythic-fulcrum-424015-f9`\nfor chainlink-ops secrets) and reach pods via ExternalSecrets. Human-held\ncredentials (UI logins, API keys you need mid-task) → use the **bitwarden**\nskill, `company` folder. Never paste a token into a YAML/TOML file — wire it\nthrough GCP + ESO.\n\n## Permission model\n\n✅ Without asking: logs, describe, metrics queries, topup API GETs, reading\nconfigs in git, rendering proposed TOML diffs.\n\n🔶 GitOps: ALL config changes (TOML, images, sidecars) = k8s-apps MR. Remember\nHelm lists replace, not merge — include all sidecars when overriding per-node.\n\n🛑 Ask first, with a one-line blast-radius statement: pod deletes/restarts\n(especially OCR1 and keystone), job deletions, adapter removals (show the\ndual-metric evidence first), secret pushes to GCP, ESO secret deletes, anything\nin `chainlink-database`.\n",
+          "body": "# Chainlink operations\n\n**Blast-radius warning:** everything here serves live oracle jobs. A bad config\nmerge crashloops nodes; a wrongly deleted adapter breaks feeds. Mutations get\nexplicit confirmation; config changes go through k8s-apps MRs (see `git-mr`).\n\n## Fleet layout\n\n- **Namespaces**: `chainlink` (shared svcs) plus `chainlink-{automation,bootstrap,ccip,cre,cre-df,data-feeds,data-streams,keystone,streams[-experimental],database,vpn}` and `chainlink-ea`, `chainlink-ea-data-streams-{production,staging}` (external adapters). `chainlink-database` = Zalando postgres.\n- **Pod containers**: `node` (the chainlink binary — `kubectl logs <pod> -c node`),\n  sidecars `auto-approve`, `registry`. Init: `init-config`, `init-secrets`.\n  Rendered config inside the pod: `/mount/config.toml`.\n- **Node configs in git**: `k8s-apps/appsets/chainlink/decentralized-oracle-network/{bootstrap,cre,cre-df,data-feeds,automation,ccip,keystone,data-streams}/nodes/<chain|capability>.yaml`\n  — a multi-line **TOML-in-YAML string**. Watch for commented-out reference\n  blocks (filter `#` lines when grepping for active URLs) and mixed quote styles.\n\n## RPC config rules\n\nPer-chain TOML shape:\n\n```toml\n[[EVM]]\nChainID = \"<id>\"\n\n  [[EVM.Nodes]]\n  Name = \"<label>\"\n  WSURL = \"ws://...\"\n  HTTPURL = \"http://...\"\n  IsLoadBalancedRPC = true   # REQUIRED for any *.rpc.cinternal.com URL\n  Order = 1\n```\n\n- **`IsLoadBalancedRPC = true` for every HAProxy URL** (`*.rpc.cinternal.com`).\n  It makes the node declare a sole stale LB endpoint dead and reconnect\n  (next TCP lands on a healthier upstream). `false` (default) = \"dedicated RPC,\n  never give up on it\" — wrong for an LB.\n- **One `<chain>.rpc.cinternal.com` entry is enough** — the normal backend\n  already round-robins full-node + archive. Don't add `<chain>-archive` as a\n  second `[[EVM.Nodes]]`. Exception: `eth-main-execution` + `-archive` are\n  genuinely separate pools — keep both.\n- **Strict TOML decoder**: unknown keys hard-crash old images. Known too-old:\n  `2.9.1-automation-20240304`, `v2.20.0-0.0.5-tron`, `v2.24.0-starknet-plugins`,\n  `2.26.1-aptos-hotfix8a/8b`. `2.39.x+` is safe for `IsLoadBalancedRPC`. Check\n  the product's image tag before adding new TOML keys.\n- **OCR1 fragility**: OCR1 bootstraps via one-shot `ConfigFromLogs`; if the pod\n  restarts after its `ConfigSet` block left the RPC's log window, the job won't\n  start. Don't casually restart OCR1 pods.\n- LogPoller backfill of pruned ranges needs the **archive RPC URL directly**\n  — a full node's `--rollup.historicalrpc` does NOT forward pruned receipts.\n\n## Adapter lifecycle (chainlink-ea)\n\n- **Decommission check needs TWO metrics over 24h** (datasource\n  `deexgsum1bz7ka` / prometheus-nl-oven):\n  `http_request_duration_seconds_sum{namespace=\"chainlink-ea\"}` (HTTP) AND\n  `bg_execute_total{namespace=\"chainlink-ea\"}` (WebSocket bg execute). HTTP\n  alone falsely flags ~29 WS-driven adapters as idle. Zero on both → candidate;\n  even then watch for infrequent runners (PoR sub-adapters).\n- **Composite adapters** are marked `app.chainlayer.io/composite-adapter: \"true\"`\n  on the Service, optional `bridge-alias`/`bridge-aliases` annotations.\n  Composite = `*_ADAPTER_URL`/`*_DATA_PROVIDER_URL` pointing at data sources;\n  pointing at other adapters = orchestrator, NOT composite.\n- Adapter images: `public.ecr.aws/chainlink/adapters/` (tracked by Renovate semver).\n\n## Shared services\n\n- **chainlink-ops** (deployment, `chainlink` ns): jira_sync + jd_processor loops\n  every 5 min; PVC `chainlink-jira-sync-state`; HTTP :8080 `/health` `/status`.\n- **chainlink-topup** (svc :8080): `GET /api/v1/{config,status,history,balances}`.\n  The live API is authoritative — the repo `topup.json` can be stale. The\n  `description` field drives alert-exclusion labels; canonical values: `Safe`,\n  `Admin`, `Topup Caller`, `Excluded`, `Automation` (NOT `Keeper`).\n- **Slack token refresh** (when jd_processor 401s): grab `xoxc-…` from the POST\n  body field `token` of any authenticated api.slack.com call in Slack **web**\n  (not desktop), workspace `chainlink-nodes`; `xoxd-…` is the `d` cookie (keep\n  URL-encoded). Push both:\n  `gcloud secrets versions add chainlink-delete-jobs-slack-{token,cookie} --project=mythic-fulcrum-424015-f9 --data-file=-`\n  Then force ESO: delete `Secret/chainlink-delete-jobs-secrets` via **ArgoCD\n  UI** (Background) → recreated in ~5 s → `kubectl -n chainlink rollout restart deploy/chainlink-ops`.\n- **ESO refresh in general**: annotate `force-sync=$(date +%s)` if RBAC allows;\n  otherwise the ArgoCD-UI secret-delete dance. Peter's RBAC on `chainlink` ns\n  cannot patch externalsecrets directly.\n\n## Credentials\n\nMachine-consumed secrets live in **GCP Secret Manager** (`mythic-fulcrum-424015-f9`\nfor chainlink-ops secrets) and reach pods via ExternalSecrets. Human-held\ncredentials (UI logins, API keys you need mid-task) → use the **bitwarden**\nskill, `company` folder. Never paste a token into a YAML/TOML file — wire it\nthrough GCP + ESO.\n\n## Permission model\n\n✅ Without asking: logs, describe, metrics queries, topup API GETs, reading\nconfigs in git, rendering proposed TOML diffs.\n\n🔶 GitOps: ALL config changes (TOML, images, sidecars) = k8s-apps MR. Remember\nHelm lists replace, not merge — include all sidecars when overriding per-node.\n\n🛑 Ask first, with a one-line blast-radius statement: pod deletes/restarts\n(especially OCR1 and keystone), job deletions, adapter removals (show the\ndual-metric evidence first), secret pushes to GCP, ESO secret deletes, anything\nin `chainlink-database`.\n\n## Chainlink pre-escalation investigation\n\n**Gate — ask Peter first.** Before running any Chainlink investigation steps,\nexplicitly confirm with Peter (via issue comment or Slack) that an investigation\nis warranted. Do not self-start — these steps touch live node APIs and adapter\nendpoints on revenue feeds.\n\nThis section documents the verified procedure from CHA-193 for investigating\ndatafeed anomalies **before escalating to Chainlink support**. The pattern:\nquery the node for the exact jobspec → replay that requestData against the\nexternal adapter → check data provider coverage for gaps.\n\n### Topology\n\n- **Cluster**: `nl-oven` (k8s)\n- **Node ns**: `chainlink-data-feeds`\n- **Adapter ns**: `chainlink-ea` (each EA :8080 http / :9080 metrics)\n- **Provider keys**: k8s secrets per-adapter, wired via `envFrom`\n\n**Host RBAC**: readonly hosts (`tag:claude-readonly`, e.g. `multica-02`) can\n`get`/`logs` only — `exec`/`port-forward`/`secrets` denied. Run from a\nwrite-RBAC host (e.g. `claude-workstation-01`), ctx `nl-oven`.\n\n### Procedure\n\nAll steps are **non-mutating reads**. Secret values must never be printed into\nissues, comments, or logs.\n\n```bash\n# 1) Fetch jobspec — requestData / observationSource via node API\nkubectl exec <chainlink-data-feeds-*-pod> -n chainlink-data-feeds -c node -- sh -c '\n  E=$(sed -n 1p /mount/.api); P=$(sed -n 2p /mount/.api); CJ=$(mktemp)\n  curl -s -c $CJ -X POST localhost:6688/sessions \\\n    -H \"Content-Type: application/json\" \\\n    -d \"{\\\"email\\\":\\\"$E\\\",\\\"password\\\":\\\"$P\\\"}\" >/dev/null\n  curl -s -b $CJ localhost:6688/v2/jobs/<jobID>; rm -f $CJ'\n# Parse .data.attributes.pipelineSpec.dotDagSource for the bridge request body\n\n# 2) Replay exact requestData against the EA\nkubectl port-forward -n chainlink-ea svc/<ea> 18080:8080 &\ncurl -s -X POST localhost:18080 \\\n  -H 'Content-Type: application/json' \\\n  -d '<exact requestData from step 1>'\n# kill %1 after to clean up port-forward\n\n# 3) Provider coverage — generic pattern\n# Resolve the adapter's provider credential from its k8s secret,\n# then hit that provider's read-only API and check recency/coverage.\n# The env var name and API endpoint vary per provider — inspect the\n# adapter's deployment/envFrom to discover them.\nPROVIDER_KEY=$(kubectl get secret <ea-secret> -n chainlink-ea -o json |\n  jq -r '.data.<ENV_VAR>|@base64d')\ncurl -s \"<provider-api-endpoint>?api_key=$PROVIDER_KEY\"\n# Check response timestamps for recency and gap coverage\n```\n\n### Provider safety caveats\n\n**Some providers expose only a single shared prod credential** reused by\nevery EA session. A second concurrent query using that same credential can\nknock the live EA off its (already-flapping) socket on a revenue feed —\ntreat coordinated tests against these providers as exceptional and ask\nPeter first, or contact the provider's support directly.\n\nThe examples below illustrate the pattern; adapt to the specific EA:\n\n- **Coin Metrics**: read-only REST catalog endpoint\n  (`api.coinmetrics.io/v4/catalog/markets`). Safe for routine use —\n  API key is per-integration, not shared across sessions.\n- **GSR**: direct WebSocket hit reuses the live node's single shared prod\n  credential (`WS_USER_ID` + `secret/gsr` `WS_PRIVATE_KEY`) on\n  `wss://oracle.prod.gsr.io/oracle`. NOT routine — see the shared-credential\n  warning above.\n\n### Hand-off\n\nAfter collecting investigation results:\n1. **Post a summary to Slack** (#chainlink-ops or the relevant channel) so the\n   team has context.\n2. **File a Jira issue** (project OPS or CLL) with the findings, or add them\n   to the existing issue.\nThese steps are manual — no automation wraps them yet.\n",
           "files": {}
         },
         "multica_state": {
           "name": "chainlink-ops",
           "description": "Operate ChainLayer's Chainlink node fleet — RPC config changes, node debugging, adapter lifecycle, token refreshes, topup, and the chainlink-ops/jira-sync/delete-jobs services. Use whenever touching anything in the chainlink-* namespaces, editing node TOML configs in k8s-apps, decommissioning external adapters, or refreshing Slack/registry credentials. These are live oracle nodes earning revenue — strictest ask-first rules of any domain.",
-          "body": "# Chainlink operations\n\n**Blast-radius warning:** everything here serves live oracle jobs. A bad config\nmerge crashloops nodes; a wrongly deleted adapter breaks feeds. Mutations get\nexplicit confirmation; config changes go through k8s-apps MRs (see `git-mr`).\n\n## Fleet layout\n\n- **Namespaces**: `chainlink` (shared svcs) plus `chainlink-{automation,bootstrap,ccip,cre,cre-df,data-feeds,data-streams,keystone,streams[-experimental],database,vpn}` and `chainlink-ea`, `chainlink-ea-data-streams-{production,staging}` (external adapters). `chainlink-database` = Zalando postgres.\n- **Pod containers**: `node` (the chainlink binary — `kubectl logs <pod> -c node`),\n  sidecars `auto-approve`, `registry`. Init: `init-config`, `init-secrets`.\n  Rendered config inside the pod: `/mount/config.toml`.\n- **Node configs in git**: `k8s-apps/appsets/chainlink/decentralized-oracle-network/{bootstrap,cre,cre-df,data-feeds,automation,ccip,keystone,data-streams}/nodes/<chain|capability>.yaml`\n  — a multi-line **TOML-in-YAML string**. Watch for commented-out reference\n  blocks (filter `#` lines when grepping for active URLs) and mixed quote styles.\n\n## RPC config rules\n\nPer-chain TOML shape:\n\n```toml\n[[EVM]]\nChainID = \"<id>\"\n\n  [[EVM.Nodes]]\n  Name = \"<label>\"\n  WSURL = \"ws://...\"\n  HTTPURL = \"http://...\"\n  IsLoadBalancedRPC = true   # REQUIRED for any *.rpc.cinternal.com URL\n  Order = 1\n```\n\n- **`IsLoadBalancedRPC = true` for every HAProxy URL** (`*.rpc.cinternal.com`).\n  It makes the node declare a sole stale LB endpoint dead and reconnect\n  (next TCP lands on a healthier upstream). `false` (default) = \"dedicated RPC,\n  never give up on it\" — wrong for an LB.\n- **One `<chain>.rpc.cinternal.com` entry is enough** — the normal backend\n  already round-robins full-node + archive. Don't add `<chain>-archive` as a\n  second `[[EVM.Nodes]]`. Exception: `eth-main-execution` + `-archive` are\n  genuinely separate pools — keep both.\n- **Strict TOML decoder**: unknown keys hard-crash old images. Known too-old:\n  `2.9.1-automation-20240304`, `v2.20.0-0.0.5-tron`, `v2.24.0-starknet-plugins`,\n  `2.26.1-aptos-hotfix8a/8b`. `2.39.x+` is safe for `IsLoadBalancedRPC`. Check\n  the product's image tag before adding new TOML keys.\n- **OCR1 fragility**: OCR1 bootstraps via one-shot `ConfigFromLogs`; if the pod\n  restarts after its `ConfigSet` block left the RPC's log window, the job won't\n  start. Don't casually restart OCR1 pods.\n- LogPoller backfill of pruned ranges needs the **archive RPC URL directly**\n  — a full node's `--rollup.historicalrpc` does NOT forward pruned receipts.\n\n## Adapter lifecycle (chainlink-ea)\n\n- **Decommission check needs TWO metrics over 24h** (datasource\n  `deexgsum1bz7ka` / prometheus-nl-oven):\n  `http_request_duration_seconds_sum{namespace=\"chainlink-ea\"}` (HTTP) AND\n  `bg_execute_total{namespace=\"chainlink-ea\"}` (WebSocket bg execute). HTTP\n  alone falsely flags ~29 WS-driven adapters as idle. Zero on both → candidate;\n  even then watch for infrequent runners (PoR sub-adapters).\n- **Composite adapters** are marked `app.chainlayer.io/composite-adapter: \"true\"`\n  on the Service, optional `bridge-alias`/`bridge-aliases` annotations.\n  Composite = `*_ADAPTER_URL`/`*_DATA_PROVIDER_URL` pointing at data sources;\n  pointing at other adapters = orchestrator, NOT composite.\n- Adapter images: `public.ecr.aws/chainlink/adapters/` (tracked by Renovate semver).\n\n## Shared services\n\n- **chainlink-ops** (deployment, `chainlink` ns): jira_sync + jd_processor loops\n  every 5 min; PVC `chainlink-jira-sync-state`; HTTP :8080 `/health` `/status`.\n- **chainlink-topup** (svc :8080): `GET /api/v1/{config,status,history,balances}`.\n  The live API is authoritative — the repo `topup.json` can be stale. The\n  `description` field drives alert-exclusion labels; canonical values: `Safe`,\n  `Admin`, `Topup Caller`, `Excluded`, `Automation` (NOT `Keeper`).\n- **Slack token refresh** (when jd_processor 401s): grab `xoxc-…` from the POST\n  body field `token` of any authenticated api.slack.com call in Slack **web**\n  (not desktop), workspace `chainlink-nodes`; `xoxd-…` is the `d` cookie (keep\n  URL-encoded). Push both:\n  `gcloud secrets versions add chainlink-delete-jobs-slack-{token,cookie} --project=mythic-fulcrum-424015-f9 --data-file=-`\n  Then force ESO: delete `Secret/chainlink-delete-jobs-secrets` via **ArgoCD\n  UI** (Background) → recreated in ~5 s → `kubectl -n chainlink rollout restart deploy/chainlink-ops`.\n- **ESO refresh in general**: annotate `force-sync=$(date +%s)` if RBAC allows;\n  otherwise the ArgoCD-UI secret-delete dance. Peter's RBAC on `chainlink` ns\n  cannot patch externalsecrets directly.\n\n## Credentials\n\nMachine-consumed secrets live in **GCP Secret Manager** (`mythic-fulcrum-424015-f9`\nfor chainlink-ops secrets) and reach pods via ExternalSecrets. Human-held\ncredentials (UI logins, API keys you need mid-task) → use the **bitwarden**\nskill, `company` folder. Never paste a token into a YAML/TOML file — wire it\nthrough GCP + ESO.\n\n## Permission model\n\n✅ Without asking: logs, describe, metrics queries, topup API GETs, reading\nconfigs in git, rendering proposed TOML diffs.\n\n🔶 GitOps: ALL config changes (TOML, images, sidecars) = k8s-apps MR. Remember\nHelm lists replace, not merge — include all sidecars when overriding per-node.\n\n🛑 Ask first, with a one-line blast-radius statement: pod deletes/restarts\n(especially OCR1 and keystone), job deletions, adapter removals (show the\ndual-metric evidence first), secret pushes to GCP, ESO secret deletes, anything\nin `chainlink-database`.\n",
+          "body": "# Chainlink operations\n\n**Blast-radius warning:** everything here serves live oracle jobs. A bad config\nmerge crashloops nodes; a wrongly deleted adapter breaks feeds. Mutations get\nexplicit confirmation; config changes go through k8s-apps MRs (see `git-mr`).\n\n## Fleet layout\n\n- **Namespaces**: `chainlink` (shared svcs) plus `chainlink-{automation,bootstrap,ccip,cre,cre-df,data-feeds,data-streams,keystone,streams[-experimental],database,vpn}` and `chainlink-ea`, `chainlink-ea-data-streams-{production,staging}` (external adapters). `chainlink-database` = Zalando postgres.\n- **Pod containers**: `node` (the chainlink binary — `kubectl logs <pod> -c node`),\n  sidecars `auto-approve`, `registry`. Init: `init-config`, `init-secrets`.\n  Rendered config inside the pod: `/mount/config.toml`.\n- **Node configs in git**: `k8s-apps/appsets/chainlink/decentralized-oracle-network/{bootstrap,cre,cre-df,data-feeds,automation,ccip,keystone,data-streams}/nodes/<chain|capability>.yaml`\n  — a multi-line **TOML-in-YAML string**. Watch for commented-out reference\n  blocks (filter `#` lines when grepping for active URLs) and mixed quote styles.\n\n## RPC config rules\n\nPer-chain TOML shape:\n\n```toml\n[[EVM]]\nChainID = \"<id>\"\n\n  [[EVM.Nodes]]\n  Name = \"<label>\"\n  WSURL = \"ws://...\"\n  HTTPURL = \"http://...\"\n  IsLoadBalancedRPC = true   # REQUIRED for any *.rpc.cinternal.com URL\n  Order = 1\n```\n\n- **`IsLoadBalancedRPC = true` for every HAProxy URL** (`*.rpc.cinternal.com`).\n  It makes the node declare a sole stale LB endpoint dead and reconnect\n  (next TCP lands on a healthier upstream). `false` (default) = \"dedicated RPC,\n  never give up on it\" — wrong for an LB.\n- **One `<chain>.rpc.cinternal.com` entry is enough** — the normal backend\n  already round-robins full-node + archive. Don't add `<chain>-archive` as a\n  second `[[EVM.Nodes]]`. Exception: `eth-main-execution` + `-archive` are\n  genuinely separate pools — keep both.\n- **Strict TOML decoder**: unknown keys hard-crash old images. Known too-old:\n  `2.9.1-automation-20240304`, `v2.20.0-0.0.5-tron`, `v2.24.0-starknet-plugins`,\n  `2.26.1-aptos-hotfix8a/8b`. `2.39.x+` is safe for `IsLoadBalancedRPC`. Check\n  the product's image tag before adding new TOML keys.\n- **OCR1 fragility**: OCR1 bootstraps via one-shot `ConfigFromLogs`; if the pod\n  restarts after its `ConfigSet` block left the RPC's log window, the job won't\n  start. Don't casually restart OCR1 pods.\n- LogPoller backfill of pruned ranges needs the **archive RPC URL directly**\n  — a full node's `--rollup.historicalrpc` does NOT forward pruned receipts.\n\n## Adapter lifecycle (chainlink-ea)\n\n- **Decommission check needs TWO metrics over 24h** (datasource\n  `deexgsum1bz7ka` / prometheus-nl-oven):\n  `http_request_duration_seconds_sum{namespace=\"chainlink-ea\"}` (HTTP) AND\n  `bg_execute_total{namespace=\"chainlink-ea\"}` (WebSocket bg execute). HTTP\n  alone falsely flags ~29 WS-driven adapters as idle. Zero on both → candidate;\n  even then watch for infrequent runners (PoR sub-adapters).\n- **Composite adapters** are marked `app.chainlayer.io/composite-adapter: \"true\"`\n  on the Service, optional `bridge-alias`/`bridge-aliases` annotations.\n  Composite = `*_ADAPTER_URL`/`*_DATA_PROVIDER_URL` pointing at data sources;\n  pointing at other adapters = orchestrator, NOT composite.\n- Adapter images: `public.ecr.aws/chainlink/adapters/` (tracked by Renovate semver).\n\n## Shared services\n\n- **chainlink-ops** (deployment, `chainlink` ns): jira_sync + jd_processor loops\n  every 5 min; PVC `chainlink-jira-sync-state`; HTTP :8080 `/health` `/status`.\n- **chainlink-topup** (svc :8080): `GET /api/v1/{config,status,history,balances}`.\n  The live API is authoritative — the repo `topup.json` can be stale. The\n  `description` field drives alert-exclusion labels; canonical values: `Safe`,\n  `Admin`, `Topup Caller`, `Excluded`, `Automation` (NOT `Keeper`).\n- **Slack token refresh** (when jd_processor 401s): grab `xoxc-…` from the POST\n  body field `token` of any authenticated api.slack.com call in Slack **web**\n  (not desktop), workspace `chainlink-nodes`; `xoxd-…` is the `d` cookie (keep\n  URL-encoded). Push both:\n  `gcloud secrets versions add chainlink-delete-jobs-slack-{token,cookie} --project=mythic-fulcrum-424015-f9 --data-file=-`\n  Then force ESO: delete `Secret/chainlink-delete-jobs-secrets` via **ArgoCD\n  UI** (Background) → recreated in ~5 s → `kubectl -n chainlink rollout restart deploy/chainlink-ops`.\n- **ESO refresh in general**: annotate `force-sync=$(date +%s)` if RBAC allows;\n  otherwise the ArgoCD-UI secret-delete dance. Peter's RBAC on `chainlink` ns\n  cannot patch externalsecrets directly.\n\n## Credentials\n\nMachine-consumed secrets live in **GCP Secret Manager** (`mythic-fulcrum-424015-f9`\nfor chainlink-ops secrets) and reach pods via ExternalSecrets. Human-held\ncredentials (UI logins, API keys you need mid-task) → use the **bitwarden**\nskill, `company` folder. Never paste a token into a YAML/TOML file — wire it\nthrough GCP + ESO.\n\n## Permission model\n\n✅ Without asking: logs, describe, metrics queries, topup API GETs, reading\nconfigs in git, rendering proposed TOML diffs.\n\n🔶 GitOps: ALL config changes (TOML, images, sidecars) = k8s-apps MR. Remember\nHelm lists replace, not merge — include all sidecars when overriding per-node.\n\n🛑 Ask first, with a one-line blast-radius statement: pod deletes/restarts\n(especially OCR1 and keystone), job deletions, adapter removals (show the\ndual-metric evidence first), secret pushes to GCP, ESO secret deletes, anything\nin `chainlink-database`.\n\n## Chainlink pre-escalation investigation\n\n**Gate — ask Peter first.** Before running any Chainlink investigation steps,\nexplicitly confirm with Peter (via issue comment or Slack) that an investigation\nis warranted. Do not self-start — these steps touch live node APIs and adapter\nendpoints on revenue feeds.\n\nThis section documents the verified procedure from CHA-193 for investigating\ndatafeed anomalies **before escalating to Chainlink support**. The pattern:\nquery the node for the exact jobspec → replay that requestData against the\nexternal adapter → check data provider coverage for gaps.\n\n### Topology\n\n- **Cluster**: `nl-oven` (k8s)\n- **Node ns**: `chainlink-data-feeds`\n- **Adapter ns**: `chainlink-ea` (each EA :8080 http / :9080 metrics)\n- **Provider keys**: k8s secrets per-adapter, wired via `envFrom`\n\n**Host RBAC**: readonly hosts (`tag:claude-readonly`, e.g. `multica-02`) can\n`get`/`logs` only — `exec`/`port-forward`/`secrets` denied. Run from a\nwrite-RBAC host (e.g. `claude-workstation-01`), ctx `nl-oven`.\n\n### Procedure\n\nAll steps are **non-mutating reads**. Secret values must never be printed into\nissues, comments, or logs.\n\n```bash\n# 1) Fetch jobspec — requestData / observationSource via node API\nkubectl exec <chainlink-data-feeds-*-pod> -n chainlink-data-feeds -c node -- sh -c '\n  E=$(sed -n 1p /mount/.api); P=$(sed -n 2p /mount/.api); CJ=$(mktemp)\n  curl -s -c $CJ -X POST localhost:6688/sessions \\\n    -H \"Content-Type: application/json\" \\\n    -d \"{\\\"email\\\":\\\"$E\\\",\\\"password\\\":\\\"$P\\\"}\" >/dev/null\n  curl -s -b $CJ localhost:6688/v2/jobs/<jobID>; rm -f $CJ'\n# Parse .data.attributes.pipelineSpec.dotDagSource for the bridge request body\n\n# 2) Replay exact requestData against the EA\nkubectl port-forward -n chainlink-ea svc/<ea> 18080:8080 &\ncurl -s -X POST localhost:18080 \\\n  -H 'Content-Type: application/json' \\\n  -d '<exact requestData from step 1>'\n# kill %1 after to clean up port-forward\n\n# 3) Provider coverage — generic pattern\n# Resolve the adapter's provider credential from its k8s secret,\n# then hit that provider's read-only API and check recency/coverage.\n# The env var name and API endpoint vary per provider — inspect the\n# adapter's deployment/envFrom to discover them.\nPROVIDER_KEY=$(kubectl get secret <ea-secret> -n chainlink-ea -o json |\n  jq -r '.data.<ENV_VAR>|@base64d')\ncurl -s \"<provider-api-endpoint>?api_key=$PROVIDER_KEY\"\n# Check response timestamps for recency and gap coverage\n```\n\n### Provider safety caveats\n\n**Some providers expose only a single shared prod credential** reused by\nevery EA session. A second concurrent query using that same credential can\nknock the live EA off its (already-flapping) socket on a revenue feed —\ntreat coordinated tests against these providers as exceptional and ask\nPeter first, or contact the provider's support directly.\n\nThe examples below illustrate the pattern; adapt to the specific EA:\n\n- **Coin Metrics**: read-only REST catalog endpoint\n  (`api.coinmetrics.io/v4/catalog/markets`). Safe for routine use —\n  API key is per-integration, not shared across sessions.\n- **GSR**: direct WebSocket hit reuses the live node's single shared prod\n  credential (`WS_USER_ID` + `secret/gsr` `WS_PRIVATE_KEY`) on\n  `wss://oracle.prod.gsr.io/oracle`. NOT routine — see the shared-credential\n  warning above.\n\n### Hand-off\n\nAfter collecting investigation results:\n1. **Post a summary to Slack** (#chainlink-ops or the relevant channel) so the\n   team has context.\n2. **File a Jira issue** (project OPS or CLL) with the findings, or add them\n   to the existing issue.\nThese steps are manual — no automation wraps them yet.\n",
           "files": {}
         }
       },
@@ -4457,13 +4819,13 @@
         "repo_state": {
           "name": "skill-index",
           "description": "Index of every ChainLayer workspace skill — name, description, and which squad members are bound to it. Agents read this at start to know what domain skills exist, what each covers, and who to route domain work to. NOT a replacement for full skill content; just enough metadata for routing decisions.",
-          "body": "# ChainLayer Skill Index\n\nThis index lists every skill registered in the ChainLayer workspace. Use it to\ndecide which squad member has the domain expertise for a given task.\n\nSkill slugs in **bold** are the canonical name used in `agent.json` `skills[]`\nand `Chainlayer/skills.json`.\n\n---\n\n## Company domain skills\n\n| Skill | Description | Bound squad members |\n|---|---|---|\n| **bitwarden** | Read/create/update secrets in Peter's self-hosted Bitwarden vault. | All Claude/ChatGPT/DeepSeek lifecycle agents + RAG Tech Lead + Maintainer. *Not bound:* Docs squad. |\n| **chainlayer-docs** | Write, review, publish ChainLayer docs on docs.chainlayer.cloud (Retype). | Doc Writer, Doc Reviewer/Publisher (Docs squad). |\n| **chainlayer-knowledge** | Cross-cutting infra facts: chainlink-tools, migrations, Filecoin voter, QuickNode RPCs. | Every agent in every squad. |\n| **chainlink-ops** | Operate Chainlink node fleet: RPC config, adapter lifecycle, token refresh, topup. | *(No agent currently bound — gap)* |\n| **company-k8s** | Operate k8s clusters (nl-oven, nl-spud, no-fryer): kubectl, manifests, ArgoCD, storage. | CF/HAProxy expert (all squads), Monitoring Operator (all squads), Issue Deployer (Claude/ChatGPT), Issue QA (all squads), Doc Reviewer/Publisher, Doc Writer. |\n| **company-proxmox** | Operate Proxmox clusters (Prox7, Prox9): VM migrations, restores, TF IaC. | Issue Coder (all squads), Monitoring Operator (all squads). |\n| **deploy-app** | Deploy new apps to k8s GitOps pipeline: repo, CI, secrets, ArgoCD, Renovate. | Issue Deployer (Claude/ChatGPT). |\n| **deploy-verify-rollback** | Generic deploy/verify/rollback for approved changes. | Issue Deployer (Claude/ChatGPT). |\n| **fortigate** | Operate Fortigate firewalls (nl2, no1): address objects, allowlisting, API. | *(No agent currently bound — gap)* |\n| **git-mr** | Ship company code to GitLab: Linear-first, MR template, SSH-signed commits. | Most lifecycle agents. *Not bound:* Lead (uses index), Communicator (Claude), Doc Writer. |\n| **grafana-monitoring** | Build dashboards, run PromQL/LogQL, manage Alertmanager silences, operate monitoring stacks. | Monitoring Operator (all squads), Doc Reviewer/Publisher, Doc Writer. |\n| **haproxy** | HAProxy RPC load balancing: bare-metal fleet + k8s Ingress Controller. | CF/HAProxy expert (all squads). |\n| **linear-company** | ChainLayer Linear workspace (OPS/CLL/MAN): issue-first rule before any code change. | All lifecycle agents except Maintainer. *Not bound:* Docs squad, Maintainer, Maintainer Private. |\n| **multica-sync** | Bidirectional agent/skill sync between multica-agents repo and workspace. | Maintainer, Maintainer Private. |\n| **new-repo-company** | Create new GitLab chainlayer/* repos via Terraform. | Issue Coder (Claude, DeepSeek). |\n| **rag-consumer** | Query the RAG MCP server for grounded, cited answers about ChainLayer infra, operations, and codebase history. | Every agent with the RAG MCP server bound (all Claude/ChatGPT/DeepSeek lifecycle agents, Tech Leads, Communicators, domain specialists, Maintainers, Docs squad, RAG Tech Lead). |\n| **rag-ops** | Operate/extend the in-house RAG ops assistant: ingestion, secret filter, retrieval, eval, deploy. | Issue Coder (DeepSeek), Issue Refiner (DeepSeek), Issue QA (Claude), Issue Deployer (Claude), RAG Tech Lead. |\n| **ssh** | SSH keys, git auth (GitHub/GitLab), commit signing, tailnet host access. | Most lifecycle agents. *Not bound:* Docs squad, Communicator (ChatGPT). |\n\n## Private / homelab skills (not company domain)\n\nThese exist in the multica-agents repo but belong to the Private workspace.\nChainLayer agents should NOT route company work to them:\n\n`cloudflare`, `eryndal-*`, `homelab`, `homeassistant`, `tremor-*`,\n`cancer-*`, `private-knowledge`, `linear-private`, `new-repo-private`,\n`multica-private`\n\n---\n\n## Maintenance\n\nWhen adding, removing, or changing a skill in the multica-agents repo, update\nthis index at the same time so squad leads can route accurately.\n\n**Update checklist:**\n1. Add/remove the row in the table above.\n2. Update `Chainlayer/skills.json` if the skill belongs to the Chainlayer workspace.\n3. If binding an existing skill to a new agent, update the \"Bound squad members\" column.\n",
+          "body": "# ChainLayer Skill Index\n\nThis index lists every skill registered in the ChainLayer workspace. Use it to\ndecide which squad member has the domain expertise for a given task.\n\nSkill slugs in **bold** are the canonical name used in `agent.json` `skills[]`\nand `Chainlayer/skills.json`.\n\n---\n\n## Company domain skills\n\n| Skill | Description | MCP required | Bound squad members |\n|---|---|---|---|---|\n| **bitwarden** | Read/create/update secrets in Peter's self-hosted Bitwarden vault. | — | All Claude/ChatGPT/DeepSeek lifecycle agents + RAG Tech Lead + Maintainer. *Not bound:* Docs squad. |\n| **chainlayer-docs** | Write, review, publish ChainLayer docs on docs.chainlayer.cloud (Retype). | — | Doc Writer, Doc Reviewer/Publisher (Docs squad). |\n| **chainlayer-knowledge** | Cross-cutting infra facts: chainlink-tools, migrations, Filecoin voter, QuickNode RPCs. | — | Every agent in every squad. |\n| **chainlink-ops** | Operate Chainlink node fleet: RPC config, adapter lifecycle, token refresh, topup. | — | *(No agent currently bound — gap)* |\n| **company-k8s** | Operate k8s clusters (nl-oven, nl-spud, no-fryer): kubectl, manifests, ArgoCD, storage. | — | CF/HAProxy expert (all squads), Monitoring Operator (all squads), Issue Deployer (Claude/ChatGPT), Issue QA (all squads), Doc Reviewer/Publisher, Doc Writer. |\n| **company-proxmox** | Operate Proxmox clusters (Prox7, Prox9): VM migrations, restores, TF IaC. | — | Issue Coder (all squads), Monitoring Operator (all squads). |\n| **datafeeds-health-findings** | Run the chainlink-datafeeds-health report read-only and turn findings into deduped Multica issues (mapping, dedup keys, lifecycle, zero-mutation guardrail). | — | *(Bound in Stage 3 — the periodic datafeeds-health findings sweep agent)* |\n| **deploy-app** | Deploy new apps to k8s GitOps pipeline: repo, CI, secrets, ArgoCD, Renovate. | — | Issue Deployer (Claude/ChatGPT). |\n| **deploy-verify-rollback** | Generic deploy/verify/rollback for approved changes. | — | Issue Deployer (Claude/ChatGPT). |\n| **fortigate** | Operate Fortigate firewalls (nl2, no1): address objects, allowlisting, API. | — | *(No agent currently bound — gap)* |\n| **git-mr** | Ship company code to GitLab: Linear-first, MR template, SSH-signed commits. | — | Most lifecycle agents. *Not bound:* Lead (uses index), Communicator (Claude), Doc Writer. |\n| **grafana-monitoring** | Build dashboards, run PromQL/LogQL, manage Alertmanager silences, operate monitoring stacks. | — | Monitoring Operator (all squads), Doc Reviewer/Publisher, Doc Writer. |\n| **haproxy** | HAProxy RPC load balancing: bare-metal fleet + k8s Ingress Controller. | — | CF/HAProxy expert (all squads). |\n| **incidentio** | incident.io: incident management, alerts, on-call schedules, follow-ups. | `mcpServers.incidentio` | Communicators (all squads), all lifecycle agents (all squads). |\n| **linear-company** | ChainLayer Linear workspace (OPS/CLL/MAN): issue-first rule before any code change. | `mcpServers.linear` | All lifecycle agents except Maintainer. *Not bound:* Docs squad, Maintainer, Maintainer Private. |\n| **multica-sync** | Bidirectional agent/skill sync between multica-agents repo and workspace. | — | Maintainer, Maintainer Private. |\n| **new-repo-company** | Create new GitLab chainlayer/* repos via Terraform. | — | Issue Coder (Claude, DeepSeek). |\n| **rag-consumer** | Query the RAG MCP server for grounded, cited answers about ChainLayer infra, operations, and codebase history. | `mcpServers.rag` | Every agent with the RAG MCP server bound (all Claude/ChatGPT/DeepSeek lifecycle agents, Tech Leads, Communicators, domain specialists, Maintainers, Docs squad, RAG Tech Lead). |\n| **rag-ops** | Operate/extend the in-house RAG ops assistant: ingestion, secret filter, retrieval, eval, deploy. | `mcpServers.rag` | Issue Coder (DeepSeek), Issue Refiner (DeepSeek), Issue QA (Claude), Issue Deployer (Claude), RAG Tech Lead. |\n| **slack** | Slack workspace: read channels, post messages, manage threads and reactions. | `mcpServers.slack` | Communicators (all squads), all lifecycle agents (all squads). |\n| **ssh** | SSH keys, git auth (GitHub/GitLab), commit signing, tailnet host access. | — | Most lifecycle agents. *Not bound:* Docs squad, Communicator (ChatGPT). |\n| **gdrive** | Google Drive / Docs / Sheets: read, write, create, format documents. | `mcpServers.gdrive` | Communicators (all squads), all lifecycle agents (all squads). |\n\n## Private / homelab skills (not company domain)\n\nThese exist in the multica-agents repo but belong to the Private workspace.\nChainLayer agents should NOT route company work to them:\n\n`cloudflare`, `eryndal-*`, `homelab`, `homeassistant`, `tremor-*`,\n`cancer-*`, `private-knowledge`, `linear-private`, `new-repo-private`,\n`multica-private`\n\n---\n\n## MCP dependency rule\n\nWhen a skill requires an MCP server (e.g. `linear-company` → `mcpServers.linear`),\nthe agent **must** have that MCP server configured in its `mcp_config` at agent\ncreate/update time. Skills document which MCP server they need in the **MCP required**\ncolumn above.\n\n**Creating a new agent with an MCP-dependent skill:** include the matching\n`mcpServers.<name>` in the agent's `--mcp-config` alongside the skill binding.\nThe actual API tokens are secret — store them in Bitwarden and use\n`#Bitwarden item name#` placeholders in the repo's `agent.json` (the sync\nautopilot resolves them at runtime via `bw unlock`).\n\n## Maintenance\n\nWhen adding, removing, or changing a skill in the multica-agents repo, update\nthis index at the same time so squad leads can route accurately.\n\n**Update checklist:**\n1. Add/remove the row in the table above.\n2. If the skill needs an MCP server, add the `mcpServers.<name>` to the **MCP required** column.\n3. Update `Chainlayer/skills.json` if the skill belongs to the Chainlayer workspace.\n4. If binding an existing skill to a new agent, update the \"Bound squad members\" column.\n",
           "files": {}
         },
         "multica_state": {
           "name": "skill-index",
           "description": "Index of every ChainLayer workspace skill — name, description, and which squad members are bound to it. Agents read this at start to know what domain skills exist, what each covers, and who to route domain work to. NOT a replacement for full skill content; just enough metadata for routing decisions.",
-          "body": "# ChainLayer Skill Index\n\nThis index lists every skill registered in the ChainLayer workspace. Use it to\ndecide which squad member has the domain expertise for a given task.\n\nSkill slugs in **bold** are the canonical name used in `agent.json` `skills[]`\nand `Chainlayer/skills.json`.\n\n---\n\n## Company domain skills\n\n| Skill | Description | Bound squad members |\n|---|---|---|\n| **bitwarden** | Read/create/update secrets in Peter's self-hosted Bitwarden vault. | All Claude/ChatGPT/DeepSeek lifecycle agents + RAG Tech Lead + Maintainer. *Not bound:* Docs squad. |\n| **chainlayer-docs** | Write, review, publish ChainLayer docs on docs.chainlayer.cloud (Retype). | Doc Writer, Doc Reviewer/Publisher (Docs squad). |\n| **chainlayer-knowledge** | Cross-cutting infra facts: chainlink-tools, migrations, Filecoin voter, QuickNode RPCs. | Every agent in every squad. |\n| **chainlink-ops** | Operate Chainlink node fleet: RPC config, adapter lifecycle, token refresh, topup. | *(No agent currently bound — gap)* |\n| **company-k8s** | Operate k8s clusters (nl-oven, nl-spud, no-fryer): kubectl, manifests, ArgoCD, storage. | CF/HAProxy expert (all squads), Monitoring Operator (all squads), Issue Deployer (Claude/ChatGPT), Issue QA (all squads), Doc Reviewer/Publisher, Doc Writer. |\n| **company-proxmox** | Operate Proxmox clusters (Prox7, Prox9): VM migrations, restores, TF IaC. | Issue Coder (all squads), Monitoring Operator (all squads). |\n| **deploy-app** | Deploy new apps to k8s GitOps pipeline: repo, CI, secrets, ArgoCD, Renovate. | Issue Deployer (Claude/ChatGPT). |\n| **deploy-verify-rollback** | Generic deploy/verify/rollback for approved changes. | Issue Deployer (Claude/ChatGPT). |\n| **fortigate** | Operate Fortigate firewalls (nl2, no1): address objects, allowlisting, API. | *(No agent currently bound — gap)* |\n| **git-mr** | Ship company code to GitLab: Linear-first, MR template, SSH-signed commits. | Most lifecycle agents. *Not bound:* Lead (uses index), Communicator (Claude), Doc Writer. |\n| **grafana-monitoring** | Build dashboards, run PromQL/LogQL, manage Alertmanager silences, operate monitoring stacks. | Monitoring Operator (all squads), Doc Reviewer/Publisher, Doc Writer. |\n| **haproxy** | HAProxy RPC load balancing: bare-metal fleet + k8s Ingress Controller. | CF/HAProxy expert (all squads). |\n| **linear-company** | ChainLayer Linear workspace (OPS/CLL/MAN): issue-first rule before any code change. | All lifecycle agents except Maintainer. *Not bound:* Docs squad, Maintainer, Maintainer Private. |\n| **multica-sync** | Bidirectional agent/skill sync between multica-agents repo and workspace. | Maintainer, Maintainer Private. |\n| **new-repo-company** | Create new GitLab chainlayer/* repos via Terraform. | Issue Coder (Claude, DeepSeek). |\n| **rag-consumer** | Query the RAG MCP server for grounded, cited answers about ChainLayer infra, operations, and codebase history. | Every agent with the RAG MCP server bound (all Claude/ChatGPT/DeepSeek lifecycle agents, Tech Leads, Communicators, domain specialists, Maintainers, Docs squad, RAG Tech Lead). |\n| **rag-ops** | Operate/extend the in-house RAG ops assistant: ingestion, secret filter, retrieval, eval, deploy. | Issue Coder (DeepSeek), Issue Refiner (DeepSeek), Issue QA (Claude), Issue Deployer (Claude), RAG Tech Lead. |\n| **ssh** | SSH keys, git auth (GitHub/GitLab), commit signing, tailnet host access. | Most lifecycle agents. *Not bound:* Docs squad, Communicator (ChatGPT). |\n\n## Private / homelab skills (not company domain)\n\nThese exist in the multica-agents repo but belong to the Private workspace.\nChainLayer agents should NOT route company work to them:\n\n`cloudflare`, `eryndal-*`, `homelab`, `homeassistant`, `tremor-*`,\n`cancer-*`, `private-knowledge`, `linear-private`, `new-repo-private`,\n`multica-private`\n\n---\n\n## Maintenance\n\nWhen adding, removing, or changing a skill in the multica-agents repo, update\nthis index at the same time so squad leads can route accurately.\n\n**Update checklist:**\n1. Add/remove the row in the table above.\n2. Update `Chainlayer/skills.json` if the skill belongs to the Chainlayer workspace.\n3. If binding an existing skill to a new agent, update the \"Bound squad members\" column.\n",
+          "body": "# ChainLayer Skill Index\n\nThis index lists every skill registered in the ChainLayer workspace. Use it to\ndecide which squad member has the domain expertise for a given task.\n\nSkill slugs in **bold** are the canonical name used in `agent.json` `skills[]`\nand `Chainlayer/skills.json`.\n\n---\n\n## Company domain skills\n\n| Skill | Description | MCP required | Bound squad members |\n|---|---|---|---|---|\n| **bitwarden** | Read/create/update secrets in Peter's self-hosted Bitwarden vault. | — | All Claude/ChatGPT/DeepSeek lifecycle agents + RAG Tech Lead + Maintainer. *Not bound:* Docs squad. |\n| **chainlayer-docs** | Write, review, publish ChainLayer docs on docs.chainlayer.cloud (Retype). | — | Doc Writer, Doc Reviewer/Publisher (Docs squad). |\n| **chainlayer-knowledge** | Cross-cutting infra facts: chainlink-tools, migrations, Filecoin voter, QuickNode RPCs. | — | Every agent in every squad. |\n| **chainlink-ops** | Operate Chainlink node fleet: RPC config, adapter lifecycle, token refresh, topup. | — | *(No agent currently bound — gap)* |\n| **company-k8s** | Operate k8s clusters (nl-oven, nl-spud, no-fryer): kubectl, manifests, ArgoCD, storage. | — | CF/HAProxy expert (all squads), Monitoring Operator (all squads), Issue Deployer (Claude/ChatGPT), Issue QA (all squads), Doc Reviewer/Publisher, Doc Writer. |\n| **company-proxmox** | Operate Proxmox clusters (Prox7, Prox9): VM migrations, restores, TF IaC. | — | Issue Coder (all squads), Monitoring Operator (all squads). |\n| **datafeeds-health-findings** | Run the chainlink-datafeeds-health report read-only and turn findings into deduped Multica issues (mapping, dedup keys, lifecycle, zero-mutation guardrail). | — | *(Bound in Stage 3 — the periodic datafeeds-health findings sweep agent)* |\n| **deploy-app** | Deploy new apps to k8s GitOps pipeline: repo, CI, secrets, ArgoCD, Renovate. | — | Issue Deployer (Claude/ChatGPT). |\n| **deploy-verify-rollback** | Generic deploy/verify/rollback for approved changes. | — | Issue Deployer (Claude/ChatGPT). |\n| **fortigate** | Operate Fortigate firewalls (nl2, no1): address objects, allowlisting, API. | — | *(No agent currently bound — gap)* |\n| **git-mr** | Ship company code to GitLab: Linear-first, MR template, SSH-signed commits. | — | Most lifecycle agents. *Not bound:* Lead (uses index), Communicator (Claude), Doc Writer. |\n| **grafana-monitoring** | Build dashboards, run PromQL/LogQL, manage Alertmanager silences, operate monitoring stacks. | — | Monitoring Operator (all squads), Doc Reviewer/Publisher, Doc Writer. |\n| **haproxy** | HAProxy RPC load balancing: bare-metal fleet + k8s Ingress Controller. | — | CF/HAProxy expert (all squads). |\n| **incidentio** | incident.io: incident management, alerts, on-call schedules, follow-ups. | `mcpServers.incidentio` | Communicators (all squads), all lifecycle agents (all squads). |\n| **linear-company** | ChainLayer Linear workspace (OPS/CLL/MAN): issue-first rule before any code change. | `mcpServers.linear` | All lifecycle agents except Maintainer. *Not bound:* Docs squad, Maintainer, Maintainer Private. |\n| **multica-sync** | Bidirectional agent/skill sync between multica-agents repo and workspace. | — | Maintainer, Maintainer Private. |\n| **new-repo-company** | Create new GitLab chainlayer/* repos via Terraform. | — | Issue Coder (Claude, DeepSeek). |\n| **rag-consumer** | Query the RAG MCP server for grounded, cited answers about ChainLayer infra, operations, and codebase history. | `mcpServers.rag` | Every agent with the RAG MCP server bound (all Claude/ChatGPT/DeepSeek lifecycle agents, Tech Leads, Communicators, domain specialists, Maintainers, Docs squad, RAG Tech Lead). |\n| **rag-ops** | Operate/extend the in-house RAG ops assistant: ingestion, secret filter, retrieval, eval, deploy. | `mcpServers.rag` | Issue Coder (DeepSeek), Issue Refiner (DeepSeek), Issue QA (Claude), Issue Deployer (Claude), RAG Tech Lead. |\n| **slack** | Slack workspace: read channels, post messages, manage threads and reactions. | `mcpServers.slack` | Communicators (all squads), all lifecycle agents (all squads). |\n| **ssh** | SSH keys, git auth (GitHub/GitLab), commit signing, tailnet host access. | — | Most lifecycle agents. *Not bound:* Docs squad, Communicator (ChatGPT). |\n| **gdrive** | Google Drive / Docs / Sheets: read, write, create, format documents. | `mcpServers.gdrive` | Communicators (all squads), all lifecycle agents (all squads). |\n\n## Private / homelab skills (not company domain)\n\nThese exist in the multica-agents repo but belong to the Private workspace.\nChainLayer agents should NOT route company work to them:\n\n`cloudflare`, `eryndal-*`, `homelab`, `homeassistant`, `tremor-*`,\n`cancer-*`, `private-knowledge`, `linear-private`, `new-repo-private`,\n`multica-private`\n\n---\n\n## MCP dependency rule\n\nWhen a skill requires an MCP server (e.g. `linear-company` → `mcpServers.linear`),\nthe agent **must** have that MCP server configured in its `mcp_config` at agent\ncreate/update time. Skills document which MCP server they need in the **MCP required**\ncolumn above.\n\n**Creating a new agent with an MCP-dependent skill:** include the matching\n`mcpServers.<name>` in the agent's `--mcp-config` alongside the skill binding.\nThe actual API tokens are secret — store them in Bitwarden and use\n`#Bitwarden item name#` placeholders in the repo's `agent.json` (the sync\nautopilot resolves them at runtime via `bw unlock`).\n\n## Maintenance\n\nWhen adding, removing, or changing a skill in the multica-agents repo, update\nthis index at the same time so squad leads can route accurately.\n\n**Update checklist:**\n1. Add/remove the row in the table above.\n2. If the skill needs an MCP server, add the `mcpServers.<name>` to the **MCP required** column.\n3. Update `Chainlayer/skills.json` if the skill belongs to the Chainlayer workspace.\n4. If binding an existing skill to a new agent, update the \"Bound squad members\" column.\n",
           "files": {}
         }
       },
@@ -4478,6 +4840,20 @@
           "name": "rag-consumer",
           "description": "How ChainLayer agents consume the RAG MCP server — the `rag_ask` tool for querying internal knowledge. Bound to agents that have the RAG MCP server in their mcp_config. NOT the rag-ops skill (that's for operating the RAG system itself).",
           "body": "# rag-consumer — querying the RAG from agent sessions\n\nEvery lifecycle agent (Refiner, Coder, QA, Deployer) across all squads, plus\nTech Leads, Communicators, Maintainers, and domain specialists, has the **RAG\nMCP server** configured as an MCP tool. This means you can call `rag_ask`\ndirectly in your session — the model decides when context is needed.\n\n## The tool: `rag_ask`\n\n```\nrag_ask(query: str) -> str\n```\n\nTakes a natural-language question about ChainLayer infrastructure, operations,\nrunbooks, incidents, deployments, or codebase history. Returns a **grounded\nanswer with numbered source citations** (`[n]`), retrieved from the in-house\nRAG corpus (270+ repos, nightly-refreshed).\n\nUse it whenever you need internal context: before writing code, refining an\nissue, verifying a fix, or deciding a deploy strategy.\n\n## When to use it\n\n- **Refiner:** ask \"What does this system do?\" before scoping a change\n- **Coder:** ask \"How is this configured in production?\" before implementing\n- **QA:** ask \"What are the known failure modes?\" before testing\n- **Deployer:** ask \"What is the rollout order?\" before deploying\n- **Anyone:** ask \"Has this been done before?\" before starting work\n\n## What it returns\n\nA typical response looks like:\n\n```\nThe chainlink-tools platform consists of three apps under a monorepo... [1]\n\nSources:\n  [1] chainlink-ops:README.md\n  [2] linear-ops-cll:OPS-1179.md\n```\n\nIf no relevant context is found, it returns `\"No relevant context found.\"` —\ndo not treat this as a failure; it means your question falls outside the\ningested corpus.\n\n## Architecture\n\n| Property | Value |\n|---|---|\n| Transport | SSE (`GET /sse` + `POST /messages/`) |\n| Endpoint | `http://100.69.200.97:8041/sse` |\n| Auth | None (Tailscale-only binding — any tailnet host can query) |\n| Host | `claude-readonly-01` |\n| Retrieval | Hybrid (dense Qdrant ANN + lexical full-text, RRF fusion) |\n| Model | Qwen3-30B-A3B-Instruct on `gx10-f018` |\n\n## Binding to an agent\n\nTo give an agent the RAG MCP tool, add the following to its `mcp_config` in\n`agent.json`:\n\n```json\n\"rag\": {\n  \"type\": \"sse\",\n  \"url\": \"http://100.69.200.97:8041/sse\"\n}\n```\n\nThen run `scripts/sync.py` in the multica-agents repo to push the config to\nMultica, or wait for the sync autopilot.\n\n## See also\n\n- `rag-ops` skill — operating the RAG system itself (ingestion, secret filter,\n  eval, deploy)\n- `claude-config/chainlayer/mcp/README.md` — general MCP connector management\n",
+          "files": {}
+        }
+      },
+      "datafeeds-health-findings": {
+        "repo_state": {
+          "name": "datafeeds-health-findings",
+          "description": "Run the chainlink-datafeeds-health report READ-ONLY and turn its findings into deduplicated Multica issues. Use whenever an agent (e.g. a scheduled findings sweep) must check Chainlink data-feeds health and file/refresh findings as issues. Defines the exact finding→issue mapping, the dedup metadata keys (adapter_id / feed_contract), the new/known/recovered lifecycle (never auto-close), the N-consecutive-window debounce on new degraded-adapter issues (CHA-197), where issues are placed (the \"Datafeeds health — open findings\" project, not as sub-issues), and the hard zero-mutation guardrail. Pairs with bitwarden (token) and grafana-monitoring (Loki enrichment).",
+          "body": "# Datafeeds health → findings issues\n\nThis skill turns the **read-only** `chainlink-datafeeds-health` report into a\ndeduplicated set of Multica issues. It is the source of truth for the\nfinding→issue mapping; bind it to the agent that runs the periodic sweep.\n\nThe report tool itself (`github.com/tyrion70/chainlink-datafeeds-health`,\nbuilt under CHA-154) only *observes* — it reads Prometheus through the Grafana\nCloud proxy and prints findings. This skill adds the issue-filing layer on top.\n**Active triage / restarts are explicitly out of scope** (tracked separately as\nCHA-165) — see the guardrail at the bottom.\n\n---\n\n## 0. Prerequisites\n\n- **Findings project id.** All issues land in the dedicated\n  **\"Datafeeds health — open findings\"** project (created and wired in Stage 3).\n  Get its id once with `multica project list --output json` and reuse it; this\n  skill refers to it as `$PROJECT`.\n- **Squad assignee.** Issues are assigned to the **Chainlayer Squad DeepSeek** (the\n  permanent assignee), id `6cb3a5fe-fd11-4ddd-8f06-395d3b82ef11`.\n- Bitwarden access (`bitwarden` skill) for the Grafana viewer token.\n\n---\n\n## 1. Run the report (read-only, JSON)\n\n```bash\n# 1. Check out the report tool\nmultica repo checkout https://github.com/tyrion70/chainlink-datafeeds-health\ncd chainlink-datafeeds-health\n\n# 2. Fetch the Grafana viewer token at runtime (never commit it).\n#    Bitwarden item \"readonly chainlayer credentials\", field GRAFANA_VIEWER_TOKEN\n#    — via the bitwarden skill.\nexport GRAFANA_VIEWER_TOKEN=\"<token from Bitwarden>\"\n\n# 3. Fetch the READ-ONLY DSN (the known-issue suppression source, CHA-320/CHA-331).\n#    Bitwarden item \"DATAFEEDS_HEALTH_DSN\", field DATAFEEDS_HEALTH_DSN_READONLY —\n#    the least-privilege `datafeeds_readonly` role (SELECT-only; granted read on\n#    known_issue by CHA-326 / migration 0009). NOT the datafeed_ingest owner DSN —\n#    the report only reads. Never commit or echo it.\nexport DATAFEEDS_HEALTH_DSN=\"<readonly DSN from Bitwarden>\"\n\n# 4. Run with --json AND the DSN — the machine-readable source of truth.\npython3 chainlink-datafeeds-report.py --json > run.json\n```\n\n`--json` emits the **same** findings and thresholds as the text report but with\n**full, untruncated** contract ids, and it **subsumes `--by-adapter`** (the\nper-bridge rollup is always included), so you never need a second invocation.\nstdlib Python 3 plus `psycopg` (v3) for the DB read — no `pip install` beyond that\ndep, which the ingester already carries. Do not change detection thresholds —\nfile against the defaults the tool ships with.\n\n**The DSN is what turns suppression on.** With `DATAFEEDS_HEALTH_DSN` set, the\nreport reads the `known_issue` table and the run shows `known_source=db`; matched\n`(bridge, contract)` pairs move into the `KNOWN` bucket and stop paging (e.g.\nBSW/USD on bridge-gsr). With no DSN the report **fails open** —\n`known_source='unavailable — suppression skipped, failing open'`, empty known set,\nso every known issue pages. Use the **read-only** DSN here; the `datafeed_ingest`\nowner DSN is only for the persistence step (`sweep-ingest.sh`) and the §4a streak\nquery. Do **not** pass `--known-issues` (that is the offline/test JSON override).\n\n### The JSON you consume (`v3` shape)\n\n```jsonc\n{\n  \"as_of\": \"2026-06-28T12:58:00Z\",      // RFC3339 UTC — use as the <ts> in comments\n  \"summary\": { \"silent\": 2, \"erroring\": 0, \"degraded_adapter\": 9,\n               \"lowfreq_por\": 4, \"dead_frozen\": 1, \"decommissioned\": 9,\n               \"suppressed\": 208, \"unclassified\": 0 },\n  \"findings\": [ /* one per finding; field `bucket` selects the mapping below */ ],\n  \"adapters\": [ /* per-bridge rollup = the --by-adapter view */ ]\n}\n```\n\nA `findings[]` entry (the fields this skill uses):\n\n```jsonc\n{\n  \"bucket\": \"DEGRADED_ADAPTER\",   // SILENT | ERRORING | DEGRADED_ADAPTER | LOWFREQ_POR\n                                  // | DEAD_FROZEN | DECOMMISSIONED | SUPPRESSED | UNCLASSIFIED\n  \"job_name\": \"USDD / USD | OCR2 | contract 0x837Af6E8…2Ab83b | network tron-mainnet\",\n  \"contract\": \"0x837Af6E843EDa17079d742b44A800f2E6D2Ab83b\",  // FULL (0x or base58); null if unknown\n  \"network\": \"tron\",\n  \"completed\": 2805.79, \"completed_recent\": 840.0, \"errors\": 794.21,\n  \"error_fraction\": 0.2206,\n  \"adapters\": [                   // failing bridges ON THIS feed\n    { \"task_id\": \"ds2\", \"bridge_name\": \"bridge-elwood\",\n      \"label\": \"ds2→bridge-elwood\", \"errors\": 264.74, \"completed\": 95.26,\n      \"error_fraction\": 0.73 }\n  ]\n  // SILENT also carries `note`; DEAD_FROZEN carries `transmit`,`frozen`,`med_seen`;\n  // DECOMMISSIONED carries `reason`.\n}\n```\n\nAn `adapters[]` rollup entry (per bridge, active feeds only):\n\n```jsonc\n{ \"bridge_name\": \"bridge-coinmetrics-lwba\",\n  \"feeds_failing\": 3, \"feeds_using\": 395,   // → the failing/using ratio\n  \"errors\": 364.01, \"networks\": [\"bsc\",\"ethereum\",\"polygon\"],\n  \"adapter_wide\": false,                     // true ⇒ failing on ≥80% of feeds that use it\n  \"feeds\": [ /* full job_name of each failing feed */ ] }\n```\n\n---\n\n## 2. Finding → issue mapping\n\nDrive everything off `bucket`. There are exactly two issue *shapes* — one per\n**adapter** and one per **feed** — plus two buckets that are never auto-filed.\n\n| Bucket(s) | Issue shape | One issue per | Dedup key |\n|---|---|---|---|\n| `DEGRADED_ADAPTER` | **per-adapter** | failing bridge (`bridge_name`) | `adapter_id` |\n| `SILENT`, `ERRORING`, `DEAD_FROZEN` | **per-feed** | feed (full `contract`) | `feed_contract` |\n| `LOWFREQ_POR`, `DECOMMISSIONED` | **not filed** | — (counts only) | — |\n| `SUPPRESSED`, `UNCLASSIFIED` | **not filed** | — (gating / noise) | — |\n\n### 2a. Per-adapter issues (`DEGRADED_ADAPTER`)\n\nOne issue **per failing bridge**, not per feed — a single adapter failing across\nmany feeds is one issue. Build each from the `adapters[]` rollup entry plus the\n`DEGRADED_ADAPTER` findings that name that bridge:\n\n- **Group** all `findings` where `bucket == \"DEGRADED_ADAPTER\"` by the\n  `bridge_name` inside their `adapters[]`. (A feed degraded on two bridges\n  contributes a row to two adapter issues.)\n- **Header** comes from the matching `adapters[]` rollup entry:\n  `feeds_failing/feeds_using` (the failing/using ratio), `errors`, `networks`,\n  and the `adapter_wide` flag.\n- **Per-feed table** — one row per contributing finding:\n\n  | Feed | Network | Contract (full) | feed err/used | adapter err/completed |\n  |---|---|---|---|---|\n  | USDD / USD | tron | `0x837Af6E8…2Ab83b` (full) | 22% (809e/2,791c) | ds2→bridge-elwood 75% (270e/90c) |\n\n  Feed name = `job_name`; contract = full `contract`; feed err = finding\n  `error_fraction` with `errors`/`completed`; adapter err/completed = the\n  matching `adapters[]`-on-feed entry's `error_fraction`, `errors`, `completed`.\n\nThe table lives **inside** the adapter issue and is **rewritten in full every\nrun** (feeds can join/leave as the adapter degrades or partially recovers).\n\n- **Title:** `DEGRADED ADAPTER: <bridge_name> (<feeds_failing> feed(s))`\n- **Metadata:** `adapter_id = <bridge_name>` (exact string, e.g. `bridge-elwood`).\n\n### 2b. Per-feed issues (`SILENT`, `ERRORING`, `DEAD_FROZEN`)\n\nA whole-feed alert is **one issue per feed**, keyed by its contract. Body:\nbucket, `job_name`, `network`, full `contract`, `error_fraction` with\n`errors`/`completed`/`completed_recent`, the named failing adapter(s) from\n`adapters[]` (the `label`, e.g. `ds1→bridge-proof-of-reserves 100%`), and the\nbucket-specific extras (`note` for SILENT; `transmit`/`frozen`/`med_seen` for\nDEAD_FROZEN).\n\n- **Title:** `<BUCKET>: <feed name> (<network>)` — e.g.\n  `SILENT: USDO Reserves (base)`.\n- **Metadata:** `feed_contract = <full contract>` (the `0x…` or base58 string,\n  exactly as in JSON — never the truncated text-report form).\n- If `contract` is `null`, fall back to `feed_contract = job_name` and note the\n  missing contract in the body; this keeps dedup stable until the contract is\n  known.\n\n### 2c. Never auto-filed (counts only)\n\n- **`LOWFREQ_POR`** — PoR/NAV feeds are chronically near-idle *by design*;\n  paging on their silence is noise.\n- **`DECOMMISSIONED`** — the OCR job is gone from the node; excluded so it\n  doesn't sit as permanent noise.\n\nDo **not** open issues for these. Report them only as the counts from\n`summary.lowfreq_por` / `summary.decommissioned` (e.g. in a run-summary comment\non the tracking issue, or a log line). `SUPPRESSED` (closed-market gating) and\n`UNCLASSIFIED` are likewise never filed.\n\n---\n\n## 3. Dedup convention\n\n**Match on metadata, never by parsing the title.** Titles are human-facing and\nchange; the dedup keys are the contract.\n\n| Issue shape | Metadata key | Value |\n|---|---|---|\n| per-adapter | `adapter_id` | `bridge_name` (e.g. `bridge-elwood`) |\n| per-feed | `feed_contract` | full contract (`0x…` / base58) |\n\n### Per-key procedure (run for every finding that maps to an issue)\n\n```bash\n# 1. List open findings-project issues that already carry this key.\nmultica issue list --project \"$PROJECT\" \\\n  --metadata adapter_id=bridge-elwood --output json\n#   (per-feed: --metadata feed_contract=0xC28b74022D625849ff43f6E5...)\n\n# 2. Treat status done/cancelled as NOT open. Among the open ones:\n#    - exactly one match  → UPDATE it (§4 Known)\n#    - no match           → CREATE it (§4 New)\n```\n\n`multica issue list` supports `--metadata key=value` (AND-combinable,\nJSON-typed — contracts and bridge names sniff as strings, which is what we\nwant). Scope by `--project \"$PROJECT\"` so you only ever match findings issues.\nIf two open issues somehow share a key, update the oldest and leave a comment\nflagging the duplicate — don't silently pick one.\n\n---\n\n## 4. Lifecycle\n\nDecide per dedup key, comparing **this run's findings** against **open issues in\nthe project**.\n\n- **New** — key present in this run, **no** open issue with it →\n  `multica issue create` with the body from §2, `--project \"$PROJECT\"`,\n  `--assignee-id 6cb3a5fe-fd11-4ddd-8f06-395d3b82ef11`, `--status todo`, then\n  pin the dedup metadata key. **For `DEGRADED_ADAPTER` (per-adapter) issues this\n  step is gated by the debounce in §4a — open the new issue only once the adapter\n  has been over threshold for `N` consecutive windows.** The per-feed buckets\n  (`SILENT` / `ERRORING` / `DEAD_FROZEN`) are **never** debounced; they file on\n  the first over-threshold run as before.\n- **Known** — key present in this run **and** an open issue exists →\n  `multica issue update` to **rewrite the body/table** with fresh numbers, and\n  add **one** comment: `still degraded as of <as_of>` (per-adapter) or\n  `still <bucket> as of <as_of>` (per-feed). **Do not create a second issue.**\n- **Recovered** — key is on an **open issue** but **absent from this run's\n  findings** → post a **`recovered as of <as_of>` comment only**. **Never\n  auto-close, never change status, never reassign.** A human (QA/Tech Lead)\n  decides when to close. To find these: list all open issues in `$PROJECT`,\n  read each one's `adapter_id`/`feed_contract`, and diff against the set of keys\n  this run produced.\n\nUse `as_of` from the JSON (RFC3339 UTC) as the `<ts>` in every comment so the\ntimeline is anchored to the evaluation time, not wall-clock.\n\n### 4a. DEGRADED_ADAPTER debounce (CHA-197)\n\nA single threshold-edge flap — one bridge tipping just over `--adapter-error-frac`\nfor one hour (CHA-195 / CHA-198: bridge-bea at 10.1%) — used to file an issue\nimmediately. Per Peter's decision (option 1), a **new** `DEGRADED_ADAPTER` issue is\nopened only once the adapter (`bridge_name` = the `adapter_id` dedup key) has been\nover threshold for **`N` = 4 consecutive hourly windows**. This gates **only\nnew-issue creation** for the per-adapter shape; everything else in §4 is unchanged,\nand `SILENT` / `ERRORING` / `DEAD_FROZEN` are never debounced.\n\n**Constants — tune here, never inline:**\n- `N_CONSECUTIVE = 4` — windows required before a new degraded-adapter issue is filed.\n- `gap_tolerance` — how long the run series may be interrupted before the streak is\n  considered broken. It is the default of the SQL helper below (**150 min**); pass\n  an explicit value only to override.\n\n**The streak is read from the persistence DB** (the CHA-201 `datafeeds_health`\nschema on multica-02). Migration `0004` of the report repo provides the read-time\nhelper `adapter_degraded_streak(bridge, ref_as_of [, gap_tolerance])`, which returns\nthe count of **consecutive prior runs** the bridge was in a `DEGRADED_ADAPTER`\nfinding, walking `health_run` backwards from `ref_as_of`: a present run **without**\nthe bridge degraded breaks it (observed recovery); a single missed sweep within\n`gap_tolerance` does not; ≥2 missed runs do. It does **not** include the current run.\n\n**Why \"prior\" and a `+1`.** The sweep files issues **before** `sweep-ingest.sh`\nruns, so the current run is not yet in the DB (persistence is deliberately last and\nfail-soft — CHA-201 — so a DB hiccup never gates filing). Do **not** reorder to\ningest-then-file. Compute:\n\n> `streak = 1 (current run — run.json has the bridge in DEGRADED_ADAPTER)`\n> `       + adapter_degraded_streak(bridge, <run as_of>)   -- prior runs, from the DB`\n\nand create the new issue only when `streak >= N_CONSECUTIVE`. Below that, **file\nnothing** for that adapter this run — the degradation is still fully captured in\n`health_finding` for history, and the streak resumes (or resets) on the next run.\n\nPer dedup key, once §3 finds **no** open issue for the `adapter_id`:\n\n```bash\n# DSN from Bitwarden: item \"DATAFEEDS_HEALTH_DSN\", field DATAFEEDS_HEALTH_DSN, vault\n# company folder — the SAME DSN the ingester uses; never commit or echo it.\nprior=$(psql \"$DATAFEEDS_HEALTH_DSN\" -At \\\n  -c \"SELECT datafeeds_health.adapter_degraded_streak('bridge-elwood', '<run as_of>'::timestamptz)\")\n# streak = 1 (current run) + prior;  open the new issue iff streak >= 4\n```\n\n**DB unreachable at filing time → fail-closed for DEGRADED_ADAPTER only.** If the\nstreak can't be read (DSN unset, DB down, query error), **do not open the new\ndegraded-adapter issue this run** — defer; it files next run once the streak is\nconfirmable. This class is low-severity and the data is captured regardless, so\ndeferring beats re-introducing churn by fail-open filing. **Never let a DB problem\ngate `SILENT` / `ERRORING` / `DEAD_FROZEN` filing — those always proceed.**\n\n**Debounce gates first creation only — it never re-arms.** Once the issue exists,\nthe **Known** path takes over immediately: subsequent over-threshold runs append the\n`still degraded as of <as_of>` update to the same issue (dedup by `adapter_id`), and\nrecovery closes via the existing path. After a close, a fresh degradation must\nre-accumulate `N` consecutive windows before a new issue is filed (the streak is the\ncurrent unbroken run; a recovery/close gap breaks it). Issues already open when this\nships are unaffected.\n\n---\n\n## 5. Placement\n\n- Findings are **issues in the \"Datafeeds health — open findings\" project**\n  (`--project \"$PROJECT\"`), **assigned to the Chainlayer Squad**, `--status todo`.\n- They are **NOT** sub-issues — do **not** pass `--parent`, and do not file them\n  under CHA-165 or any tracking parent. Project membership is the only grouping.\n\n---\n\n## 6. Investigation depth — READ-ONLY guardrail\n\nBeyond the report's metrics, the filing agent **MAY** enrich an issue with:\n\n- **Loki adapter logs** via the `grafana-monitoring` skill — read-only LogQL\n  through the Grafana datasource proxy (e.g. the failing bridge's container logs\n  in the `chainlink-ea*` namespaces) to add context to the issue body.\n- **A read-only bridge GET** — a plain HTTP `GET` against the external-adapter\n  endpoint to confirm reachability / capture the error response. GET only.\n\n**Hard guardrail — ZERO production mutations. Allowed = reads only:**\n\n| Allowed (read) | Forbidden (mutation) |\n|---|---|\n| Prometheus / report metrics | Restarting adapters or nodes |\n| Loki log queries (LogQL GET) | Any `POST`/`PUT`/`PATCH`/`DELETE` to a bridge |\n| Read-only bridge `GET` | Redeploys, scaling, k8s `apply`/`delete` |\n| Reading k8s/Grafana state | Key rotation or secret writes |\n| Filing/updating Multica issues | Any config change / MR to prod |\n\nIf a finding looks like it needs a restart, a key rotation, or any write, that\nis **active triage (CHA-165)** — file/refresh the issue and hand off; **do not\nperform the mutation**. State this in the issue if relevant. The whole point of\nthis lane is a safe, repeatable, observe-and-file sweep.\n\n---\n\n## Quick reference\n\n```\nrun --json ──► for each finding:\n  DEGRADED_ADAPTER → group by bridge_name → per-adapter issue, key adapter_id\n  SILENT/ERRORING/DEAD_FROZEN → per-feed issue, key feed_contract (full)\n  LOWFREQ_POR / DECOMMISSIONED / SUPPRESSED → counts only, never filed\n\ndedup: list --project $PROJECT --metadata <key>=<val>  → match=update, none=create\nlifecycle: new=create · known=update+“still …” comment · recovered=“recovered …” comment ONLY (never close)\ndebounce (§4a, CHA-197): new DEGRADED_ADAPTER issue only when streak >= N(4);\n  streak = 1 (current run) + adapter_degraded_streak(bridge, as_of) from the DB;\n  DB unreachable → defer DEGRADED_ADAPTER (fail-closed), never SILENT/ERRORING/DEAD_FROZEN\nplacement: project issue, squad assignee, status todo, NEVER --parent\nguardrail: reads only (metrics, Loki, bridge GET) — zero prod mutations\n```\n",
+          "files": {}
+        },
+        "multica_state": {
+          "name": "datafeeds-health-findings",
+          "description": "Run the chainlink-datafeeds-health report READ-ONLY and turn its findings into deduplicated Multica issues. Use whenever an agent (e.g. a scheduled findings sweep) must check Chainlink data-feeds health and file/refresh findings as issues. Defines the exact finding→issue mapping, the dedup metadata keys (adapter_id / feed_contract), the new/known/recovered lifecycle (never auto-close), the N-consecutive-window debounce on new degraded-adapter issues (CHA-197), where issues are placed (the \"Datafeeds health — open findings\" project, not as sub-issues), and the hard zero-mutation guardrail. Pairs with bitwarden (token) and grafana-monitoring (Loki enrichment).",
+          "body": "# Datafeeds health → findings issues\n\nThis skill turns the **read-only** `chainlink-datafeeds-health` report into a\ndeduplicated set of Multica issues. It is the source of truth for the\nfinding→issue mapping; bind it to the agent that runs the periodic sweep.\n\nThe report tool itself (`github.com/tyrion70/chainlink-datafeeds-health`,\nbuilt under CHA-154) only *observes* — it reads Prometheus through the Grafana\nCloud proxy and prints findings. This skill adds the issue-filing layer on top.\n**Active triage / restarts are explicitly out of scope** (tracked separately as\nCHA-165) — see the guardrail at the bottom.\n\n---\n\n## 0. Prerequisites\n\n- **Findings project id.** All issues land in the dedicated\n  **\"Datafeeds health — open findings\"** project (created and wired in Stage 3).\n  Get its id once with `multica project list --output json` and reuse it; this\n  skill refers to it as `$PROJECT`.\n- **Squad assignee.** Issues are assigned to the **Chainlayer Squad DeepSeek** (the\n  permanent assignee), id `6cb3a5fe-fd11-4ddd-8f06-395d3b82ef11`.\n- Bitwarden access (`bitwarden` skill) for the Grafana viewer token.\n\n---\n\n## 1. Run the report (read-only, JSON)\n\n```bash\n# 1. Check out the report tool\nmultica repo checkout https://github.com/tyrion70/chainlink-datafeeds-health\ncd chainlink-datafeeds-health\n\n# 2. Fetch the Grafana viewer token at runtime (never commit it).\n#    Bitwarden item \"readonly chainlayer credentials\", field GRAFANA_VIEWER_TOKEN\n#    — via the bitwarden skill.\nexport GRAFANA_VIEWER_TOKEN=\"<token from Bitwarden>\"\n\n# 3. Fetch the READ-ONLY DSN (the known-issue suppression source, CHA-320/CHA-331).\n#    Bitwarden item \"DATAFEEDS_HEALTH_DSN\", field DATAFEEDS_HEALTH_DSN_READONLY —\n#    the least-privilege `datafeeds_readonly` role (SELECT-only; granted read on\n#    known_issue by CHA-326 / migration 0009). NOT the datafeed_ingest owner DSN —\n#    the report only reads. Never commit or echo it.\nexport DATAFEEDS_HEALTH_DSN=\"<readonly DSN from Bitwarden>\"\n\n# 4. Run with --json AND the DSN — the machine-readable source of truth.\npython3 chainlink-datafeeds-report.py --json > run.json\n```\n\n`--json` emits the **same** findings and thresholds as the text report but with\n**full, untruncated** contract ids, and it **subsumes `--by-adapter`** (the\nper-bridge rollup is always included), so you never need a second invocation.\nstdlib Python 3 plus `psycopg` (v3) for the DB read — no `pip install` beyond that\ndep, which the ingester already carries. Do not change detection thresholds —\nfile against the defaults the tool ships with.\n\n**The DSN is what turns suppression on.** With `DATAFEEDS_HEALTH_DSN` set, the\nreport reads the `known_issue` table and the run shows `known_source=db`; matched\n`(bridge, contract)` pairs move into the `KNOWN` bucket and stop paging (e.g.\nBSW/USD on bridge-gsr). With no DSN the report **fails open** —\n`known_source='unavailable — suppression skipped, failing open'`, empty known set,\nso every known issue pages. Use the **read-only** DSN here; the `datafeed_ingest`\nowner DSN is only for the persistence step (`sweep-ingest.sh`) and the §4a streak\nquery. Do **not** pass `--known-issues` (that is the offline/test JSON override).\n\n### The JSON you consume (`v3` shape)\n\n```jsonc\n{\n  \"as_of\": \"2026-06-28T12:58:00Z\",      // RFC3339 UTC — use as the <ts> in comments\n  \"summary\": { \"silent\": 2, \"erroring\": 0, \"degraded_adapter\": 9,\n               \"lowfreq_por\": 4, \"dead_frozen\": 1, \"decommissioned\": 9,\n               \"suppressed\": 208, \"unclassified\": 0 },\n  \"findings\": [ /* one per finding; field `bucket` selects the mapping below */ ],\n  \"adapters\": [ /* per-bridge rollup = the --by-adapter view */ ]\n}\n```\n\nA `findings[]` entry (the fields this skill uses):\n\n```jsonc\n{\n  \"bucket\": \"DEGRADED_ADAPTER\",   // SILENT | ERRORING | DEGRADED_ADAPTER | LOWFREQ_POR\n                                  // | DEAD_FROZEN | DECOMMISSIONED | SUPPRESSED | UNCLASSIFIED\n  \"job_name\": \"USDD / USD | OCR2 | contract 0x837Af6E8…2Ab83b | network tron-mainnet\",\n  \"contract\": \"0x837Af6E843EDa17079d742b44A800f2E6D2Ab83b\",  // FULL (0x or base58); null if unknown\n  \"network\": \"tron\",\n  \"completed\": 2805.79, \"completed_recent\": 840.0, \"errors\": 794.21,\n  \"error_fraction\": 0.2206,\n  \"adapters\": [                   // failing bridges ON THIS feed\n    { \"task_id\": \"ds2\", \"bridge_name\": \"bridge-elwood\",\n      \"label\": \"ds2→bridge-elwood\", \"errors\": 264.74, \"completed\": 95.26,\n      \"error_fraction\": 0.73 }\n  ]\n  // SILENT also carries `note`; DEAD_FROZEN carries `transmit`,`frozen`,`med_seen`;\n  // DECOMMISSIONED carries `reason`.\n}\n```\n\nAn `adapters[]` rollup entry (per bridge, active feeds only):\n\n```jsonc\n{ \"bridge_name\": \"bridge-coinmetrics-lwba\",\n  \"feeds_failing\": 3, \"feeds_using\": 395,   // → the failing/using ratio\n  \"errors\": 364.01, \"networks\": [\"bsc\",\"ethereum\",\"polygon\"],\n  \"adapter_wide\": false,                     // true ⇒ failing on ≥80% of feeds that use it\n  \"feeds\": [ /* full job_name of each failing feed */ ] }\n```\n\n---\n\n## 2. Finding → issue mapping\n\nDrive everything off `bucket`. There are exactly two issue *shapes* — one per\n**adapter** and one per **feed** — plus two buckets that are never auto-filed.\n\n| Bucket(s) | Issue shape | One issue per | Dedup key |\n|---|---|---|---|\n| `DEGRADED_ADAPTER` | **per-adapter** | failing bridge (`bridge_name`) | `adapter_id` |\n| `SILENT`, `ERRORING`, `DEAD_FROZEN` | **per-feed** | feed (full `contract`) | `feed_contract` |\n| `LOWFREQ_POR`, `DECOMMISSIONED` | **not filed** | — (counts only) | — |\n| `SUPPRESSED`, `UNCLASSIFIED` | **not filed** | — (gating / noise) | — |\n\n### 2a. Per-adapter issues (`DEGRADED_ADAPTER`)\n\nOne issue **per failing bridge**, not per feed — a single adapter failing across\nmany feeds is one issue. Build each from the `adapters[]` rollup entry plus the\n`DEGRADED_ADAPTER` findings that name that bridge:\n\n- **Group** all `findings` where `bucket == \"DEGRADED_ADAPTER\"` by the\n  `bridge_name` inside their `adapters[]`. (A feed degraded on two bridges\n  contributes a row to two adapter issues.)\n- **Header** comes from the matching `adapters[]` rollup entry:\n  `feeds_failing/feeds_using` (the failing/using ratio), `errors`, `networks`,\n  and the `adapter_wide` flag.\n- **Per-feed table** — one row per contributing finding:\n\n  | Feed | Network | Contract (full) | feed err/used | adapter err/completed |\n  |---|---|---|---|---|\n  | USDD / USD | tron | `0x837Af6E8…2Ab83b` (full) | 22% (809e/2,791c) | ds2→bridge-elwood 75% (270e/90c) |\n\n  Feed name = `job_name`; contract = full `contract`; feed err = finding\n  `error_fraction` with `errors`/`completed`; adapter err/completed = the\n  matching `adapters[]`-on-feed entry's `error_fraction`, `errors`, `completed`.\n\nThe table lives **inside** the adapter issue and is **rewritten in full every\nrun** (feeds can join/leave as the adapter degrades or partially recovers).\n\n- **Title:** `DEGRADED ADAPTER: <bridge_name> (<feeds_failing> feed(s))`\n- **Metadata:** `adapter_id = <bridge_name>` (exact string, e.g. `bridge-elwood`).\n\n### 2b. Per-feed issues (`SILENT`, `ERRORING`, `DEAD_FROZEN`)\n\nA whole-feed alert is **one issue per feed**, keyed by its contract. Body:\nbucket, `job_name`, `network`, full `contract`, `error_fraction` with\n`errors`/`completed`/`completed_recent`, the named failing adapter(s) from\n`adapters[]` (the `label`, e.g. `ds1→bridge-proof-of-reserves 100%`), and the\nbucket-specific extras (`note` for SILENT; `transmit`/`frozen`/`med_seen` for\nDEAD_FROZEN).\n\n- **Title:** `<BUCKET>: <feed name> (<network>)` — e.g.\n  `SILENT: USDO Reserves (base)`.\n- **Metadata:** `feed_contract = <full contract>` (the `0x…` or base58 string,\n  exactly as in JSON — never the truncated text-report form).\n- If `contract` is `null`, fall back to `feed_contract = job_name` and note the\n  missing contract in the body; this keeps dedup stable until the contract is\n  known.\n\n### 2c. Never auto-filed (counts only)\n\n- **`LOWFREQ_POR`** — PoR/NAV feeds are chronically near-idle *by design*;\n  paging on their silence is noise.\n- **`DECOMMISSIONED`** — the OCR job is gone from the node; excluded so it\n  doesn't sit as permanent noise.\n\nDo **not** open issues for these. Report them only as the counts from\n`summary.lowfreq_por` / `summary.decommissioned` (e.g. in a run-summary comment\non the tracking issue, or a log line). `SUPPRESSED` (closed-market gating) and\n`UNCLASSIFIED` are likewise never filed.\n\n---\n\n## 3. Dedup convention\n\n**Match on metadata, never by parsing the title.** Titles are human-facing and\nchange; the dedup keys are the contract.\n\n| Issue shape | Metadata key | Value |\n|---|---|---|\n| per-adapter | `adapter_id` | `bridge_name` (e.g. `bridge-elwood`) |\n| per-feed | `feed_contract` | full contract (`0x…` / base58) |\n\n### Per-key procedure (run for every finding that maps to an issue)\n\n```bash\n# 1. List open findings-project issues that already carry this key.\nmultica issue list --project \"$PROJECT\" \\\n  --metadata adapter_id=bridge-elwood --output json\n#   (per-feed: --metadata feed_contract=0xC28b74022D625849ff43f6E5...)\n\n# 2. Treat status done/cancelled as NOT open. Among the open ones:\n#    - exactly one match  → UPDATE it (§4 Known)\n#    - no match           → CREATE it (§4 New)\n```\n\n`multica issue list` supports `--metadata key=value` (AND-combinable,\nJSON-typed — contracts and bridge names sniff as strings, which is what we\nwant). Scope by `--project \"$PROJECT\"` so you only ever match findings issues.\nIf two open issues somehow share a key, update the oldest and leave a comment\nflagging the duplicate — don't silently pick one.\n\n---\n\n## 4. Lifecycle\n\nDecide per dedup key, comparing **this run's findings** against **open issues in\nthe project**.\n\n- **New** — key present in this run, **no** open issue with it →\n  `multica issue create` with the body from §2, `--project \"$PROJECT\"`,\n  `--assignee-id 6cb3a5fe-fd11-4ddd-8f06-395d3b82ef11`, `--status todo`, then\n  pin the dedup metadata key. **For `DEGRADED_ADAPTER` (per-adapter) issues this\n  step is gated by the debounce in §4a — open the new issue only once the adapter\n  has been over threshold for `N` consecutive windows.** The per-feed buckets\n  (`SILENT` / `ERRORING` / `DEAD_FROZEN`) are **never** debounced; they file on\n  the first over-threshold run as before.\n- **Known** — key present in this run **and** an open issue exists →\n  `multica issue update` to **rewrite the body/table** with fresh numbers, and\n  add **one** comment: `still degraded as of <as_of>` (per-adapter) or\n  `still <bucket> as of <as_of>` (per-feed). **Do not create a second issue.**\n- **Recovered** — key is on an **open issue** but **absent from this run's\n  findings** → post a **`recovered as of <as_of>` comment only**. **Never\n  auto-close, never change status, never reassign.** A human (QA/Tech Lead)\n  decides when to close. To find these: list all open issues in `$PROJECT`,\n  read each one's `adapter_id`/`feed_contract`, and diff against the set of keys\n  this run produced.\n\nUse `as_of` from the JSON (RFC3339 UTC) as the `<ts>` in every comment so the\ntimeline is anchored to the evaluation time, not wall-clock.\n\n### 4a. DEGRADED_ADAPTER debounce (CHA-197)\n\nA single threshold-edge flap — one bridge tipping just over `--adapter-error-frac`\nfor one hour (CHA-195 / CHA-198: bridge-bea at 10.1%) — used to file an issue\nimmediately. Per Peter's decision (option 1), a **new** `DEGRADED_ADAPTER` issue is\nopened only once the adapter (`bridge_name` = the `adapter_id` dedup key) has been\nover threshold for **`N` = 4 consecutive hourly windows**. This gates **only\nnew-issue creation** for the per-adapter shape; everything else in §4 is unchanged,\nand `SILENT` / `ERRORING` / `DEAD_FROZEN` are never debounced.\n\n**Constants — tune here, never inline:**\n- `N_CONSECUTIVE = 4` — windows required before a new degraded-adapter issue is filed.\n- `gap_tolerance` — how long the run series may be interrupted before the streak is\n  considered broken. It is the default of the SQL helper below (**150 min**); pass\n  an explicit value only to override.\n\n**The streak is read from the persistence DB** (the CHA-201 `datafeeds_health`\nschema on multica-02). Migration `0004` of the report repo provides the read-time\nhelper `adapter_degraded_streak(bridge, ref_as_of [, gap_tolerance])`, which returns\nthe count of **consecutive prior runs** the bridge was in a `DEGRADED_ADAPTER`\nfinding, walking `health_run` backwards from `ref_as_of`: a present run **without**\nthe bridge degraded breaks it (observed recovery); a single missed sweep within\n`gap_tolerance` does not; ≥2 missed runs do. It does **not** include the current run.\n\n**Why \"prior\" and a `+1`.** The sweep files issues **before** `sweep-ingest.sh`\nruns, so the current run is not yet in the DB (persistence is deliberately last and\nfail-soft — CHA-201 — so a DB hiccup never gates filing). Do **not** reorder to\ningest-then-file. Compute:\n\n> `streak = 1 (current run — run.json has the bridge in DEGRADED_ADAPTER)`\n> `       + adapter_degraded_streak(bridge, <run as_of>)   -- prior runs, from the DB`\n\nand create the new issue only when `streak >= N_CONSECUTIVE`. Below that, **file\nnothing** for that adapter this run — the degradation is still fully captured in\n`health_finding` for history, and the streak resumes (or resets) on the next run.\n\nPer dedup key, once §3 finds **no** open issue for the `adapter_id`:\n\n```bash\n# DSN from Bitwarden: item \"DATAFEEDS_HEALTH_DSN\", field DATAFEEDS_HEALTH_DSN, vault\n# company folder — the SAME DSN the ingester uses; never commit or echo it.\nprior=$(psql \"$DATAFEEDS_HEALTH_DSN\" -At \\\n  -c \"SELECT datafeeds_health.adapter_degraded_streak('bridge-elwood', '<run as_of>'::timestamptz)\")\n# streak = 1 (current run) + prior;  open the new issue iff streak >= 4\n```\n\n**DB unreachable at filing time → fail-closed for DEGRADED_ADAPTER only.** If the\nstreak can't be read (DSN unset, DB down, query error), **do not open the new\ndegraded-adapter issue this run** — defer; it files next run once the streak is\nconfirmable. This class is low-severity and the data is captured regardless, so\ndeferring beats re-introducing churn by fail-open filing. **Never let a DB problem\ngate `SILENT` / `ERRORING` / `DEAD_FROZEN` filing — those always proceed.**\n\n**Debounce gates first creation only — it never re-arms.** Once the issue exists,\nthe **Known** path takes over immediately: subsequent over-threshold runs append the\n`still degraded as of <as_of>` update to the same issue (dedup by `adapter_id`), and\nrecovery closes via the existing path. After a close, a fresh degradation must\nre-accumulate `N` consecutive windows before a new issue is filed (the streak is the\ncurrent unbroken run; a recovery/close gap breaks it). Issues already open when this\nships are unaffected.\n\n---\n\n## 5. Placement\n\n- Findings are **issues in the \"Datafeeds health — open findings\" project**\n  (`--project \"$PROJECT\"`), **assigned to the Chainlayer Squad**, `--status todo`.\n- They are **NOT** sub-issues — do **not** pass `--parent`, and do not file them\n  under CHA-165 or any tracking parent. Project membership is the only grouping.\n\n---\n\n## 6. Investigation depth — READ-ONLY guardrail\n\nBeyond the report's metrics, the filing agent **MAY** enrich an issue with:\n\n- **Loki adapter logs** via the `grafana-monitoring` skill — read-only LogQL\n  through the Grafana datasource proxy (e.g. the failing bridge's container logs\n  in the `chainlink-ea*` namespaces) to add context to the issue body.\n- **A read-only bridge GET** — a plain HTTP `GET` against the external-adapter\n  endpoint to confirm reachability / capture the error response. GET only.\n\n**Hard guardrail — ZERO production mutations. Allowed = reads only:**\n\n| Allowed (read) | Forbidden (mutation) |\n|---|---|\n| Prometheus / report metrics | Restarting adapters or nodes |\n| Loki log queries (LogQL GET) | Any `POST`/`PUT`/`PATCH`/`DELETE` to a bridge |\n| Read-only bridge `GET` | Redeploys, scaling, k8s `apply`/`delete` |\n| Reading k8s/Grafana state | Key rotation or secret writes |\n| Filing/updating Multica issues | Any config change / MR to prod |\n\nIf a finding looks like it needs a restart, a key rotation, or any write, that\nis **active triage (CHA-165)** — file/refresh the issue and hand off; **do not\nperform the mutation**. State this in the issue if relevant. The whole point of\nthis lane is a safe, repeatable, observe-and-file sweep.\n\n---\n\n## Quick reference\n\n```\nrun --json ──► for each finding:\n  DEGRADED_ADAPTER → group by bridge_name → per-adapter issue, key adapter_id\n  SILENT/ERRORING/DEAD_FROZEN → per-feed issue, key feed_contract (full)\n  LOWFREQ_POR / DECOMMISSIONED / SUPPRESSED → counts only, never filed\n\ndedup: list --project $PROJECT --metadata <key>=<val>  → match=update, none=create\nlifecycle: new=create · known=update+“still …” comment · recovered=“recovered …” comment ONLY (never close)\ndebounce (§4a, CHA-197): new DEGRADED_ADAPTER issue only when streak >= N(4);\n  streak = 1 (current run) + adapter_degraded_streak(bridge, as_of) from the DB;\n  DB unreachable → defer DEGRADED_ADAPTER (fail-closed), never SILENT/ERRORING/DEAD_FROZEN\nplacement: project issue, squad assignee, status todo, NEVER --parent\nguardrail: reads only (metrics, Loki, bridge GET) — zero prod mutations\n```\n",
           "files": {}
         }
       }
