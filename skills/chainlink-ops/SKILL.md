@@ -86,6 +86,53 @@ ChainID = "<id>"
   otherwise the ArgoCD-UI secret-delete dance. Peter's RBAC on `chainlink` ns
   cannot patch externalsecrets directly.
 
+## Chainlink node API (job specs, config)
+
+Node UIs and REST API are accessible at:
+
+```
+https://{chain}.chainlink-data-feeds.nl-oven.chainlayer.cloud
+```
+
+No `kubectl exec` or port-forward needed — the ingress is routed via haproxy-private
+(`10.3.1.29`, subnet `10.3.1.0/24`) over Tailscale.
+
+**Retrieve a job spec:**
+
+```bash
+# 1. Authenticate — writes a session cookie to /tmp/cl-session.txt
+curl -s -c /tmp/cl-session.txt \
+  https://{chain}.chainlink-data-feeds.nl-oven.chainlayer.cloud/sessions \
+  -X POST -H 'Content-Type: application/json' \
+  -d '{"email":"<email>","password":"<password>"}'
+
+# 2. Fetch the job — observationSource is the TOML pipeline block
+curl -s -b /tmp/cl-session.txt \
+  https://{chain}.chainlink-data-feeds.nl-oven.chainlayer.cloud/v2/jobs/<jobId>
+
+rm -f /tmp/cl-session.txt
+```
+
+**Credentials**: email + password live in GCP Secret Manager, project
+`plasma-raceway-438008-b6`, secret `chainlink-node-api-credentials` (format:
+`email\npassword`, one value per line). Access from a host with GCP credentials:
+
+```bash
+gcloud secrets versions access latest \
+  --secret=chainlink-node-api-credentials \
+  --project=plasma-raceway-438008-b6
+```
+
+Also store these in Bitwarden `company` folder so agents on hosts without GCP
+access can retrieve them — look there first before going to GCP.
+
+**`FeedsManager = true` nodes** (data-feeds fleet): job specs live in the node DB,
+**not** in k8s configmaps — the API is the only way to read `observationSource`
+(the TOML pipeline task graph: ds1/ds2/ds3 bridge tasks, jsonparse, multiply, median).
+
+**Node URL list**: `chainlayer/utilities/chainlink-adapter-update`,
+file `config/cl_hosts.json`.
+
 ## Credentials
 
 Machine-consumed secrets live in **GCP Secret Manager** (`mythic-fulcrum-424015-f9`
