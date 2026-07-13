@@ -18,6 +18,9 @@ each one. It does **not** duplicate the runbook — the runbook is the contract.
 
 ```bash
 new-network <network> --client <client> [--snapshot-url <url>] [--cluster <dir>] [--site <site>]
+
+# Flags may go before or after the network — validate scope first with a dry-run:
+new-network --dry-run testnetx --client reth
 ```
 
 - `<network>` — short lowercase slug, reused for the NetBox tag, the

@@ -49,8 +49,8 @@ EOF
 }
 
 if [[ $# -eq 0 ]]; then usage; exit 2; fi
-NETWORK="$1"; shift || true
-if [[ "$NETWORK" == "-h" || "$NETWORK" == "--help" ]]; then usage; exit 0; fi
+# Flags may appear in any order relative to the positional <network> — the first
+# bare (non-flag) token is the network, so `--dry-run <network> …` works too.
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --client)       CLIENT="${2:-}"; shift 2 ;;
@@ -59,7 +59,10 @@ while [[ $# -gt 0 ]]; do
     --site)         SITE="${2:-}"; shift 2 ;;
     --dry-run)      DRY_RUN=1; shift ;;
     -h|--help)      usage; exit 0 ;;
-    *) echo "unknown argument: $1" >&2; usage; exit 2 ;;
+    --*) echo "unknown option: $1" >&2; usage; exit 2 ;;
+    *)
+      if [[ -z "$NETWORK" ]]; then NETWORK="$1"; shift
+      else echo "unexpected argument: $1 (network already set to '$NETWORK')" >&2; usage; exit 2; fi ;;
   esac
 done
 
@@ -110,7 +113,7 @@ snapshot_discover() {
   step "Step 2 — Snapshot discovery & disk sizing"
   note "Snapshot URL: ${SNAPSHOT_URL}"
   local clen=""
-  if clen=$(curl -fsSI "$SNAPSHOT_URL" 2>/dev/null | tr -d '\r' | awk 'tolower($1)=="content-length:"{print $2}'); then
+  if clen=$(curl -fsSI --connect-timeout 5 --max-time 15 "$SNAPSHOT_URL" 2>/dev/null | tr -d '\r' | awk 'tolower($1)=="content-length:"{print $2}'); then
     :
   fi
   if [[ -z "$clen" ]]; then
