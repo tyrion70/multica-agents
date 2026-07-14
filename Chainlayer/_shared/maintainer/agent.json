@@ -53,6 +53,9 @@
   "thinking_level": null,
   "custom_args": [],
   "runtime_config": {},
+  "custom_env": {
+    "NETBOX_API_TOKEN": "#readonly chainlayer credentials:NETBOX_TOKEN#"
+  },
   "visibility": "workspace",
   "max_concurrent_tasks": 6,
   "skills": [

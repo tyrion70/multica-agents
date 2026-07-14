@@ -79,6 +79,11 @@ if [ $rc -eq 0 ] && [ -n "$workspace" ]; then
       cp "$REPO_ROOT/$md" "$HOME/.claude/CLAUDE.md"
       echo "  → copied ~/.claude/CLAUDE.md ← $REPO_ROOT/$md"
     fi
+    # Install nb NetBox CLI (script and install step — survives re-provisioning
+    # when the sync autopilot runs after container rebuild).
+    if [ -x "$REPO_ROOT/scripts/install-nb.sh" ]; then
+      "$REPO_ROOT/scripts/install-nb.sh"
+    fi
 fi
 
 exit $rc
