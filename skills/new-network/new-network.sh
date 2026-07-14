@@ -25,7 +25,7 @@ set -euo pipefail
 
 # ── Constants (single source of truth; mirror the runbook) ───────────────────
 SNAPSHOT_BASE="http://quicksync-2a-nl2m.chosts.io:9000/chainlink"  # RustFS, port 9000, bucket "chainlink"
-RPC_DOMAIN_SUFFIX="rpc.chainlayer.cloud"                            # <network>.rpc.chainlayer.cloud
+RPC_DOMAIN_SUFFIX="rpc.cinternal.com"                               # <network>.rpc.cinternal.com — grey-cloud DNS-only wildcard
 DEFAULT_CLUSTER="nl2_c4"   # Prox9 — new VMs go here; Prox7/Norway/de2 are EOL
 DEFAULT_SITE="nl2"
 GITLAB_GROUP="chainlayer"
@@ -87,7 +87,12 @@ gate() {
 }
 
 # ── Step 1 — Existence check (gate) ──────────────────────────────────────────
-# Absent from all five sources → provision. Present in any → record + close.
+# Absent from all authoritative sources → provision. Present in any → record + close.
+# NOTE: DNS is NOT an existence signal. `*.rpc.cinternal.com` is a grey-cloud
+# wildcard that resolves for every <network> whether or not it exists, so a
+# `dig` hit is meaningless here — checking it would false-positive every new
+# network and wrongly close the onboarding. Gate on the four authoritative
+# sources instead.
 existence_check() {
   step "Step 1 — Existence check for '${NETWORK}'"
   local hits=()
@@ -95,14 +100,14 @@ existence_check() {
   [[ -d proxmox-iac ]] && ls proxmox-iac/clusters/*/vms-"${NETWORK}".tf >/dev/null 2>&1 && hits+=("proxmox-iac")
   command -v glab >/dev/null 2>&1 && glab repo view "${GITLAB_GROUP}/nodes/${NETWORK}-infra" >/dev/null 2>&1 && hits+=("<network>-infra repo")
   [[ -f haproxy/backends.yaml ]] && grep -q "name: ${NETWORK}\b" haproxy/backends.yaml 2>/dev/null && hits+=("haproxy backend")
-  if command -v dig >/dev/null 2>&1 && [[ -n "$(dig +short "${NETWORK}.${RPC_DOMAIN_SUFFIX}" 2>/dev/null)" ]]; then hits+=("DNS"); fi
 
   if [[ ${#hits[@]} -gt 0 ]]; then
     log "STOP: '${NETWORK}' already exists in: ${hits[*]}"
     note "Record where it lives and CLOSE the issue — no provisioning. (cf. Plasma.)"
     exit 3
   fi
-  note "Absent from NetBox / proxmox-iac / infra repo / haproxy / DNS → proceed."
+  note "Absent from NetBox / proxmox-iac / infra repo / haproxy → proceed."
+  note "(DNS not checked: *.rpc.cinternal.com is a grey-cloud wildcard, resolves for all.)"
 }
 
 # ── Step 2 — Snapshot discovery & disk sizing ────────────────────────────────
@@ -129,9 +134,10 @@ snapshot_discover() {
   local disk=$(( comp_gb * 4 + 100 ))
   DISK_GB="$disk"
   note "Compressed ≈ ${comp_gb} GiB → data-disk estimate ≈ ${DISK_GB} GiB (unpacked×4 + 100 headroom)."
-  note "The documented bootstrap the node/CI runs:"
+  note "The documented bootstrap the node/CI runs (compression per the runbook — never hardcode zstd):"
   note '  set -euo pipefail'
-  note "  curl -f \"${SNAPSHOT_URL}\" | tar --use-compress-program=zstd -x -C /data"
+  note '  # resolve provider latest.json -> format -> $LIB (zstd|lz4); see snapshot-bootstrap.md'
+  note "  curl -f \"${SNAPSHOT_URL}\" | tar --use-compress-program=\"\$LIB\" -x -C /data"
   note '  touch /data/.bootstrapped   # on SUCCESS only'
 }
 
@@ -153,7 +159,7 @@ step4_proxmox_iac() {
   note "Module: modules/proxmox_vm_ubuntu  vm_name=${VM_NAME}"
   note "        vm_data_disk_size = ${DISK_GB}   # from Step 2c"
   note "        vm_host = local.vm_hosts.__PLACEMENT__   # ▶ Peter's capacity data (non-blocking TODO)"
-  note "        netbox_tags = [ansible, mainnet, rpc, ${NETWORK}]"
+  note "        netbox_tags = [ansible, mainnet, rpc, healthcheck, ${NETWORK}]  (register tag first)"
   note "Module also wires NetBox IP+registration, Cloudflare DNS, FortiGate, Alloy agent."
   note "Run tofu fmt -recursive; MR → tofu apply on merge."
   gate "proxmox-iac apply creates VM ${VM_NAME}"
@@ -205,10 +211,13 @@ smoke_test() {
   local body='{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'
   local h='content-type: application/json'
   local cid b1 b2
-  cid=$(curl -s "$RPC_URL" -H "$h" -d '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' | grep -o '"result":"[^"]*"' || true)
-  b1=$(curl -s "$RPC_URL" -H "$h" -d "$body" | grep -o '"result":"[^"]*"' || true)
+  # -k: <network>.rpc.cinternal.com is grey-cloud (DNS-only) and the origin serves a
+  # *.quickapi.com Origin-CA cert, not a browser-trusted public cert — so run this
+  # from inside the network (Tailscale) and skip TLS verification.
+  cid=$(curl -sk "$RPC_URL" -H "$h" -d '{"jsonrpc":"2.0","method":"eth_chainId","params":[],"id":1}' | grep -o '"result":"[^"]*"' || true)
+  b1=$(curl -sk "$RPC_URL" -H "$h" -d "$body" | grep -o '"result":"[^"]*"' || true)
   sleep 10
-  b2=$(curl -s "$RPC_URL" -H "$h" -d "$body" | grep -o '"result":"[^"]*"' || true)
+  b2=$(curl -sk "$RPC_URL" -H "$h" -d "$body" | grep -o '"result":"[^"]*"' || true)
   note "chainId=${cid:-<none>}  block1=${b1:-<none>}  block2=${b2:-<none>}"
   if [[ -n "$cid" && -n "$b1" && -n "$b2" && "$b1" != "$b2" ]]; then
     log "✅ DONE — RPC answers with a chain id and an advancing head."
