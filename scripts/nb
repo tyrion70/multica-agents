@@ -1,0 +1,111 @@
+#!/usr/bin/env python3
+"""Thin NetBox CLI — tag-based inventory queries.
+
+Usage:
+  nb <tag> [<tag>...]     list matching VMs/devices (hostnames)
+  nb <tag> [<tag>...] -H  hostname only (one per line)
+  nb <tag> [<tag>...] -H -f  flat space-separated hostnames
+
+Env:
+  NETBOX_URL      base URL (default: https://thebox2.cinternal.com)
+  NETBOX_API_TOKEN  read-only API token
+"""
+
+import json
+import os
+import sys
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
+NETBOX_URL = os.environ.get("NETBOX_URL", "https://thebox2.cinternal.com")
+TOKEN = os.environ.get("NETBOX_API_TOKEN")
+
+
+def _api_get(path: str) -> list[dict]:
+    url = f"{NETBOX_URL}/api/{path.lstrip('/')}"
+    req = Request(url, headers={
+        "Authorization": f"Token {TOKEN}",
+        "Accept": "application/json",
+    })
+    try:
+        with urlopen(req, timeout=15) as resp:
+            body = json.loads(resp.read())
+    except HTTPError as e:
+        print(f"HTTP {e.code}: {e.reason}", file=sys.stderr)
+        sys.exit(1)
+    except URLError as e:
+        print(f"Error: {e.reason}", file=sys.stderr)
+        sys.exit(1)
+    # NetBox paginates: results in body["results"]
+    results = body if isinstance(body, list) else body.get("results", [body])
+    # Follow next pages
+    while isinstance(body, dict) and body.get("next"):
+        try:
+            req = Request(body["next"], headers={"Authorization": f"Token {TOKEN}", "Accept": "application/json"})
+            with urlopen(req, timeout=15) as resp:
+                body = json.loads(resp.read())
+            results.extend(body.get("results", []))
+        except (HTTPError, URLError):
+            break
+    return results
+
+
+def _tag_filter(tags: list[str]) -> str:
+    """Build a tag-filter query string."""
+    parts = []
+    for t in tags:
+        parts.append(f"tag={t}")
+    return "&".join(parts)
+
+
+def _query(tags: list[str]) -> list[str]:
+    """Query NetBox for VMs and devices matching ALL given tags.
+    Returns sorted unique hostnames."""
+    qs = _tag_filter(tags)
+    hostnames = set()
+    # Virtual machines
+    if qs:
+        path = f"virtualization/virtual-machines/?{qs}&limit=250"
+    else:
+        path = "virtualization/virtual-machines/?limit=250"
+    for vm in _api_get(path):
+        name = vm.get("name")
+        if name:
+            hostnames.add(name)
+    # Physical devices
+    if qs:
+        path = f"dcim/devices/?{qs}&limit=250"
+    else:
+        path = "dcim/devices/?limit=250"
+    for dev in _api_get(path):
+        name = dev.get("name")
+        if name:
+            hostnames.add(name)
+    return sorted(hostnames)
+
+
+def main():
+    args = sys.argv[1:]
+    # Extract flags before positional args
+    hostname_only = "-H" in args
+    flat = "-f" in args
+    tags = [a for a in args if not a.startswith("-")]
+    if not TOKEN:
+        print("Error: NETBOX_API_TOKEN not set", file=sys.stderr)
+        sys.exit(1)
+    # If no tags provided, query everything
+    names = _query(tags)
+    if not names:
+        # empty result — print nothing, exit clean
+        return
+    if hostname_only and flat:
+        print(" ".join(names))
+    elif hostname_only:
+        print("\n".join(names))
+    else:
+        for n in names:
+            print(n)
+
+
+if __name__ == "__main__":
+    main()
