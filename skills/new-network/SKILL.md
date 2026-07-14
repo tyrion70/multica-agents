@@ -26,8 +26,10 @@ new-network --dry-run testnetx --client reth
 - `<network>` — short lowercase slug, reused for the NetBox tag, the
   `<network>-infra` repo, and the HAProxy backend.
 - `--client` — node software (`reth`, `geth`, …).
-- `--snapshot-url` — override the default RustFS snapshot
-  (`http://quicksync-2a-nl2m.chosts.io:9000/chainlink/<network>/latest.tar.zst`).
+- `--snapshot-url` — override with a direct archive URL. By default the object(s) +
+  format are resolved from the network's manifest at
+  `http://quicksync-2a-nl2m.chosts.io:9000/chainlink/<network>/latest.json` — there is
+  **no** fixed `latest.tar.zst`.
 - `--dry-run` — print the complete ordered artifact/MR plan with **no side
   effects** (use this first, every time, to validate scope before provisioning).
 
@@ -69,8 +71,9 @@ All MRs follow **`git-mr`** (Linear-issue-first, SSH-signed, no Co-Authored-By).
     labeled input (`vm_host`/`cluster`), filled from Peter's capacity data.
     Non-blocking for everything except the actual VM apply; new VMs default to
     **Prox9** (`clusters/nl2_c4`).
-  - **The snapshot object key** under the `chainlink` bucket, maintained by
-    Peter/Chris — confirm it (or pass `--snapshot-url`) before Step 2 apply.
+  - **The snapshot object(s)** under the `chainlink` bucket — resolved from the
+    network's `latest.json` manifest at Step 2 (not a fixed `latest.tar.zst`).
+    Confirm the network has a manifest, or pass `--snapshot-url`, before Step 2 apply.
 
 ## Scope boundary
 

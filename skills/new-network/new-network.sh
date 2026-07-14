@@ -40,7 +40,7 @@ usage() {
 
 Options:
   --client <name>        Node software (reth, geth, …). Required.
-  --snapshot-url <url>   Override the default RustFS snapshot URL.
+  --snapshot-url <url>   Override with a direct archive URL (default: resolve <network>/latest.json).
   --cluster <dir>        proxmox-iac cluster dir (default: nl2_c4 / Prox9).
   --site <site>          monitoring2/haproxy site (default: nl2).
   --dry-run              Print the full artifact/MR plan; no side effects.
@@ -70,7 +70,9 @@ done
 [[ -n "$CLIENT"  ]] || { echo "error: --client is required" >&2; exit 2; }
 # Normalise: the slug is reused for the NetBox tag, the repo, and the backend.
 [[ "$NETWORK" =~ ^[a-z0-9-]+$ ]] || { echo "error: network slug must be [a-z0-9-]" >&2; exit 2; }
-[[ -n "$SNAPSHOT_URL" ]] || SNAPSHOT_URL="${SNAPSHOT_BASE}/${NETWORK}/latest.tar.zst"
+# No fixed 'latest.tar.zst' object — the default is the per-network manifest, resolved at
+# run time for the real object(s) + format. --snapshot-url overrides with a direct archive URL.
+MANIFEST_URL="${SNAPSHOT_BASE}/${NETWORK}/latest.json"
 
 RPC_URL="https://${NETWORK}.${RPC_DOMAIN_SUFFIX}/"
 VM_NAME="${NETWORK}-main-rpc-1a-${SITE}v"
@@ -116,28 +118,43 @@ existence_check() {
 DISK_GB=""
 snapshot_discover() {
   step "Step 2 — Snapshot discovery & disk sizing"
-  note "Snapshot URL: ${SNAPSHOT_URL}"
-  local clen=""
-  if clen=$(curl -fsSI --connect-timeout 5 --max-time 15 "$SNAPSHOT_URL" 2>/dev/null | tr -d '\r' | awk 'tolower($1)=="content-length:"{print $2}'); then
-    :
+  local bytes="" key="" fmt="" parts=""
+  if [[ -n "$SNAPSHOT_URL" ]]; then
+    # Explicit override — a direct archive URL (e.g. a public provider). Size from HEAD.
+    note "Snapshot URL (override): ${SNAPSHOT_URL}"
+    bytes=$(curl -fsSI --connect-timeout 5 --max-time 15 "$SNAPSHOT_URL" 2>/dev/null | tr -d '\r' | awk 'tolower($1)=="content-length:"{print $2}')
+  else
+    # Default — resolve the per-network manifest (no fixed latest.tar.zst). The manifest
+    # gives object path(s), archive format, and exact bytes (better than a HEAD guess).
+    note "Manifest: ${MANIFEST_URL}"
+    local snap=""
+    if snap=$(curl -fsS --connect-timeout 5 --max-time 20 "$MANIFEST_URL" 2>/dev/null); then
+      # Two shapes: array ({files:[…]}, multi-part) or flat ({path,format,bytes}); (.files // [.]) normalises both.
+      bytes=$(printf '%s' "$snap" | jq -r '[ (.files // [.])[].bytes ] | add // empty' 2>/dev/null)
+      key=$(printf '%s'   "$snap" | jq -r '(.files // [.])[0].path   // empty' 2>/dev/null)
+      fmt=$(printf '%s'   "$snap" | jq -r '(.files // [.])[0].format // empty' 2>/dev/null)
+      parts=$(printf '%s' "$snap" | jq -r '(.files // [.]) | length'  2>/dev/null)
+      [[ -n "$key" ]] && note "Resolved: ${key} (format ${fmt}, ${parts} object(s))"
+    fi
   fi
-  if [[ -z "$clen" ]]; then
-    note "⚠ snapshot not reachable (HTTP != 200) or no Content-Length."
-    note "  → confirm the object key against the bucket, or pass --snapshot-url,"
-    note "    or (no snapshot) record the expected unpacked size for sizing."
+  if [[ -z "$bytes" ]]; then
+    note "⚠ snapshot manifest not reachable / no size (jq required for manifest parsing)."
+    note "  → confirm the network prefix in the bucket: curl \"${SNAPSHOT_BASE}/?prefix=${NETWORK}/\""
+    note "    or pass --snapshot-url, or (no snapshot) record the expected unpacked size for sizing."
     [[ "$DRY_RUN" -eq 1 ]] || { echo "   abort: resolve the snapshot first" >&2; exit 4; }
     DISK_GB="__DISK_GB__ (TODO: no snapshot — record expected unpacked size)"
     return 0
   fi
-  local comp_gb=$(( (clen + 1073741823) / 1073741824 ))
-  # zstd block snapshots unpack ~3–4×; size the data disk from unpacked + headroom.
+  local comp_gb=$(( (bytes + 1073741823) / 1073741824 ))
+  # Compressed snapshots unpack ~3–4×; size the data disk from unpacked + headroom.
   local disk=$(( comp_gb * 4 + 100 ))
   DISK_GB="$disk"
   note "Compressed ≈ ${comp_gb} GiB → data-disk estimate ≈ ${DISK_GB} GiB (unpacked×4 + 100 headroom)."
-  note "The documented bootstrap the node/CI runs (compression per the runbook — never hardcode zstd):"
+  note "The documented bootstrap the node/CI runs (object(s) + format resolved from the manifest — never hardcode zstd):"
   note '  set -euo pipefail'
-  note '  # resolve provider latest.json -> format -> $LIB (zstd|lz4); see snapshot-bootstrap.md'
-  note "  curl -f \"${SNAPSHOT_URL}\" | tar --use-compress-program=\"\$LIB\" -x -C /data"
+  note '  # read latest.json -> per-object path + format -> matching --use-compress-program'
+  note '  # full resolver: snapshot-bootstrap.md#standard-snapshot-bootstrap-commands-per-network'
+  note "  curl -f \"${SNAPSHOT_BASE}/${NETWORK}/<object-from-manifest>\" | tar --use-compress-program=<lib> -x -C /data"
   note '  touch /data/.bootstrapped   # on SUCCESS only'
 }
 
