@@ -134,9 +134,10 @@ snapshot_discover() {
   local disk=$(( comp_gb * 4 + 100 ))
   DISK_GB="$disk"
   note "Compressed ≈ ${comp_gb} GiB → data-disk estimate ≈ ${DISK_GB} GiB (unpacked×4 + 100 headroom)."
-  note "The documented bootstrap the node/CI runs:"
+  note "The documented bootstrap the node/CI runs (compression per the runbook — never hardcode zstd):"
   note '  set -euo pipefail'
-  note "  curl -f \"${SNAPSHOT_URL}\" | tar --use-compress-program=zstd -x -C /data"
+  note '  # resolve provider latest.json -> format -> $LIB (zstd|lz4); see snapshot-bootstrap.md'
+  note "  curl -f \"${SNAPSHOT_URL}\" | tar --use-compress-program=\"\$LIB\" -x -C /data"
   note '  touch /data/.bootstrapped   # on SUCCESS only'
 }
 
@@ -158,7 +159,7 @@ step4_proxmox_iac() {
   note "Module: modules/proxmox_vm_ubuntu  vm_name=${VM_NAME}"
   note "        vm_data_disk_size = ${DISK_GB}   # from Step 2c"
   note "        vm_host = local.vm_hosts.__PLACEMENT__   # ▶ Peter's capacity data (non-blocking TODO)"
-  note "        netbox_tags = [ansible, mainnet, rpc, ${NETWORK}]"
+  note "        netbox_tags = [ansible, mainnet, rpc, healthcheck, ${NETWORK}]  (register tag first)"
   note "Module also wires NetBox IP+registration, Cloudflare DNS, FortiGate, Alloy agent."
   note "Run tofu fmt -recursive; MR → tofu apply on merge."
   gate "proxmox-iac apply creates VM ${VM_NAME}"
