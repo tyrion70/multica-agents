@@ -56,9 +56,14 @@ All MRs follow **`git-mr`** (Linear-issue-first, SSH-signed, no Co-Authored-By).
 
 ## Done / not-done
 
-- **Done** = the terminal smoke test passes: the public RPC URL
-  (`https://<network>.rpc.chainlayer.cloud/`) answers with the correct
+- **Done** = the terminal smoke test passes: the internal RPC URL
+  (`https://<network>.rpc.cinternal.com/`) answers with the correct
   `eth_chainId` **and** a strictly-advancing `eth_blockNumber`.
+  - **Endpoint caveat:** `*.rpc.cinternal.com` is a **grey-cloud (DNS-only)**
+    wildcard — it already resolves, so no per-network DNS/Cloudflare work is
+    needed. The origin serves a `*.quickapi.com` Origin-CA cert (not a
+    browser-trusted public cert), so run the done-check curl **from inside the
+    network** (Tailscale) and with `-k` — which is what `new-network.sh` does.
 - **Two external inputs** the orchestration cannot invent:
   - **Placement** — which Proxmox host/cluster the VM lands on (Step 4). One
     labeled input (`vm_host`/`cluster`), filled from Peter's capacity data.
