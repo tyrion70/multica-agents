@@ -108,6 +108,23 @@ the Linear issue.** The GitLab↔Linear magic-word integration is not reliable.
 Always include it (or `Refs` for partial work), but you must also explicitly
 close the Linear issue via MCP after the MR merges (see "After the MR exists").
 
+## Approval gate — never self-approve (human review is required)
+
+If the MR carries a **required-approval gate** (project "approvals required ≥ 1",
+protected-branch approval rules, CODEOWNERS approval), an agent must **NOT** click
+Approve on it — **not on its own MR, and not to cross-approve another agent's MR.**
+The gate exists to enforce a second-party *code review*; an agent approving its
+own or a peer's change defeats the control the gate is there to provide.
+
+- A **human** clicking Approve — or explicitly saying "merge it" / "approved" —
+  satisfies the gate. Nothing an agent does satisfies it.
+- A verbal go-live "go" (e.g. "Go, direct") authorizes the **deploy**, not the
+  code review. It does **not** substitute for the approval. (CHA-719: a verbal
+  "Go, direct" was wrongly treated as approval for a required-approval MR.)
+- **Route the approval to a human via the Tech Lead.** Post the MR, state it is
+  ready and blocked on a required approval, and ask the Tech Lead to have a human
+  approve. Do not merge until the gate is satisfied by a human.
+
 ## After the MR exists
 
 - Post the URL on the Linear issue and report it to the user.

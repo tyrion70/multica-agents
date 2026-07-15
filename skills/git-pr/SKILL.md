@@ -85,6 +85,24 @@ There is **no Linear closing magic word** for private work — the tracking issu
 lives in Multica, not Linear. A GitHub-side `Closes #NN` may still be used to
 close an issue in the *code* repo itself, when one exists.
 
+## Approval gate — never self-approve (human review is required)
+
+If the PR carries a **required-review gate** (branch protection "require a pull
+request review before merging", required reviewers, CODEOWNERS approval), an agent
+must **NOT** submit an approving review on it — **not on its own PR, and not to
+cross-approve another agent's PR.** The gate exists to enforce a second-party
+*code review*; an agent approving its own or a peer's change defeats the control
+the gate is there to provide.
+
+- A **human** approving the PR — or explicitly saying "merge it" / "approved" —
+  satisfies the gate. Nothing an agent does satisfies it.
+- A verbal go-live "go" (e.g. "Go, direct") authorizes the **deploy**, not the
+  code review. It does **not** substitute for the approval. (CHA-719: a verbal
+  "Go, direct" was wrongly treated as approval for a required-approval MR.)
+- **Route the approval to a human via the Tech Lead.** Post the PR, state it is
+  ready and blocked on a required approval, and ask the Tech Lead to have a human
+  approve. Do not merge until the gate is satisfied by a human.
+
 ## After the PR exists
 
 - Link the PR URL back on the Multica issue (`multica issue comment add`, and
