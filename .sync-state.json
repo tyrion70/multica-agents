@@ -2573,7 +2573,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
-        "custom_env": null
+        "custom_env": [
+          "NETBOX_API_TOKEN"
+        ]
       },
       "multica_state": {
         "name": "Chainlayer Maintainer",
@@ -2596,7 +2598,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
-        "custom_env": null
+        "custom_env": [
+          "NETBOX_API_TOKEN"
+        ]
       }
     },
     "Chainlayer~Private Maintainer": {
