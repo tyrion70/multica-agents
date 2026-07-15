@@ -1,16 +1,35 @@
 ---
 name: new-network
-description: "Spin up a NEW network as a VM-based, publicly-reachable RPC node, end to end. Use when onboarding a network that does not yet run anywhere (existence check → snapshot bootstrap → proxmox VM → <network>-infra repo/pipeline → HAProxy → monitoring → docs → smoke test). This skill is the thin entrypoint: it points at the canonical runbook and the owning domain skills — it does NOT restate their steps. Runs the `new-network` orchestration (bundled `new-network.sh`) or walks the runbook by hand. Scope ends at a live, syncing, public RPC; Chainlink/DON/oracle config is out of scope (Joakim's handoff)."
+description: "Spin up a NEW network as a publicly-reachable RPC node, end to end — the single entrypoint for BOTH the VM plane (Proxmox + Ansible + HAProxy) and the Kubernetes plane (op-stack/op-reth on ArgoCD). Use when onboarding a network that does not yet run anywhere: Step 0 is a VM-vs-k8s class-branch that routes to the matching runbook (VM: existence check → snapshot → proxmox VM → <network>-infra pipeline → HAProxy → monitoring → docs; k8s: chart choice → snapshot on PV → ApplicationSet → AppProject allowlist → config → Cilium LB → monitoring → docs). This skill is the thin entrypoint: it points at the canonical runbook and the owning domain skills — it does NOT restate their steps. Runs the `new-network` orchestration (bundled `new-network.sh`, VM) or walks the runbook by hand. Scope ends at a live, syncing, public RPC; Chainlink/DON/oracle config is out of scope (Joakim's handoff)."
 ---
 
-# new-network — spin up a VM RPC network
+# new-network — spin up an RPC network (VM or k8s)
 
-The single entrypoint for bringing a **new** network online as a VM-based,
+The single entrypoint for bringing a **new** network online as a
 publicly-reachable RPC node. This skill is intentionally **thin**: it names the
 ordered steps and links to the runbook section and the domain skill that owns
 each one. It does **not** duplicate the runbook — the runbook is the contract.
 
-**Canonical runbook (the contract):**
+## Step 0 — VM or k8s? (class-branch — do this first)
+
+There are **two deployment planes** and they diverge from the very first step.
+Decide the plane before anything else, then follow the matching runbook — this
+skill is the single entrypoint for both.
+
+| Class | When (CHA-698 placement rule) | Canonical runbook (the contract) | Mechanics |
+|---|---|---|---|
+| **VM** | Heavier chains, non-OP-stack clients, or archive-scale disk | [spin-up-a-network](https://docs.chainlayer.cloud/operations/spin-up-a-network/) | Proxmox VM + Ansible + HAProxy — the flow **below** |
+| **k8s** | Light **OP-Stack** L2, roughly **RAM 8–16 GB and disk < 1 TB** | [spin-up-a-network-k8s](https://docs.chainlayer.cloud/operations/kubernetes/spin-up-a-network-k8s/) | op-stack/op-reth chart on ArgoCD (GitOps, no `kubectl apply`) |
+
+Both runbooks are **RPC-only** and stop at a live, syncing, publicly-reachable
+node; Chainlink/DON/oracle config is Joakim's handoff. The `new-network.sh`
+orchestration automates the **VM** flow; the **k8s** flow is a reviewed set of
+`k8s-apps` MRs walked by hand per its runbook (its steps name the AppProject
+allowlist, snapshot-on-PV, Cilium LB exposure, and the ArgoCD sync boundaries).
+
+Everything below is the **VM** flow. For the k8s flow, follow its runbook.
+
+**Canonical VM runbook (the contract):**
 [documentation:docs/operations/spin-up-a-network.md](https://docs.chainlayer.cloud/operations/spin-up-a-network/)
 — every step there names its repo, files, command, and a falsifiable done-check.
 
@@ -78,5 +97,7 @@ All MRs follow **`git-mr`** (Linear-issue-first, SSH-signed, no Co-Authored-By).
 ## Scope boundary
 
 Ends at a **live, syncing, publicly-reachable RPC node**. Chainlink node / DON /
-oracle-job configuration is **out of scope** (handed to Joakim once the RPC is up).
-VM-only — there is no Kubernetes path in this flow.
+oracle-job configuration is **out of scope** (handed to Joakim once the RPC is up)
+on **both** planes. The plane is chosen at [Step 0](#step-0--vm-or-k8s-class-branch--do-this-first);
+the steps above are the VM flow, the [k8s runbook](https://docs.chainlayer.cloud/operations/kubernetes/spin-up-a-network-k8s/)
+is the Kubernetes flow.
