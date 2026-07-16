@@ -76,6 +76,14 @@ bites hard and has caught us before, so know it up front:
 - **What still works headlessly:** the GitLab **REST API** with the group PAT
   (e.g. `GET /projects/:id/repository/files/<path>/raw`). Use it to *read*
   source when you only need to inspect a repo you can't clone.
+- **The group PAT has `self_rotate` — keep it alive yourself.** The PAT
+  (`ChainLayer · GitLab — group PAT`, Bitwarden `company` folder) carries the
+  `self_rotate` scope. Rotate it with
+  `POST https://gitlab.com/api/v4/personal_access_tokens/self/rotate` using the
+  current token as `PRIVATE-TOKEN`, then **write the new token back** into
+  Bitwarden (the item is a SecureNote; the token is in its hidden `PAT` field)
+  and `bw sync`. See the **`git-mr`** skill for the full procedure and the
+  important caveat (only works while still valid — rotate proactively).
 - **To actually clone/push** a `chainlayer/*` repo from an agent runtime, a human
   must refresh the group's SSO session for the workspace credential (or the repo
   must be pre-synced). Surface this as a blocker rather than burning time on key
