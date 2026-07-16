@@ -20,6 +20,21 @@ for var in MULTICA_AGENT_ID MULTICA_AGENT_NAME MULTICA_DAEMON_PORT \
   unset "$var"
 done
 
+# The multica CLI also reads a file-based task context from
+# .multica/daemon_task_context.json in the workdir. It is the on-disk twin of
+# the MULTICA_* vars we just unset, so a leftover one from a prior task re-scopes
+# the CLI (or makes it reject calls) and defeats the host-login fallback. Move it
+# aside for the duration of this script and restore it on exit, so we fall back
+# cleanly without disturbing anything else that shares the workdir.
+DAEMON_CTX=".multica/daemon_task_context.json"
+if [ -f "$DAEMON_CTX" ]; then
+  DAEMON_CTX_BAK="$(mktemp)"
+  mv "$DAEMON_CTX" "$DAEMON_CTX_BAK"
+  # shellcheck disable=SC2064
+  trap "mv -f '$DAEMON_CTX_BAK' '$DAEMON_CTX'" EXIT
+  echo "  → moved aside stale $DAEMON_CTX (restored on exit) so CLI falls back to host login" >&2
+fi
+
 # Resolve MCP secrets from Bitwarden (runs under the host local login
 # after the unset above, so bw unlock authenticates as peter@tyrion.nl).
 BOOTSTRAP="${BW_BOOTSTRAP:-$HOME/.claude/secrets/bw-bootstrap.env}"
@@ -29,11 +44,23 @@ if [ -f "$BOOTSTRAP" ]; then
   source "$BOOTSTRAP"
   set +a
   export NODE_TLS_REJECT_UNAUTHORIZED=0
-  if BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw 2>/dev/null)"; then
+  # Capture the real bw error instead of swallowing it with 2>/dev/null — a
+  # silently-failed unlock is what let unresolved #…# placeholders get pushed
+  # over live MCP keys (CHA-790). A failed unlock is a hard stop for the
+  # MCP-push path: we leave BW_SESSION unset so sync.py fails closed (skips +
+  # reports every agent whose config needs a secret, and exits non-zero) rather
+  # than warning and pushing placeholders.
+  bw_err="$(mktemp)"
+  if BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw 2>"$bw_err")"; then
     export BW_SESSION
   else
-    echo "  WARNING: bw unlock failed — mcp placeholders will not be resolved" >&2
+    echo "  ERROR: bw unlock failed — MCP secret placeholders cannot be resolved." >&2
+    echo "         bw reported:" >&2
+    sed 's/^/           /' "$bw_err" >&2
+    echo "         Continuing without BW_SESSION; sync.py will fail closed and" >&2
+    echo "         SKIP (never overwrite) any agent whose config needs a secret." >&2
   fi
+  rm -f "$bw_err"
 fi
 
 # Parse --workspace without consuming positional args (sync.py needs them all).

@@ -38,9 +38,20 @@ class FakeMulticaBackend:
         self.agents = {}  # id -> agent dict
         self._seq = 0
         self.created_calls = 0
+        self.updated_calls = 0
         # Set of agent ids to hide from `agent list` (simulates a mis-scoped or
         # transient list that omits an existing agent — the AC5 trigger).
         self.hidden_ids = set()
+
+    @staticmethod
+    def _load_mcp(flags):
+        """Read the pushed mcp config from --mcp-config-file, as the real backend
+        would persist it. Lets tests assert what value actually landed live."""
+        path = flags.get("--mcp-config-file")
+        if isinstance(path, str):
+            with open(path) as fh:
+                return json.load(fh)
+        return None
 
     def _mint(self):
         self._seq += 1
@@ -84,10 +95,14 @@ class FakeMulticaBackend:
                                 ("--model", "model"), ("--visibility", "visibility")):
                 if flag in flags:
                     agent[field] = flags[flag]
+            mcp = self._load_mcp(flags)
+            if mcp is not None:
+                agent["mcp_config"] = mcp
             self.agents[aid] = agent
             return agent
 
         if args[:2] == ["agent", "update"]:
+            self.updated_calls += 1
             aid = args[2]
             flags = self._parse_flags(args[3:])
             agent = self.agents[aid]
@@ -96,7 +111,13 @@ class FakeMulticaBackend:
                                 ("--model", "model"), ("--visibility", "visibility")):
                 if flag in flags:
                     agent[field] = flags[flag]
+            mcp = self._load_mcp(flags)
+            if mcp is not None:
+                agent["mcp_config"] = mcp
             return agent
+
+        if args[:3] == ["agent", "env", "set"]:
+            return {}
 
         if args[:3] == ["agent", "skills", "set"]:
             return {}
@@ -204,6 +225,71 @@ class SyncIdentityTest(unittest.TestCase):
         self._run()  # no --allow-create
         self.assertEqual(self.backend.created_calls, 1, "re-minted an omitted agent")
         self.assertEqual(set(self.backend.agents), {anchored_id}, "UUID set changed")
+
+    # --- Fail-closed secret resolution + --force re-resolve (CHA-792) ---
+
+    _MCP_PLACEHOLDER = {"mcpServers": {"svc": {"command": "run", "env": {"TOKEN": "#Some Item#"}}}}
+
+    def test_failclosed_unresolved_placeholder_not_created(self):
+        """An unresolvable #…# placeholder must never be pushed: the agent is
+        skipped (not created) and the run exits non-zero."""
+        self._write_agent("squad-a/coder", {
+            "name": "Test Coder", "runtime_id": "rt-1", "description": "d",
+            "mcp_config": self._MCP_PLACEHOLDER,
+        })
+        with mock.patch.object(sync, "_bw_get_secret", return_value=None):
+            code = self._run("--allow-create")
+        self.assertEqual(self.backend.created_calls, 0, "pushed a placeholder over a live agent")
+        self.assertEqual(self.backend.agents, {}, "an agent was created with an unresolved secret")
+        self.assertEqual(code, 1, "fail-closed skip should exit non-zero")
+
+    def test_failclosed_update_does_not_wipe_live_secret(self):
+        """If a secret stops resolving, a later sync must NOT overwrite the live
+        agent's real key with a placeholder — it skips and leaves the key intact.
+        This is the exact CHA-790 key-wipe."""
+        self._write_agent("squad-a/coder", {
+            "name": "Test Coder", "runtime_id": "rt-1", "description": "d",
+            "mcp_config": self._MCP_PLACEHOLDER,
+        })
+        # First run: secret resolves, real key lands live.
+        with mock.patch.object(sync, "_bw_get_secret", return_value="REALKEY"):
+            self._run("--allow-create")
+        aid = next(iter(self.backend.agents))
+        self.assertEqual(
+            self.backend.agents[aid]["mcp_config"]["mcpServers"]["svc"]["env"]["TOKEN"],
+            "REALKEY",
+        )
+
+        # Second run: secret no longer resolves — must skip, not wipe.
+        with mock.patch.object(sync, "_bw_get_secret", return_value=None):
+            code = self._run()
+        self.assertEqual(self.backend.updated_calls, 0, "issued an update with an unresolved secret")
+        self.assertEqual(
+            self.backend.agents[aid]["mcp_config"]["mcpServers"]["svc"]["env"]["TOKEN"],
+            "REALKEY",
+            "live secret was wiped with a placeholder",
+        )
+        self.assertEqual(code, 1, "fail-closed skip should exit non-zero")
+
+    def test_force_repushes_unchanged_mcp_agent(self):
+        """--force re-pushes mcp_config even when change detection says the agent
+        is unchanged (the redacted-diff blind spot)."""
+        self._write_agent("squad-a/coder", {
+            "name": "Test Coder", "runtime_id": "rt-1", "description": "d",
+            "mcp_config": {"mcpServers": {"svc": {"command": "run", "env": {"TOKEN": "literal"}}}},
+        })
+        self._run("--allow-create")
+        self.assertEqual(self.backend.created_calls, 1)
+
+        # A plain second run is a no-op (unchanged) — no update issued.
+        code = self._run()
+        self.assertEqual(code, 0)
+        self.assertEqual(self.backend.updated_calls, 0, "unchanged agent should not be re-pushed")
+
+        # --force bypasses the diff and re-pushes mcp_config.
+        code = self._run("--force")
+        self.assertEqual(code, 0)
+        self.assertEqual(self.backend.updated_calls, 1, "--force did not re-push an unchanged agent")
 
     def test_max_creates_threshold_aborts(self):
         """With --allow-create, creates beyond the threshold abort the run."""

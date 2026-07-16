@@ -17,7 +17,8 @@ committing and pushing them (including .sync-state.json).
 
 Exit codes:
   0  success (no conflicts)
-  1  one or more errors (schema validation, API failure, etc.)
+  1  one or more errors (schema validation, API failure, etc.) OR one or more
+     agents skipped fail-closed (a secret placeholder could not be resolved)
   2  one or more conflicts (no errors; manual resolution needed)
 
 Usage:
@@ -27,6 +28,7 @@ Usage:
   scripts/sync.py --workspace Chainlayer       # one workspace; passes --workspace-id to every CLI call
   scripts/sync.py --workspace Private          # Private workspace (9627be94-...)
   scripts/sync.py --dry-run                    # print what would happen, no writes
+  scripts/sync.py --force                      # re-resolve + re-push every agent's mcp_config (full restore)
   scripts/sync.py --sync-state /tmp/state.json # alternate state file
 
 Workspace IDs (same Multica instance, multica.252h.org):
@@ -505,24 +507,53 @@ def _bw_get_secret(item_name: str) -> Optional[str]:
         return None
 
 
+class SecretResolutionError(RuntimeError):
+    """Raised when an mcp_config/custom_env `#…#` placeholder cannot be resolved
+    to a real secret (BW_SESSION missing/expired, or the Bitwarden item is not
+    found). The sync fails closed on this: the agent's config is skipped and
+    never pushed, so an unresolved placeholder can never be written over a live
+    agent's MCP keys (the CHA-790 key-wipe: the old code logged "leaving
+    placeholder as-is" and pushed it anyway)."""
+
+    def __init__(self, unresolved: List[str]):
+        self.unresolved = sorted(set(unresolved))
+        super().__init__(
+            "could not resolve Bitwarden placeholder(s): "
+            + ", ".join(f"#{name}#" for name in self.unresolved)
+        )
+
+
 def _resolve_mcp_secrets(mcp_config: Any) -> Any:
     """Walk mcp_config recursively, replacing #Item Name# placeholders
     with real secrets fetched live from Bitwarden via bw CLI.
+
+    Fails closed: if any placeholder can't be resolved (missing BW_SESSION or an
+    unknown item), raises SecretResolutionError rather than returning a config
+    that still holds the raw placeholder. The caller skips the agent instead of
+    overwriting live keys with a `#…#` string.
     """
-    if isinstance(mcp_config, dict):
-        return {k: _resolve_mcp_secrets(v) for k, v in mcp_config.items()}
-    if isinstance(mcp_config, list):
-        return [_resolve_mcp_secrets(v) for v in mcp_config]
-    if isinstance(mcp_config, str):
-        def _replace(m: re.Match) -> str:
-            item_name = m.group(1).strip()
-            val = _bw_get_secret(item_name)
-            if val is None:
-                print(f"      WARNING: could not resolve Bitwarden item '{item_name}' — leaving placeholder as-is", file=sys.stderr)
-                return m.group(0)
-            return val
-        return _PLACEHOLDER_RE.sub(_replace, mcp_config)
-    return mcp_config
+    unresolved: List[str] = []
+
+    def _walk(node: Any) -> Any:
+        if isinstance(node, dict):
+            return {k: _walk(v) for k, v in node.items()}
+        if isinstance(node, list):
+            return [_walk(v) for v in node]
+        if isinstance(node, str):
+            def _replace(m: re.Match) -> str:
+                item_name = m.group(1).strip()
+                val = _bw_get_secret(item_name)
+                if val is None:
+                    unresolved.append(item_name)
+                    return m.group(0)
+                return val
+            return _PLACEHOLDER_RE.sub(_replace, node)
+        return node
+
+    resolved = _walk(mcp_config)
+    if unresolved:
+        raise SecretResolutionError(unresolved)
+    return resolved
 
 
 def _write_mcp_config_tempfile(agent_data: Dict[str, Any]) -> Optional[str]:
@@ -810,6 +841,7 @@ def sync_agents_workspace(
     id_map: Dict[str, str],
     create_guard: CreateGuard,
     dry_run: bool,
+    force: bool = False,
 ) -> Tuple[Dict[str, int], List[Dict[str, Any]]]:
     workspace_name = workspace_dir.name
     print(f"\n── Agents: {workspace_name} ──", file=sys.stderr)
@@ -887,6 +919,22 @@ def sync_agents_workspace(
             action = _decide_action(repo_norm, multica_norm, last)
             agent_id: Optional[str] = live_agent["id"] if live_agent else None
 
+            # --force: re-resolve and re-push mcp_config for every agent that has
+            # a block and a live counterpart, bypassing change detection. The
+            # diff compares against a redacted live read, so an agent already
+            # holding placeholders (or whose secret was wiped) reads as
+            # "unchanged" and is skipped forever; --force is the reliable
+            # full-restore path. Fail-closed still applies inside the push, so a
+            # forced run can never push an unresolved placeholder either.
+            if (
+                force
+                and live_agent is not None
+                and repo_data.get("mcp_config") is not None
+                and action != "push_to_multica"
+            ):
+                print(f"    ⟳ --force: re-pushing mcp_config (bypassing diff, was '{action}')", file=sys.stderr)
+                action = "push_to_multica"
+
             if action == "unchanged":
                 print(f"    ✓ unchanged", file=sys.stderr)
                 counts["unchanged"] += 1
@@ -912,8 +960,22 @@ def sync_agents_workspace(
                 }
 
             elif action == "push_to_multica":
-                mcp_file = _write_mcp_config_tempfile(repo_data)
-                custom_env_file = _write_custom_env_tempfile(repo_data)
+                mcp_file = custom_env_file = None
+                try:
+                    mcp_file = _write_mcp_config_tempfile(repo_data)
+                    custom_env_file = _write_custom_env_tempfile(repo_data)
+                except SecretResolutionError as e:
+                    # Fail closed: never push an unresolved #…# placeholder over a
+                    # live agent's config (the CHA-790 key-wipe). Skip + report,
+                    # and leave the sync state untouched so the agent is retried
+                    # once secrets resolve again. skipped>0 makes the run exit
+                    # non-zero.
+                    if mcp_file:
+                        os.unlink(mcp_file)
+                    print(f"    ✗ SKIPPING push (fail-closed): {e}", file=sys.stderr)
+                    print(f"      refusing to overwrite a live config with an unresolved placeholder", file=sys.stderr)
+                    counts["skipped"] += 1
+                    continue
                 try:
                     mcp_args = ["--mcp-config-file", mcp_file] if mcp_file else []
                     custom_env_args = ["--custom-env-file", custom_env_file] if custom_env_file else []
@@ -1024,8 +1086,18 @@ def sync_agents_workspace(
                     print(f"    → reconciling: merging both sides' changes", file=sys.stderr)
                     # 1. Push merged state to Multica
                     merged_repo_data = _apply_reconciled_to_repo_data(repo_data, reconciled)
-                    mcp_file = _write_mcp_config_tempfile(merged_repo_data)
-                    custom_env_file = _write_custom_env_tempfile(merged_repo_data)
+                    mcp_file = custom_env_file = None
+                    try:
+                        mcp_file = _write_mcp_config_tempfile(merged_repo_data)
+                        custom_env_file = _write_custom_env_tempfile(merged_repo_data)
+                    except SecretResolutionError as e:
+                        # Fail closed: same guard as the push path — never write an
+                        # unresolved placeholder over a live agent while reconciling.
+                        if mcp_file:
+                            os.unlink(mcp_file)
+                        print(f"    ✗ SKIPPING reconcile push (fail-closed): {e}", file=sys.stderr)
+                        counts["skipped"] += 1
+                        continue
                     try:
                         mcp_args = ["--mcp-config-file", mcp_file] if mcp_file else []
                         _multica(
@@ -1195,7 +1267,7 @@ def sync_agents_workspace(
     print(
         f"  agents {workspace_name}: created={counts['created']} updated={counts['updated']} "
         f"repo_updated={counts['repo_updated']} unchanged={counts['unchanged']} "
-        f"conflicts={counts['conflicts']} errors={counts['errors']}",
+        f"skipped={counts['skipped']} conflicts={counts['conflicts']} errors={counts['errors']}",
         file=sys.stderr,
     )
     return counts, conflicts
@@ -1522,6 +1594,16 @@ def main() -> None:
         help=f"Path to the sync-state snapshot file (default: {DEFAULT_STATE_PATH})",
     )
     parser.add_argument(
+        "--force",
+        action="store_true",
+        help="Re-resolve and re-push mcp_config for every agent that has a block, "
+             "bypassing change detection. The diff compares against a redacted "
+             "live read, so an agent already holding placeholders reads as "
+             "'unchanged' and is never re-pushed; --force is the reliable "
+             "full-restore path. Fail-closed still applies (never pushes an "
+             "unresolved placeholder).",
+    )
+    parser.add_argument(
         "--allow-create",
         action="store_true",
         help="Permit creating new agents. Without this, a repo agent with no "
@@ -1595,7 +1677,7 @@ def main() -> None:
 
                     counts, conflicts = sync_agents_workspace(
                         ws, schema, live_agents, skill_map, state, id_map,
-                        create_guard, args.dry_run,
+                        create_guard, args.dry_run, args.force,
                     )
                     save_agent_ids(ws, id_map, args.dry_run)
                     for k, v in counts.items():
@@ -1621,9 +1703,18 @@ def main() -> None:
     print(
         f"    total: created={totals['created']} updated={totals['updated']} "
         f"repo_updated={totals['repo_updated']} "
-        f"unchanged={totals['unchanged']} conflicts={totals['conflicts']} errors={totals['errors']}",
+        f"unchanged={totals['unchanged']} skipped={totals['skipped']} "
+        f"conflicts={totals['conflicts']} errors={totals['errors']}",
         file=sys.stderr,
     )
+    if totals["skipped"] > 0:
+        print(
+            f"==> {totals['skipped']} agent(s) SKIPPED (fail-closed): an mcp_config/"
+            f"custom_env secret could not be resolved, so the config was NOT pushed "
+            f"(no live key overwritten with a placeholder). Fix the Bitwarden unlock/"
+            f"item and re-run — with --force to re-push once secrets resolve.",
+            file=sys.stderr,
+        )
 
     if aborted:
         print(
@@ -1651,7 +1742,7 @@ def main() -> None:
             print(f"    - {label}", file=sys.stderr)
         print(json.dumps({"conflicts": all_conflicts}, indent=2))
 
-    if totals["errors"] > 0:
+    if totals["errors"] > 0 or totals["skipped"] > 0:
         sys.exit(1)
     if all_conflicts:
         sys.exit(2)
