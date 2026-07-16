@@ -67,7 +67,9 @@ Use this skill when the signal points company:
 6. **Link the change back**: after the MR exists, its URL goes on the issue
    (attachment or comment), and the MR description carries `Closes OPS-XXXX`
    for traceability — but **always close the Linear issue explicitly via MCP
-   after the MR merges** (magic words are not reliable). See the `git-mr` skill.
+   after the Multica issue or MR reaches a terminal state** (magic words are
+   not reliable). See the `git-mr` skill and the "Multica issues: link & sync"
+   section below for the general no-MR close path.
 
 ## Multica issues: link & sync
 
@@ -96,7 +98,7 @@ second story.
   Pinning this key is mandatory at create/link time. Without it the downstream
   rules cannot resolve the linkage and will silently skip.
 
-- **Already linked → keep in sync, don't duplicate.** Three lifecycle rules apply
+- **Already linked → keep in sync, don't duplicate.** Two lifecycle rules apply
   once the link is established:
 
   **Start-of-work transition.** When you (the Coder) begin implementation on a
@@ -115,7 +117,7 @@ second story.
     magic-word integration is not reliable.
   - **After the Multica issue reaches a terminal state** (`done` or `cancelled`),
     explicitly close the Linear issue via the `mcp__claude_ai_Linear__*`
-    status-update tool. Mirror `done`→Done, `cancelled`→Cancelled. This is a
+    status-update tool. Mirror `done`→Done, `cancelled`→Canceled. This is a
     required completion step, not a fallback, and applies equally to the **no-MR**
     path (a Multica issue closed without a code change still closes its story).
     (MCP is unavailable in headless/cron runs — if so, say so rather than
