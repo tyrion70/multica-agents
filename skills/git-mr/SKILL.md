@@ -38,6 +38,17 @@ git remote get-url origin   # must be gitlab.com/chainlayer/*
 | `github.com/tyrion70/*` | → use the **`git-pr`** skill | | |
 | anything else | **ask the user** | | |
 
+> **GitLab auth token (group PAT).** `glab` and the REST API authenticate with
+> the vault group PAT (`ChainLayer · GitLab — group PAT`, `bitwarden` **company**
+> folder). It carries the **`self_rotate`** scope, so a near-expiry token is
+> **not** a reason to escalate — rotate it yourself and write the new value back
+> to the vault. Full recovery path (rotate via `POST
+> /personal_access_tokens/self/rotate`, write-back, and the "must still be valid,
+> so rotate proactively" caveat) lives in the **ssh** skill under *GitLab group
+> PAT — keep it alive yourself*. A hard-expired (401) token still needs a human.
+> This is orthogonal to the SAML SSO gate (also in the **ssh** skill), which a
+> fresh token does not defeat.
+
 ## Step 2 — pre-flight (mandatory, every push)
 
 1. **Git identity**: `git config user.email` must be `peter@chainlayer.io`.

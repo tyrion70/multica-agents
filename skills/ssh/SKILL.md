@@ -94,6 +94,47 @@ above — not another SSH-key/PAT permutation, which won't work.)
 (GitHub `tyrion70/*` repos have no such enforcement — clone/push works with
 `id_ed25519_peter` directly.)
 
+## GitLab group PAT — keep it alive yourself (`self_rotate`)
+
+The vault item **`ChainLayer · GitLab — group PAT`** (`bitwarden` skill,
+**`company`** folder, `token` field) carries the **`self_rotate`** scope
+(verified scopes: `api, self_rotate, write_repository, read_api,
+read_repository`). That means an agent can rotate the token itself instead of
+escalating an expired-token merge to a human — **do this, don't escalate**, as
+long as the token is still valid (see the caveat below).
+
+**Recovery path (agent-driven rotation):**
+
+1. Read the current token from the vault (`bitwarden` skill), then rotate it —
+   GitLab returns a **new** token and revokes the old one in the same call:
+
+   ```bash
+   NODE_TLS_REJECT_UNAUTHORIZED=0   # only if bw was just unlocked; not needed for the curl
+   NEW_TOKEN=$(curl -sf --request POST \
+     --header "PRIVATE-TOKEN: $CURRENT_TOKEN" \
+     "https://gitlab.com/api/v4/personal_access_tokens/self/rotate" \
+     | python3 -c "import json,sys; print(json.load(sys.stdin)['token'])")
+   ```
+
+2. **Write `$NEW_TOKEN` straight back** into the same vault item's `token`
+   field and `bw sync`, so the next run reads the fresh value (update pattern in
+   the `bitwarden` skill). The old token is already dead — if you skip the
+   write-back, every later run breaks.
+
+⚠️ **Caveat — rotate proactively, NOT after a 401.** `self/rotate` only works
+while the token is **still valid**. A fully-expired token returns `401
+Unauthorized` and **cannot rotate itself** — at that point only a human can
+re-issue it. So rotate **near expiry / on a schedule**, never as after-401
+recovery. Check the expiry (`GET /personal_access_tokens/self`) and rotate with
+comfortable margin; a hard-expired token is a genuine escalation to Peter.
+
+> Rotating does **not** defeat the SAML SSO gate above — a fresh token still
+> needs a live group SSO session to clone/push. Rotation keeps the token from
+> expiring; it does not replace the human SSO refresh.
+>
+> Follow-up (not yet built): a scheduled autopilot that rotates the PAT before
+> expiry so no interactive run has to.
+
 ## Git commit signing
 
 SSH-format signing with the dedicated signing key:
