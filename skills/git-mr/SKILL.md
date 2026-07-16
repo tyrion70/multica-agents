@@ -123,6 +123,43 @@ close the Linear issue via MCP after the MR merges (see "After the MR exists").
   bump MRs for `latest@sha256:…` pins.
 - After the branch merges: check out main, drop stale stashes.
 
+## GitLab group PAT — self-rotation
+
+The group PAT (`ChainLayer · GitLab — group PAT`, stored in Bitwarden `company`
+folder) carries the `self_rotate` scope, so agents can rotate it without human
+involvement — no more dead-token escalations blocking nightly MRs.
+
+**Proactive rotation (while the token is still valid):**
+
+```bash
+# 1. Read current token from Bitwarden
+OLD_TOKEN=$(bw get password "ChainLayer · GitLab — group PAT" --session "$BW_SESSION")
+
+# 2. Rotate — returns a new token, revokes the old one
+NEW_TOKEN=$(curl -s -X POST https://gitlab.com/api/v4/personal_access_tokens/self/rotate \
+  -H "PRIVATE-TOKEN: $OLD_TOKEN" | python3 -c "import json,sys; print(json.load(sys.stdin)['token'])")
+
+# 3. Write the new token into Bitwarden (see the bitwarden skill's update pattern)
+bw get item "ChainLayer · GitLab — group PAT" --session "$BW_SESSION" > /tmp/bw-pat.json
+python3 -c "
+import json
+d = json.load(open('/tmp/bw-pat.json'))
+d['login']['password'] = '$NEW_TOKEN'
+print(json.dumps(d))
+" | bw encode | xargs -I{} bw edit item "$(bw get item 'ChainLayer · GitLab — group PAT' --session "$BW_SESSION" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')" {} --session "$BW_SESSION"
+bw sync --session "$BW_SESSION"
+rm -f /tmp/bw-pat.json
+```
+
+⚠️ **Caveat — only works while the token is still valid.** A fully-expired
+token returns 401 and cannot rotate itself. Rotate **proactively** (near-expiry
+or scheduled), not as a post-401 recovery. A hard-expired token still needs a
+human to re-issue via the GitLab UI.
+
+> **Follow-up:** a scheduled Multica autopilot that rotates the PAT before
+> expiry would eliminate the human-in-loop entirely. Not implemented yet —
+> the agent-driven path above is the current approach.
+
 ## When to ask the user (explicit list)
 
 - Remote is not `gitlab.com/chainlayer` (and not `github.com/tyrion70`, which

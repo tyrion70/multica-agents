@@ -207,3 +207,11 @@ When a sibling skill (e.g. `homelab`, `company-k8s`) needs a credential, it shou
 > **Mikrotik**: BW item "Mikrotik CRS812-8DS-2DQ-2DDQ — homelab switch" (`MIKROTIK_HOST`, `MIKROTIK_USER`, `MIKROTIK_PASSWORD`)
 
 That way a future read happens from BW (current, rotated values), not from a stale skill file.
+
+### Known self-rotating item
+
+The group PAT item **"ChainLayer · GitLab — group PAT"** (`company` folder) carries the
+`self_rotate` GitLab scope. An agent that finds the token expired or near-expiry
+can rotate it via GitLab's `POST /personal_access_tokens/self/rotate` endpoint
+and **write the new value back** into this item's `token` field + `bw sync`.
+See the **`git-mr`** skill for the full procedure and the proactive-only caveat.
