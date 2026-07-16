@@ -81,9 +81,9 @@ bites hard and has caught us before, so know it up front:
   `self_rotate` scope. Rotate it with
   `POST https://gitlab.com/api/v4/personal_access_tokens/self/rotate` using the
   current token as `PRIVATE-TOKEN`, then **write the new token back** into
-  Bitwarden (`token` field) and `bw sync`. See the **`git-mr`** skill for the
-  full procedure and the important caveat (only works while still valid —
-  rotate proactively).
+  Bitwarden (the item is a SecureNote; the token is in its hidden `PAT` field)
+  and `bw sync`. See the **`git-mr`** skill for the full procedure and the
+  important caveat (only works while still valid — rotate proactively).
 - **To actually clone/push** a `chainlayer/*` repo from an agent runtime, a human
   must refresh the group's SSO session for the workspace credential (or the repo
   must be pre-synced). Surface this as a blocker rather than burning time on key

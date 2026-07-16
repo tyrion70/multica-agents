@@ -129,24 +129,34 @@ The group PAT (`ChainLayer · GitLab — group PAT`, stored in Bitwarden `compan
 folder) carries the `self_rotate` scope, so agents can rotate it without human
 involvement — no more dead-token escalations blocking nightly MRs.
 
+The item is a **SecureNote** whose token lives in a **hidden custom field named
+`PAT`** (not a Login — there is no `login.password`). Read and write it by
+parsing the `fields` array, per the bitwarden skill's SecureNote pattern.
+
 **Proactive rotation (while the token is still valid):**
 
 ```bash
-# 1. Read current token from Bitwarden
-OLD_TOKEN=$(bw get password "ChainLayer · GitLab — group PAT" --session "$BW_SESSION")
+ITEM="ChainLayer · GitLab — group PAT"
+
+# 1. Read current token from the PAT hidden field
+OLD_TOKEN=$(bw get item "$ITEM" --session "$BW_SESSION" \
+  | python3 -c "import json,sys; d=json.load(sys.stdin); print({f['name']:f['value'] for f in d.get('fields',[])}['PAT'])")
 
 # 2. Rotate — returns a new token, revokes the old one
 NEW_TOKEN=$(curl -s -X POST https://gitlab.com/api/v4/personal_access_tokens/self/rotate \
   -H "PRIVATE-TOKEN: $OLD_TOKEN" | python3 -c "import json,sys; print(json.load(sys.stdin)['token'])")
 
-# 3. Write the new token into Bitwarden (see the bitwarden skill's update pattern)
-bw get item "ChainLayer · GitLab — group PAT" --session "$BW_SESSION" > /tmp/bw-pat.json
+# 3. Write the new token back into the PAT field + sync
+bw get item "$ITEM" --session "$BW_SESSION" > /tmp/bw-pat.json
+ITEM_ID=$(python3 -c "import json; print(json.load(open('/tmp/bw-pat.json'))['id'])")
 python3 -c "
 import json
 d = json.load(open('/tmp/bw-pat.json'))
-d['login']['password'] = '$NEW_TOKEN'
+for f in d['fields']:
+    if f['name'] == 'PAT':
+        f['value'] = '$NEW_TOKEN'
 print(json.dumps(d))
-" | bw encode | xargs -I{} bw edit item "$(bw get item 'ChainLayer · GitLab — group PAT' --session "$BW_SESSION" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')" {} --session "$BW_SESSION"
+" | bw encode | xargs -I{} bw edit item "$ITEM_ID" {} --session "$BW_SESSION"
 bw sync --session "$BW_SESSION"
 rm -f /tmp/bw-pat.json
 ```

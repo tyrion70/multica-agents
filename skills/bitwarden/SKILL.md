@@ -210,8 +210,10 @@ That way a future read happens from BW (current, rotated values), not from a sta
 
 ### Known self-rotating item
 
-The group PAT item **"ChainLayer · GitLab — group PAT"** (`company` folder) carries the
-`self_rotate` GitLab scope. An agent that finds the token expired or near-expiry
-can rotate it via GitLab's `POST /personal_access_tokens/self/rotate` endpoint
-and **write the new value back** into this item's `token` field + `bw sync`.
-See the **`git-mr`** skill for the full procedure and the proactive-only caveat.
+The group PAT item **"ChainLayer · GitLab — group PAT"** (`company` folder) is a
+**SecureNote** whose token lives in a **hidden custom field named `PAT`** (parse
+the `fields` array — there is no `login.password`). It carries the `self_rotate`
+GitLab scope. An agent that finds the token expired or near-expiry can rotate it
+via GitLab's `POST /personal_access_tokens/self/rotate` endpoint and **write the
+new value back** into this item's `PAT` field + `bw sync`. See the **`git-mr`**
+skill for the full procedure and the proactive-only caveat.
