@@ -85,6 +85,26 @@ There is **no Linear closing magic word** for private work — the tracking issu
 lives in Multica, not Linear. A GitHub-side `Closes #NN` may still be used to
 close an issue in the *code* repo itself, when one exists.
 
+## Approval gates — never self-approve (human-only)
+
+If a PR carries a **required-approval gate** (a GitHub branch-protection rule
+requiring N approving reviews / required reviewers), an agent must **not**
+approve it — not its own PR, and not another agent's (no "cross-approval").
+The gate exists to enforce a second-party **code review**, and no agent stands
+in for that.
+
+- **Route the approval to a human via the Tech Lead.** A human clicking
+  **Approve** in GitHub — or explicitly telling you "merge it" — satisfies the
+  gate. Nothing an agent does can.
+- **A verbal go-live "go" (or "go, direct") authorizes the _deploy_, not the
+  code-review gate.** It does not let you approve your own or another agent's
+  PR, and it does not let you bypass a required reviewer. If a go-live is
+  blocked only on the approval, surface that to the Tech Lead and set the
+  issue `blocked` for Peter — do **not** submit an approving review yourself.
+
+(Set after CHA-719, where a fleet agent self-approved a required-approval MR
+under a verbal "Go, direct". Codified in CHA-779.)
+
 ## After the PR exists
 
 - Link the PR URL back on the Multica issue (`multica issue comment add`, and
@@ -105,4 +125,6 @@ close an issue in the *code* repo itself, when one exists.
   is the `git-mr` skill's job).
 - Any force-push, push directly to `main`/protected branches, or history rewrite.
 - Closing/merging someone else's PR, or deleting branches you didn't create.
+- A PR carries a **required-approval gate** — never self-approve or
+  cross-approve; route to a human via the Tech Lead (see "Approval gates" above).
 - The user wants to skip the Multica issue (confirm once, note it in the PR).

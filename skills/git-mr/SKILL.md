@@ -108,6 +108,25 @@ the Linear issue.** The GitLab↔Linear magic-word integration is not reliable.
 Always include it (or `Refs` for partial work), but you must also explicitly
 close the Linear issue via MCP after the MR merges (see "After the MR exists").
 
+## Approval gates — never self-approve (human-only)
+
+If an MR carries a **required-approval gate** (a GitLab approval rule /
+required approver), an agent must **not** approve it — not its own MR, and not
+another agent's (no "cross-approval"). The gate exists to enforce a
+second-party **code review**, and no agent stands in for that.
+
+- **Route the approval to a human via the Tech Lead.** A human clicking
+  **Approve** in GitLab — or explicitly telling you "merge it" — satisfies the
+  gate. Nothing an agent does can.
+- **A verbal go-live "go" (or "go, direct") authorizes the _deploy_, not the
+  code-review gate.** It does not let you approve your own or another agent's
+  MR, and it does not let you bypass a required approver. If a go-live is
+  blocked only on the approval, surface that to the Tech Lead and set the
+  issue `blocked` for Peter — do **not** click approve yourself.
+
+(Set after CHA-719, where a fleet agent self-approved a required-approval MR
+under a verbal "Go, direct". Codified in CHA-779.)
+
 ## After the MR exists
 
 - Post the URL on the Linear issue and report it to the user.
@@ -176,4 +195,6 @@ human to re-issue via the GitLab UI.
   is the `git-pr` skill's job).
 - Any force-push, push directly to `main`/protected branches, or history rewrite.
 - Closing/merging someone else's MR, or deleting branches you didn't create.
+- An MR carries a **required-approval gate** — never self-approve or
+  cross-approve; route to a human via the Tech Lead (see "Approval gates" above).
 - The user wants to skip the Linear issue (confirm once, note it in the MR).
