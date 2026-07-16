@@ -54,8 +54,11 @@ Use this skill when the signal points company:
    <optional>
    ```
 
-3. **Always assign to Peter** (`assignee: "me"` on MCP). Applies to follow-up
-   issues created mid-task too.
+3. **Always assign to Peter; always create in Backlog.** Every agent-created
+   ChainLayer story is created with state **Backlog** (not the Triage default)
+   and assigned to Peter (`assignee: "me"` on MCP). This is unconditional across
+   OPS/CLL/MAN — no Triage exception for any team. Applies to follow-up issues
+   created mid-task too.
 4. **Branch name comes from Linear.** Use the Linear-generated branch name
    (`peter/ops-XXXX-<slug>`). If the branch was already used for a merged MR,
    append a short suffix (`-cleanup`, `-v2`) — never reuse a merged branch.
@@ -81,23 +84,42 @@ identifier or a `linear.app/…/issue/…` URL. If any is found, do NOT create a
 second story.
 
 - **No link → create one "as usual"** via the MCP access path above (body
-  template, assigned to Peter), then pin it back so future runs don't duplicate it:
+  template, assigned to Peter, created in Backlog), then **mandatorily pin**
+  `external_issue_url` — the start-of-work and close-on-close rules below both
+  depend on it as the lookup key:
 
   ```bash
   multica issue metadata set <multica-issue-id> --key external_issue_url \
     --value "https://linear.app/chainlayer/issue/OPS-123"
   ```
 
-- **Already linked → keep in sync, don't duplicate.** Closing the Multica issue
-  must close the ChainLayer story:
+  Pinning this key is mandatory at create/link time. Without it the downstream
+  rules cannot resolve the linkage and will silently skip.
+
+- **Already linked → keep in sync, don't duplicate.** Three lifecycle rules apply
+  once the link is established:
+
+  **Start-of-work transition.** When you (the Coder) begin implementation on a
+  Multica issue — the moment it moves to `in_progress` / you start coding — set
+  the linked Linear story to **In Progress** and re-assert `assignee: "me"` via
+  the `mcp__claude_ai_Linear__*` tools. This transition is idempotent: if the
+  story is already In Progress / already assigned to Peter, no error and no
+  duplicate action. The trigger is the Coder stage only — not the Refiner or any
+  other pre-implementation stage. (MCP is unavailable in headless/cron runs — if
+  so, say so rather than silently skipping.)
+
+  **Close Linear when Multica closes.** Closing a Multica issue must close the
+  linked ChainLayer story:
   - Include `Closes OPS-XXXX` in the MR description for traceability, but
     **do not rely on it to auto-close the Linear issue** — the GitLab↔Linear
     magic-word integration is not reliable.
-  - **After the MR merges (or the Multica issue reaches a terminal state),
-    explicitly close the Linear issue** via the `mcp__claude_ai_Linear__*`
+  - **After the Multica issue reaches a terminal state** (`done` or `cancelled`),
+    explicitly close the Linear issue via the `mcp__claude_ai_Linear__*`
     status-update tool. Mirror `done`→Done, `cancelled`→Cancelled. This is a
-    required completion step, not a fallback. (MCP is unavailable in
-    headless/cron runs — if so, say so rather than skipping silently.)
+    required completion step, not a fallback, and applies equally to the **no-MR**
+    path (a Multica issue closed without a code change still closes its story).
+    (MCP is unavailable in headless/cron runs — if so, say so rather than
+    skipping silently.)
   - Keep `external_issue_url` honest — if it's stale on entry, overwrite or
     `multica issue metadata delete` it before exiting.
 
