@@ -34,5 +34,13 @@
   "chainlayer-squad-docs/doc-reviewer-publisher": "ed39a23d-9378-495c-b8ff-75fd6c08a6da",
   "chainlayer-squad-docs/doc-writer": "f6dfc567-02c1-4d43-a83b-2fc939257063",
   "chainlayer-squad-docs/docs-lead": "113b9a5c-21c4-4fb0-b7c5-d6c8376a40bb",
+  "chainlayer-squad-glm/glm-cf-haproxy-expert": "cf476108-9723-4033-afc2-19bb91d98f27",
+  "chainlayer-squad-glm/glm-communicator": "0da21f32-52c8-43a0-8d51-8dcc5a37eb3c",
+  "chainlayer-squad-glm/glm-issue-coder": "b71870af-bb42-4719-b6a9-ea5e8235405b",
+  "chainlayer-squad-glm/glm-issue-deployer": "7308d98a-6d18-426e-a920-528a54170f4e",
+  "chainlayer-squad-glm/glm-issue-qa": "8187cce2-3657-4013-94b9-5ccbbc7c894e",
+  "chainlayer-squad-glm/glm-issue-refiner": "950f6138-d5e6-4d12-8bf5-dd892ff98215",
+  "chainlayer-squad-glm/glm-monitoring-operator": "c5afe09d-3ee3-4bc8-88dc-8e164213c67a",
+  "chainlayer-squad-glm/glm-tech-lead": "ff83e693-0319-4fe4-9630-1e694cc4bc4c",
   "chainlayer-squad-rag/rag-tech-lead": "f87421f3-e3c5-438a-bd7e-a5a1eaf8c51a"
 }
