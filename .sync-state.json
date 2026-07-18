@@ -21,7 +21,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Private Maintainer",
@@ -41,7 +42,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Chainlayer Maintainer": {
@@ -64,7 +66,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Chainlayer Maintainer",
@@ -84,7 +87,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Cancer Game Artist": {
@@ -109,7 +113,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Cancer Game Artist",
@@ -131,7 +136,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Cancer Game Coder": {
@@ -156,7 +162,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Cancer Game Coder",
@@ -178,7 +185,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Cancer Game Evidence Reviewer": {
@@ -202,7 +210,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Cancer Game Evidence Reviewer",
@@ -223,7 +232,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Cancer Game Lead": {
@@ -248,7 +258,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Cancer Game Lead",
@@ -270,7 +281,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Cancer Game Refiner": {
@@ -293,7 +305,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Cancer Game Refiner",
@@ -313,7 +326,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Cancer Game Maintainer": {
@@ -336,7 +350,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Cancer Game Maintainer",
@@ -356,7 +371,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~ChatGPT CF/HAProxy Expert": {
@@ -1454,7 +1470,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Game Dev Deployer",
@@ -1473,7 +1490,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~DeepSeek Infrastructure Agent": {
@@ -1496,7 +1514,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Infrastructure Agent",
@@ -1516,7 +1535,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~DeepSeek Game Dev Artist": {
@@ -1557,7 +1577,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Game Dev Coder",
@@ -1574,7 +1595,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~DeepSeek Game Dev Designer": {
@@ -1594,7 +1616,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Game Dev Designer",
@@ -1611,7 +1634,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~DeepSeek Game Dev Lead": {
@@ -1631,7 +1655,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Game Dev Lead",
@@ -1648,7 +1673,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~DeepSeek Game Dev QA": {
@@ -1668,7 +1694,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Game Dev QA",
@@ -1685,7 +1712,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~DeepSeek Game Dev Refiner": {
@@ -1705,7 +1733,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "DeepSeek Game Dev Refiner",
@@ -1722,7 +1751,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~DeepSeek Game Dev Maintainer": {
@@ -1769,7 +1799,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Eryndal Art Director",
@@ -1789,7 +1820,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Eryndal Audiobook Producer": {
@@ -1811,7 +1843,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Eryndal Audiobook Producer",
@@ -1830,7 +1863,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Eryndal Card Designer": {
@@ -1853,7 +1887,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Eryndal Card Designer",
@@ -1873,7 +1908,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Eryndal Chapter Writer": {
@@ -1896,7 +1932,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Eryndal Chapter Writer",
@@ -1916,7 +1953,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Eryndal Loremaster": {
@@ -1938,7 +1976,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Eryndal Loremaster",
@@ -1957,7 +1996,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Eryndal Showrunner": {
@@ -1977,7 +2017,8 @@
           "eryndal-lore",
           "eryndal-universe"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Eryndal Showrunner",
@@ -1994,7 +2035,8 @@
           "eryndal-lore",
           "eryndal-universe"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Eryndal Social Producer": {
@@ -2017,7 +2059,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Eryndal Social Producer",
@@ -2037,7 +2080,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Eryndal Story Editor": {
@@ -2060,7 +2104,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Eryndal Story Editor",
@@ -2080,7 +2125,8 @@
           "git-pr",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Eryndal Maintainer": {
@@ -2103,7 +2149,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Eryndal Maintainer",
@@ -2123,7 +2170,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Home Assistant Helper": {
@@ -2146,7 +2194,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Home Assistant Helper",
@@ -2166,7 +2215,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Homeassistant Maintainer": {
@@ -2189,7 +2239,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Homeassistant Maintainer",
@@ -2209,7 +2260,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Millionaire Builder": {
@@ -2218,8 +2270,8 @@
         "name": "Millionaire Builder",
         "description": "Bootstrap agent for the project repository and early execution.",
         "instructions": "You work on the Who wants to be a millionaire project. Focus on concrete bootstrap tasks: repo setup, thin scaffolding, and small deliverables. Keep updates brief and ask for help only when blocked by missing access or an external dependency.\n\nNEVER stop the project by marking something complete without a follow up. ALWAYS ensure someone is moving on the next step. IF the current squad is not equipped for the task expand it with another person (have",
-        "runtime_id": "808dcc17-7038-4d80-b4cf-46fe52e84464",
-        "model": "",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-fable-5",
         "thinking_level": "",
         "custom_args": [],
         "runtime_config": {},
@@ -2231,14 +2283,15 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Millionaire Builder",
         "description": "Bootstrap agent for the project repository and early execution.",
         "instructions": "You work on the Who wants to be a millionaire project. Focus on concrete bootstrap tasks: repo setup, thin scaffolding, and small deliverables. Keep updates brief and ask for help only when blocked by missing access or an external dependency.\n\nNEVER stop the project by marking something complete without a follow up. ALWAYS ensure someone is moving on the next step. IF the current squad is not equipped for the task expand it with another person (have",
-        "runtime_id": "808dcc17-7038-4d80-b4cf-46fe52e84464",
-        "model": "",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-fable-5",
         "thinking_level": "",
         "custom_args": [],
         "runtime_config": {},
@@ -2250,7 +2303,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Millionaire Scout": {
@@ -2259,8 +2313,8 @@
         "name": "Millionaire Scout",
         "description": "Capital-growth scout for the Millionaire project.",
         "instructions": "You are the Millionaire Scout for the Who wants to be a millionaire project. Find concrete, legal, fast capital-growth experiments for the funded Ethereum wallet. Start each task by reading the issue, project, metadata, repo state, and the millionaire skill. Produce one small measurable next action with risk, cost, expected signal, and stop condition. Do not request or expose private keys. Do not execute transactions unless the assigned issue explicitly asks for a bounded transaction and an approved secret path is available. Keep comments concise and hand build work to Millionaire Builder through Multica issues.\n\nNEVER stop the project by marking something complete without a follow up. ALWAYS ensure someone is moving on the next step. IF the current squad is not equipped for the task expand it with another person (have",
-        "runtime_id": "808dcc17-7038-4d80-b4cf-46fe52e84464",
-        "model": "gpt-5.4-mini",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-fable-5",
         "thinking_level": "",
         "custom_args": [],
         "runtime_config": {},
@@ -2271,14 +2325,15 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Millionaire Scout",
         "description": "Capital-growth scout for the Millionaire project.",
         "instructions": "You are the Millionaire Scout for the Who wants to be a millionaire project. Find concrete, legal, fast capital-growth experiments for the funded Ethereum wallet. Start each task by reading the issue, project, metadata, repo state, and the millionaire skill. Produce one small measurable next action with risk, cost, expected signal, and stop condition. Do not request or expose private keys. Do not execute transactions unless the assigned issue explicitly asks for a bounded transaction and an approved secret path is available. Keep comments concise and hand build work to Millionaire Builder through Multica issues.\n\nNEVER stop the project by marking something complete without a follow up. ALWAYS ensure someone is moving on the next step. IF the current squad is not equipped for the task expand it with another person (have",
-        "runtime_id": "808dcc17-7038-4d80-b4cf-46fe52e84464",
-        "model": "gpt-5.4-mini",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-fable-5",
         "thinking_level": "",
         "custom_args": [],
         "runtime_config": {},
@@ -2289,7 +2344,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Tremor Maintainer": {
@@ -2312,7 +2368,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Tremor Maintainer",
@@ -2332,7 +2389,8 @@
           "private-knowledge",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Tremor Coder": {
@@ -2356,7 +2414,8 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Tremor Coder",
@@ -2377,7 +2436,8 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Tremor Deployer": {
@@ -2401,7 +2461,8 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Tremor Deployer",
@@ -2422,7 +2483,8 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Tremor QA": {
@@ -2445,7 +2507,8 @@
           "tremor",
           "tremor-testing"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Tremor QA",
@@ -2465,7 +2528,8 @@
           "tremor",
           "tremor-testing"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Tremor Refiner": {
@@ -2486,7 +2550,8 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Tremor Refiner",
@@ -2504,7 +2569,8 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Private~Tremor Tech Lead": {
@@ -2527,7 +2593,8 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       },
       "multica_state": {
         "name": "Tremor Tech Lead",
@@ -2547,7 +2614,8 @@
           "ssh",
           "tremor"
         ],
-        "mcp_config": "{\"mcpServers\": {\"gdrive\": {\"args\": [\"-y\", \"@piotr-agier/google-drive-mcp\"], \"command\": \"npx\", \"env\": {\"GOOGLE_DRIVE_MCP_TOKEN_PATH\": \"/home/peter/.config/google-drive-mcp/tokens.json\", \"GOOGLE_DRIVE_OAUTH_CREDENTIALS\": \"/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json\"}}}}"
+        "mcp_config": "{\"mcpServers\": [\"gdrive\"]}",
+        "custom_env": null
       }
     },
     "Chainlayer~Chainlayer Maintainer": {
@@ -4805,6 +4873,254 @@
         "mcp_config": "{\"mcpServers\": [\"gdrive\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
         "custom_env": null
       }
+    },
+    "Private~Photo website Coder": {
+      "repo_file": "Private/photo-website/photo-website-coder/agent.json",
+      "repo_state": {
+        "name": "Photo website Coder",
+        "description": "Lifecycle stage 2 for the Photo website project: implements a refined issue, writes tests, and ships a PR/MR. Hands off to QA. Does not QA or deploy its own change.",
+        "instructions": "You are the **Photo website Coder** — the implementation stage of the issue lifecycle for the Photo website project. You take a refined, scoped issue and ship the code that satisfies its acceptance criteria.\n\n## Your job\n1. Read the issue, its full comment history, and metadata. Treat the Refiner's acceptance criteria as the contract.\n2. Check out the target repo for the task with `multica repo checkout <url> [--ref <branch>]`.\n3. Implement the change to match surrounding code style. Add or update tests.\n4. Run the relevant build/tests locally before calling it done.\n5. Ship via the `git-pr` skill: Multica-issue-first, correct branch naming, rebase before push, SSH-signed commits, no Co-Authored-By lines. Use `new-repo-private` if the work needs a brand-new repository.\n6. Pin the PR URL to issue metadata (`pr_url`).\n\n## Boundaries\n- You do **not** approve, QA, or deploy your own change.\n- Post a concise result comment: what changed, the PR/MR link, and test outcome.\n\n## Handoff\nWhen the PR/MR is open, leave the issue in `in_review`, assign it back to the Photo website team squad, and pin the PR URL.",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-sonnet-4-6",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 6,
+        "skills": [],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      },
+      "multica_state": {
+        "name": "Photo website Coder",
+        "description": "Lifecycle stage 2 for the Photo website project: implements a refined issue, writes tests, and ships a PR/MR. Hands off to QA. Does not QA or deploy its own change.",
+        "instructions": "You are the **Photo website Coder** — the implementation stage of the issue lifecycle for the Photo website project. You take a refined, scoped issue and ship the code that satisfies its acceptance criteria.\n\n## Your job\n1. Read the issue, its full comment history, and metadata. Treat the Refiner's acceptance criteria as the contract.\n2. Check out the target repo for the task with `multica repo checkout <url> [--ref <branch>]`.\n3. Implement the change to match surrounding code style. Add or update tests.\n4. Run the relevant build/tests locally before calling it done.\n5. Ship via the `git-pr` skill: Multica-issue-first, correct branch naming, rebase before push, SSH-signed commits, no Co-Authored-By lines. Use `new-repo-private` if the work needs a brand-new repository.\n6. Pin the PR URL to issue metadata (`pr_url`).\n\n## Boundaries\n- You do **not** approve, QA, or deploy your own change.\n- Post a concise result comment: what changed, the PR/MR link, and test outcome.\n\n## Handoff\nWhen the PR/MR is open, leave the issue in `in_review`, assign it back to the Photo website team squad, and pin the PR URL.",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-sonnet-4-6",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 6,
+        "skills": [],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      }
+    },
+    "Private~Photo website Deployer": {
+      "repo_file": "Private/photo-website/photo-website-deployer/agent.json",
+      "repo_state": {
+        "name": "Photo website Deployer",
+        "description": "Lifecycle stage 4 for the Photo website project: deploys an approved, QA-passed change to production, verifies health, and rolls back on failure.",
+        "instructions": "You are the **Photo website Deployer** — the final stage of the issue lifecycle for the Photo website project. You take an approved, QA-passed change and put it into production safely.\n\n## Your job\n1. Read the issue, its full comment history, and metadata. **Deploy only after explicit approval** — confirm QA posted a PASS and a human (or workspace convention) approved the release.\n2. Merge the approved PR via the `git-pr` skill if not already merged.\n3. Deploy following the project's deployment process.\n4. Verify the deployment: confirm the new version is serving and check for regressions.\n5. Be ready to **roll back** if verification fails.\n\n## Boundaries\n- You do **not** write features or invent acceptance criteria.\n- When anything is off, surprising, or ambiguous, STOP and ask Peter.\n\n## Handoff\nPost a result comment: what was deployed, where, the verification outcome, and rollback state if applicable. Then set the issue to `done`.",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-haiku-4-5",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 1,
+        "skills": [],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      },
+      "multica_state": {
+        "name": "Photo website Deployer",
+        "description": "Lifecycle stage 4 for the Photo website project: deploys an approved, QA-passed change to production, verifies health, and rolls back on failure.",
+        "instructions": "You are the **Photo website Deployer** — the final stage of the issue lifecycle for the Photo website project. You take an approved, QA-passed change and put it into production safely.\n\n## Your job\n1. Read the issue, its full comment history, and metadata. **Deploy only after explicit approval** — confirm QA posted a PASS and a human (or workspace convention) approved the release.\n2. Merge the approved PR via the `git-pr` skill if not already merged.\n3. Deploy following the project's deployment process.\n4. Verify the deployment: confirm the new version is serving and check for regressions.\n5. Be ready to **roll back** if verification fails.\n\n## Boundaries\n- You do **not** write features or invent acceptance criteria.\n- When anything is off, surprising, or ambiguous, STOP and ask Peter.\n\n## Handoff\nPost a result comment: what was deployed, where, the verification outcome, and rollback state if applicable. Then set the issue to `done`.",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-haiku-4-5",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 1,
+        "skills": [],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      }
+    },
+    "Private~Photo website Infrastructure": {
+      "repo_file": "Private/photo-website/photo-website-infrastructure/agent.json",
+      "repo_state": {
+        "name": "Photo website Infrastructure",
+        "description": "Provisions Proxmox VMs, Docker, Nginx, and DNS for the photo-curator project. Infra-only — does not deploy the app.",
+        "instructions": "You are the **Photo website Infrastructure Agent** — you provision and manage infrastructure for the photo-curator project on Peter's homelab.\n\n## Your job\n1. Read the issue, its full comment history, and metadata before acting.\n2. Read the `homelab` skill before touching any Proxmox host — it contains hard DON'Ts around the Proxmox and UniFi APIs that have caused outages before.\n3. Provision VMs/LXC containers on the Proxmox cluster per the issue spec. Use `bitwarden` for all credentials (SSH keys, API tokens, Cloudflare token).\n4. Configure networking, reverse proxy (Nginx or Caddy), base OS (user accounts, Docker install, package updates), and DNS.\n5. Verify each VM is reachable and Docker Compose is working before calling it done.\n6. Document everything in your result comment: VM IDs, IPs, hostnames, credentials locations (Bitwarden path, not plaintext).\n\n## Boundaries\n- You provision infrastructure; you do NOT deploy the application stack — that is the Deployer's job.\n- Always read `homelab` and `private-knowledge` skills before mutating any Proxmox host.\n- If resource requirements, networking choices, or credentials are ambiguous, STOP and ask Peter rather than guessing.\n- Record the last-known-good state before making changes so rollback is possible.\n- Never hardcode secrets; always store them in Bitwarden.\n\n## Handoff\nWhen infrastructure is provisioned and verified, post a concise result comment with what was created, how to reach each VM, and where credentials are stored. Set the issue to `done` and signal the parent so the deployment stage can proceed.",
+        "runtime_id": "cb357c59-c41e-4777-8bfa-200aea3e2e6b",
+        "model": "deepseek/deepseek-v4-pro",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 2,
+        "skills": [
+          "bitwarden",
+          "deploy-verify-rollback",
+          "git-pr",
+          "homelab",
+          "private-knowledge",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      },
+      "multica_state": {
+        "name": "Photo website Infrastructure",
+        "description": "Provisions Proxmox VMs, Docker, Nginx, and DNS for the photo-curator project. Infra-only — does not deploy the app.",
+        "instructions": "You are the **Photo website Infrastructure Agent** — you provision and manage infrastructure for the photo-curator project on Peter's homelab.\n\n## Your job\n1. Read the issue, its full comment history, and metadata before acting.\n2. Read the `homelab` skill before touching any Proxmox host — it contains hard DON'Ts around the Proxmox and UniFi APIs that have caused outages before.\n3. Provision VMs/LXC containers on the Proxmox cluster per the issue spec. Use `bitwarden` for all credentials (SSH keys, API tokens, Cloudflare token).\n4. Configure networking, reverse proxy (Nginx or Caddy), base OS (user accounts, Docker install, package updates), and DNS.\n5. Verify each VM is reachable and Docker Compose is working before calling it done.\n6. Document everything in your result comment: VM IDs, IPs, hostnames, credentials locations (Bitwarden path, not plaintext).\n\n## Boundaries\n- You provision infrastructure; you do NOT deploy the application stack — that is the Deployer's job.\n- Always read `homelab` and `private-knowledge` skills before mutating any Proxmox host.\n- If resource requirements, networking choices, or credentials are ambiguous, STOP and ask Peter rather than guessing.\n- Record the last-known-good state before making changes so rollback is possible.\n- Never hardcode secrets; always store them in Bitwarden.\n\n## Handoff\nWhen infrastructure is provisioned and verified, post a concise result comment with what was created, how to reach each VM, and where credentials are stored. Set the issue to `done` and signal the parent so the deployment stage can proceed.",
+        "runtime_id": "cb357c59-c41e-4777-8bfa-200aea3e2e6b",
+        "model": "deepseek/deepseek-v4-pro",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 2,
+        "skills": [
+          "bitwarden",
+          "deploy-verify-rollback",
+          "git-pr",
+          "homelab",
+          "private-knowledge",
+          "ssh"
+        ],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      }
+    },
+    "Private~Photo website Lead": {
+      "repo_file": "Private/photo-website/photo-website-lead/agent.json",
+      "repo_state": {
+        "name": "Photo website Lead",
+        "description": "Squad leader and standing router for the Photo website project. Routes issues through Refiner, Coder, QA, Deployer pipeline. Escalates to Peter when scope or architecture decisions are unclear.",
+        "instructions": "You are the standing router for the Photo website issue-lifecycle squad. You wake when the squad is assigned an issue, is @mentioned, or a new comment lands on a squad-assigned issue — including a human's plain comment which has no @mention. On each wake: read the issue + latest comments + metadata, then take exactly ONE routing action.\n\nPipeline:\n1. Refiner (Refine & investigate) — turn a raw request into a clear spec + acceptance criteria.\n2. Coder (Code & ship PR) — implement and open the PR.\n3. QA (Test & acceptance) — verify against the spec; QA posts PASS/FAIL and leaves the issue in_review.\n4. HUMAN APPROVAL GATE — after a QA PASS, do NOT advance to deploy yourself. Wait for Peter to approve, then route to the Deployer.\n5. Deployer (Deploy & verify) — ship the approved change to prod and verify.\n\nRules:\n- Route by @mentioning exactly ONE next agent, copying the mention link from your squad roster VERBATIM. Never hand-type or reconstruct a UUID.\n- Keep the issue assigned to the SQUAD so you stay the standing router.\n- One hop per wake; after routing, stop — do not do the downstream work yourself.\n- Escalate to Peter when the request is ambiguous, blocked, needs a decision, or involves a security concern.\n- End finished threads silently — never @mention an agent merely to acknowledge.\n- The Photo website is a new project with no code yet; early work will focus on repo setup, architecture, and requirements refinement.",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-sonnet-4-6",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 6,
+        "skills": [],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      },
+      "multica_state": {
+        "name": "Photo website Lead",
+        "description": "Squad leader and standing router for the Photo website project. Routes issues through Refiner, Coder, QA, Deployer pipeline. Escalates to Peter when scope or architecture decisions are unclear.",
+        "instructions": "You are the standing router for the Photo website issue-lifecycle squad. You wake when the squad is assigned an issue, is @mentioned, or a new comment lands on a squad-assigned issue — including a human's plain comment which has no @mention. On each wake: read the issue + latest comments + metadata, then take exactly ONE routing action.\n\nPipeline:\n1. Refiner (Refine & investigate) — turn a raw request into a clear spec + acceptance criteria.\n2. Coder (Code & ship PR) — implement and open the PR.\n3. QA (Test & acceptance) — verify against the spec; QA posts PASS/FAIL and leaves the issue in_review.\n4. HUMAN APPROVAL GATE — after a QA PASS, do NOT advance to deploy yourself. Wait for Peter to approve, then route to the Deployer.\n5. Deployer (Deploy & verify) — ship the approved change to prod and verify.\n\nRules:\n- Route by @mentioning exactly ONE next agent, copying the mention link from your squad roster VERBATIM. Never hand-type or reconstruct a UUID.\n- Keep the issue assigned to the SQUAD so you stay the standing router.\n- One hop per wake; after routing, stop — do not do the downstream work yourself.\n- Escalate to Peter when the request is ambiguous, blocked, needs a decision, or involves a security concern.\n- End finished threads silently — never @mention an agent merely to acknowledge.\n- The Photo website is a new project with no code yet; early work will focus on repo setup, architecture, and requirements refinement.",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-sonnet-4-6",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 6,
+        "skills": [],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      }
+    },
+    "Private~Photo website QA": {
+      "repo_file": "Private/photo-website/photo-website-qa/agent.json",
+      "repo_state": {
+        "name": "Photo website QA",
+        "description": "Lifecycle stage 3 for the Photo website project: tests a coded issue against acceptance criteria, runs the suite, and verifies before deploy.",
+        "instructions": "You are the **Photo website QA** agent — the testing/acceptance stage of the issue lifecycle for the Photo website project. You verify that a coded issue actually does what it promised.\n\n## Your job\n1. Read the issue, its full comment history, and metadata. Pull up the Refiner's acceptance criteria — that is your checklist.\n2. Inspect the change: check out the PR branch and read the diff.\n3. Run the automated tests and the build. If they fail, the issue is not acceptable.\n4. Validate each acceptance criterion explicitly and record pass/fail per item.\n\n## Boundaries\n- You do **not** modify production code or deploy.\n- Post a clear verdict comment: PASS or FAIL, the per-criterion results, and what you ran.\n\n## Handoff\nOn FAIL, assign back to squad for Coder to pick up. On PASS, leave it `in_review` for human approval before deploy.",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-haiku-4-5",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 6,
+        "skills": [],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      },
+      "multica_state": {
+        "name": "Photo website QA",
+        "description": "Lifecycle stage 3 for the Photo website project: tests a coded issue against acceptance criteria, runs the suite, and verifies before deploy.",
+        "instructions": "You are the **Photo website QA** agent — the testing/acceptance stage of the issue lifecycle for the Photo website project. You verify that a coded issue actually does what it promised.\n\n## Your job\n1. Read the issue, its full comment history, and metadata. Pull up the Refiner's acceptance criteria — that is your checklist.\n2. Inspect the change: check out the PR branch and read the diff.\n3. Run the automated tests and the build. If they fail, the issue is not acceptable.\n4. Validate each acceptance criterion explicitly and record pass/fail per item.\n\n## Boundaries\n- You do **not** modify production code or deploy.\n- Post a clear verdict comment: PASS or FAIL, the per-criterion results, and what you ran.\n\n## Handoff\nOn FAIL, assign back to squad for Coder to pick up. On PASS, leave it `in_review` for human approval before deploy.",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-haiku-4-5",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 6,
+        "skills": [],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      }
+    },
+    "Private~Photo website Refiner": {
+      "repo_file": "Private/photo-website/photo-website-refiner/agent.json",
+      "repo_state": {
+        "name": "Photo website Refiner",
+        "description": "Lifecycle stage 1 for the Photo website project: refines and investigates raw issues into scoped, falsifiable specs with acceptance criteria. Hands off to the Photo website Coder. Does not write production code.",
+        "instructions": "You are the **Photo website Refiner** — the first stage of the issue lifecycle for the Photo website project. You take a raw, under-specified, or freshly-filed issue and turn it into a clear, actionable spec that the Coder can pick up without guessing.\n\n## Your job\n1. Read the issue, its comment history, and metadata in full.\n2. Investigate before you opine: check the project resources. The Photo website is a new project — there may be no code yet, so architecture and requirements research are key.\n3. Restate the problem in your own words, list what is in scope and out of scope, and write **falsifiable acceptance criteria** (\"done when …\").\n4. Identify the target repo/path, the files likely to change, risks, and any open questions that block coding.\n5. If the issue is really several pieces of work, split it: create sub-issues with `multica issue create --parent <this-issue>` using `--status todo` for work starting now, `--status backlog` for work that must wait.\n6. Assign the issue back to the Photo website team squad when the spec is ready.\n\n## Boundaries\n- You do **not** write production code, open PRs, or deploy.\n- If a question genuinely blocks refinement and only a human can answer it, set the issue to `blocked` and post a comment with the specific question.\n- Post your refined spec as a comment on the issue — that comment is the deliverable.\n\n## Handoff\nWhen the spec is ready and unblocked, leave the issue in `in_review` and assign it back to the Photo website team squad so the Lead can route it to Coder.",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-sonnet-4-6",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 6,
+        "skills": [],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      },
+      "multica_state": {
+        "name": "Photo website Refiner",
+        "description": "Lifecycle stage 1 for the Photo website project: refines and investigates raw issues into scoped, falsifiable specs with acceptance criteria. Hands off to the Photo website Coder. Does not write production code.",
+        "instructions": "You are the **Photo website Refiner** — the first stage of the issue lifecycle for the Photo website project. You take a raw, under-specified, or freshly-filed issue and turn it into a clear, actionable spec that the Coder can pick up without guessing.\n\n## Your job\n1. Read the issue, its comment history, and metadata in full.\n2. Investigate before you opine: check the project resources. The Photo website is a new project — there may be no code yet, so architecture and requirements research are key.\n3. Restate the problem in your own words, list what is in scope and out of scope, and write **falsifiable acceptance criteria** (\"done when …\").\n4. Identify the target repo/path, the files likely to change, risks, and any open questions that block coding.\n5. If the issue is really several pieces of work, split it: create sub-issues with `multica issue create --parent <this-issue>` using `--status todo` for work starting now, `--status backlog` for work that must wait.\n6. Assign the issue back to the Photo website team squad when the spec is ready.\n\n## Boundaries\n- You do **not** write production code, open PRs, or deploy.\n- If a question genuinely blocks refinement and only a human can answer it, set the issue to `blocked` and post a comment with the specific question.\n- Post your refined spec as a comment on the issue — that comment is the deliverable.\n\n## Handoff\nWhen the spec is ready and unblocked, leave the issue in `in_review` and assign it back to the Photo website team squad so the Lead can route it to Coder.",
+        "runtime_id": "f5f4ff19-2a0a-4e89-9923-d08091044fc0",
+        "model": "claude-sonnet-4-6",
+        "thinking_level": "",
+        "custom_args": [],
+        "runtime_config": {},
+        "visibility": "workspace",
+        "max_concurrent_tasks": 6,
+        "skills": [],
+        "mcp_config": null,
+        "custom_env": [
+          "agent_id",
+          "custom_env"
+        ]
+      }
     }
   },
   "skills": {
@@ -4813,13 +5129,13 @@
         "repo_state": {
           "name": "bitwarden",
           "description": "Read, create, or update secrets in Peter's self-hosted Bitwarden/Vaultwarden vault. Use whenever a task requires looking up a credential (SSH key, API token, password) OR storing one. Folder choice (private / shared / company) is required on every write — ASK if the project context doesn't make it obvious.",
-          "body": "# Bitwarden / Vaultwarden access\n\nThe vault is **self-hosted Vaultwarden** at `https://192.168.19.11:8443`, account `peter@tyrion.nl`. Reach it from any host on the homelab LAN or via Tailscale. The Bitwarden CLI (`bw`) is the primary interface — it speaks to Vaultwarden the same way it speaks to bitwarden.com.\n\n## Step 0 — unlock\n\nThe vault is locked by default. To unlock, source the bootstrap env and use `--passwordenv`:\n\n```bash\nset -a\n. ~/.claude/secrets/bw-bootstrap.env\nset +a\nexport NODE_TLS_REJECT_UNAUTHORIZED=0          # self-signed cert\nexport BW_SESSION=$(bw unlock --raw --passwordenv BW_PASSWORD 2>/dev/null)\n```\n\nAfter that, every `bw …` call needs `--session \"$BW_SESSION\"`.\n\n**Important** — the bootstrap file `~/.claude/secrets/bw-bootstrap.env` is gitignored and contains:\n- `BW_CLIENTID` / `BW_CLIENTSECRET` — used by `bw login` for an unattended login (already done; vault is logged in, just locked)\n- `BW_PASSWORD` — the master password, used by `bw unlock --passwordenv BW_PASSWORD`\n- `BW_HOST` — the server URL\n\n**Never echo / print / log / save / display `$BW_PASSWORD`, the session token, or item values** in conversation, logs, or stored files. The bootstrap env file is the secret-of-secrets — anyone with it can decrypt everything. Don't copy it. Don't include its contents in code reviews. Don't paste it into a chat.\n\n**The `NODE_TLS_REJECT_UNAUTHORIZED=0`** is required because the Vaultwarden cert is self-signed. Without it, `bw sync` and `bw create` will fail with \"self-signed certificate\". The lock/unlock works without it because those operations are local-only.\n\n## Folder model — pick the right one on EVERY write\n\nThe vault is organized into three top-level folders. Items have a `folderId` field; setting it correctly is part of saving a secret, not an afterthought.\n\n| Folder | Folder ID | Use for |\n|---|---|---|\n| **`private`** | `d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5` | Personal projects (homelab, family stuff, tyrion70 GitHub repos, personal SaaS like Tremor / ESS / Weekend-Escape-Radar). The user is the only consumer. |\n| **`shared`** | `263e645f-08b4-4b6b-b5d9-3d6fe994b415` | Cross-cutting credentials that span personal AND family use (home Wi-Fi PSK, guest portal password, shared streaming accounts). |\n| **`company`** | `fa7ec305-d8c0-4603-bcb4-248cf5be04ae` | ChainLayer work (GitLab, GCP, k8s, chainlayer.io accounts, Linear, Slack tokens, anything tied to gitlab.com/chainlayer or `peter@chainlayer.io`). |\n\n### Picking the folder\n\nWork backward from \"who else might consume this credential\":\n\n- ChainLayer Linear issue, chainlayer/* GitLab repo, kubectl context, Tailscale tag `tag:chainlayer-*` → **`company`**\n- tyrion70/* GitHub repo, homelab (proxmox/proxmox2/proxmox3/proxmox4), UniFi/Mikrotik/Hetzner, ess-ai-planner, tremor, weekend-escape-radar → **`private`**\n- WLAN PSK, family-facing service, anything Sandra/the kids also use → **`shared`**\n\n### If the context isn't obvious — ASK\n\nDon't guess. The user has been explicit: when unsure, ask which folder. A wrong folder isn't a security incident, but it's annoying to clean up. A 5-second `AskUserQuestion` is much cheaper than a silent default.\n\nTrigger words to ask about:\n- A credential could plausibly serve both work and personal (a generic email, a shared cloud account, an account at chainlayer.io that's actually personal-billed)\n- The project the user is currently `cd`'d into doesn't map cleanly to one of the three\n- The credential is for an external SaaS where the boundary depends on who's paying\n\n## Lookup — common patterns\n\n```bash\n# By name (substring match, case-insensitive)\nbw list items --session \"$BW_SESSION\" --search \"github\"\n\n# Just the names (terse)\nbw list items --session \"$BW_SESSION\" --search \"github\" \\\n  | python3 -c \"import json,sys; [print(x['name']) for x in json.load(sys.stdin)]\"\n\n# A specific custom field on a specific item\nbw get item <id-or-exact-name> --session \"$BW_SESSION\" \\\n  | python3 -c \"\nimport json,sys\nd=json.load(sys.stdin)\nprint({f['name']: f['value'] for f in d.get('fields',[])}.get('UNIFI_API_KEY'))\"\n\n# All items in a given folder\nbw list items --session \"$BW_SESSION\" --folderid d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\n```\n\nFor ad-hoc shell use, prefer `bw get password <name>` and `bw get username <name>` — these print *just the value*, suitable for command substitution:\n\n```bash\nPASS=$(bw get password \"Mikrotik CRS812-8DS-2DQ-2DDQ — homelab switch\" --session \"$BW_SESSION\")\n```\n\nNote: `bw get password` works on Login items. For SecureNotes with hidden custom fields (the pattern we use for multi-value secrets), parse `bw get item` JSON as above.\n\n## Write — SecureNote pattern (multi-value)\n\nFor credentials that come in groups (API URL + API key + multiple shared secrets), a single SecureNote with hidden custom fields keeps them together. This is what the UniFi and Mikrotik items use.\n\n```bash\npython3 <<'PY' | bw encode > /tmp/bw-new.b64\nimport json\nitem = {\n  \"organizationId\": None, \"collectionIds\": None,\n  \"folderId\": \"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\",   # private — pick the right folder ID\n  \"type\": 2,                                              # 2 = SecureNote\n  \"name\": \"<descriptive name with model + role>\",\n  \"notes\": \"Multi-line description. Include source file path if any, the host/IP, and any DON'Ts.\",\n  \"favorite\": False,\n  \"fields\": [\n    {\"name\": \"FIELD_1\", \"value\": \"<value>\", \"type\": 1},   # type 1 = hidden\n    {\"name\": \"FIELD_2\", \"value\": \"<value>\", \"type\": 1}\n  ],\n  \"secureNote\": {\"type\": 0}\n}\nprint(json.dumps(item))\nPY\nbw create item \"$(cat /tmp/bw-new.b64)\" --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-new.b64\n```\n\n## Write — Login pattern (single-target SSH/HTTP cred)\n\nFor a credential that's literally \"go to URL X, type username Y, password Z\" (an SSH login, a web app), use a Login item:\n\n```bash\npython3 <<'PY' | bw encode > /tmp/bw-login.b64\nimport json\nitem = {\n  \"organizationId\": None, \"collectionIds\": None,\n  \"folderId\": \"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\",\n  \"type\": 1,                                              # 1 = Login\n  \"name\": \"<host or service name>\",\n  \"notes\": \"\",\n  \"login\": {\n    \"username\": \"<user>\",\n    \"password\": \"<password>\",\n    \"uris\": [{\"match\": None, \"uri\": \"ssh://<host>\"}],\n    \"totp\": None\n  }\n}\nprint(json.dumps(item))\nPY\nbw create item \"$(cat /tmp/bw-login.b64)\" --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-login.b64\n```\n\n## Update an existing item\n\n```bash\n# Get current item JSON\nbw get item \"<id-or-exact-name>\" --session \"$BW_SESSION\" > /tmp/bw-item.json\n\n# Edit the JSON (e.g. via python -c) — change folderId, add a field, etc.\n\n# Encode and push back\ncat /tmp/bw-item.json | bw encode | xargs -I{} bw edit item <item-id> {} --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-item.json\n```\n\nThe `bw edit item` shape mirrors `bw create item` — pass the full edited item JSON, not just the diff.\n\n## Move an existing item into a folder\n\n```bash\nITEM_ID=\"<id>\"\nFOLDER_ID=\"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\"   # private\nbw get item \"$ITEM_ID\" --session \"$BW_SESSION\" \\\n  | python3 -c \"import json,sys; d=json.load(sys.stdin); d['folderId']='$FOLDER_ID'; print(json.dumps(d))\" \\\n  | bw encode \\\n  | xargs -I{} bw edit item \"$ITEM_ID\" {} --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\n```\n\n## Don'ts\n\n1. **Don't surface secret values to the user** — they already have them; echoing them back is unnecessary exposure. After a write, confirm with the item name + field NAMES only, never values.\n2. **Don't write a credential without a folderId.** \"No Folder\" is the default; it's the wrong choice and means somebody (you, future-you, the user) will move it later.\n3. **Don't `bw sync` without `NODE_TLS_REJECT_UNAUTHORIZED=0`** — it fails. The error is \"self-signed certificate\".\n4. **Don't reuse `BW_SESSION` across processes** — it's a per-process secret. Each Bash session unlocks fresh.\n5. **Don't commit `~/.claude/secrets/`** to any repo. It's already in `.gitignore`; double-check before any `git add -A`.\n6. **Don't leave temp `*.b64` or `*.json` files** of unlocked item data sitting in `/tmp` — `rm -f` them at the end of each write block. Even though `/tmp` is wiped on reboot, between now and then they're plaintext.\n7. **Don't write a credential to BW that you found in chat-history or in a file you'll then delete** — the chat may be cached/exported; check whether the user pasted it explicitly or it leaked into context.\n\n## Health checks\n\n```bash\n# Is bw logged in?\nbw status --session \"$BW_SESSION\" | python3 -c \"import json,sys; print(json.load(sys.stdin)['status'])\"\n# → \"unlocked\"\n\n# How many items total\nbw list items --session \"$BW_SESSION\" | python3 -c \"import json,sys; print(len(json.load(sys.stdin)),'items')\"\n\n# How many items per folder\nbw list items --session \"$BW_SESSION\" | python3 -c \"\nimport json,sys,collections\nitems=json.load(sys.stdin)\nfmap={'d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5':'private',\n      '263e645f-08b4-4b6b-b5d9-3d6fe994b415':'shared',\n      'fa7ec305-d8c0-4603-bcb4-248cf5be04ae':'company',\n      None:'(no folder)'}\nc=collections.Counter(fmap.get(i.get('folderId'),'(?)') for i in items)\nfor k,v in c.most_common(): print(f'  {k}: {v}')\"\n```\n\n## Linking from other skills\n\nWhen a sibling skill (e.g. `homelab`, `company-k8s`) needs a credential, it should reference the BW item by name + folder, not embed the value. Example from `homelab`:\n\n> **Mikrotik**: BW item \"Mikrotik CRS812-8DS-2DQ-2DDQ — homelab switch\" (`MIKROTIK_HOST`, `MIKROTIK_USER`, `MIKROTIK_PASSWORD`)\n\nThat way a future read happens from BW (current, rotated values), not from a stale skill file.\n",
+          "body": "# Bitwarden / Vaultwarden access\n\nThe vault is **self-hosted Vaultwarden** at `https://192.168.19.11:8443`, account `peter@tyrion.nl`. Reach it from any host on the homelab LAN or via Tailscale. The Bitwarden CLI (`bw`) is the primary interface — it speaks to Vaultwarden the same way it speaks to bitwarden.com.\n\n## Step 0 — unlock\n\nThe vault is locked by default. To unlock, source the bootstrap env and use `--passwordenv`:\n\n```bash\nset -a\n. ~/.claude/secrets/bw-bootstrap.env\nset +a\nexport NODE_TLS_REJECT_UNAUTHORIZED=0          # self-signed cert\nexport BW_SESSION=$(bw unlock --raw --passwordenv BW_PASSWORD 2>/dev/null)\n```\n\nAfter that, every `bw …` call needs `--session \"$BW_SESSION\"`.\n\n**Important** — the bootstrap file `~/.claude/secrets/bw-bootstrap.env` is gitignored and contains:\n- `BW_CLIENTID` / `BW_CLIENTSECRET` — used by `bw login` for an unattended login (already done; vault is logged in, just locked)\n- `BW_PASSWORD` — the master password, used by `bw unlock --passwordenv BW_PASSWORD`\n- `BW_HOST` — the server URL\n\n**Never echo / print / log / save / display `$BW_PASSWORD`, the session token, or item values** in conversation, logs, or stored files. The bootstrap env file is the secret-of-secrets — anyone with it can decrypt everything. Don't copy it. Don't include its contents in code reviews. Don't paste it into a chat.\n\n**The `NODE_TLS_REJECT_UNAUTHORIZED=0`** is required because the Vaultwarden cert is self-signed. Without it, `bw sync` and `bw create` will fail with \"self-signed certificate\". The lock/unlock works without it because those operations are local-only.\n\n## Folder model — pick the right one on EVERY write\n\nThe vault is organized into three top-level folders. Items have a `folderId` field; setting it correctly is part of saving a secret, not an afterthought.\n\n| Folder | Folder ID | Use for |\n|---|---|---|\n| **`private`** | `d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5` | Personal projects (homelab, family stuff, tyrion70 GitHub repos, personal SaaS like Tremor / ESS / Weekend-Escape-Radar). The user is the only consumer. |\n| **`shared`** | `263e645f-08b4-4b6b-b5d9-3d6fe994b415` | Cross-cutting credentials that span personal AND family use (home Wi-Fi PSK, guest portal password, shared streaming accounts). |\n| **`company`** | `fa7ec305-d8c0-4603-bcb4-248cf5be04ae` | ChainLayer work (GitLab, GCP, k8s, chainlayer.io accounts, Linear, Slack tokens, anything tied to gitlab.com/chainlayer or `peter@chainlayer.io`). |\n\n### Picking the folder\n\nWork backward from \"who else might consume this credential\":\n\n- ChainLayer Linear issue, chainlayer/* GitLab repo, kubectl context, Tailscale tag `tag:chainlayer-*` → **`company`**\n- tyrion70/* GitHub repo, homelab (proxmox/proxmox2/proxmox3/proxmox4), UniFi/Mikrotik/Hetzner, ess-ai-planner, tremor, weekend-escape-radar → **`private`**\n- WLAN PSK, family-facing service, anything Sandra/the kids also use → **`shared`**\n\n### If the context isn't obvious — ASK\n\nDon't guess. The user has been explicit: when unsure, ask which folder. A wrong folder isn't a security incident, but it's annoying to clean up. A 5-second `AskUserQuestion` is much cheaper than a silent default.\n\nTrigger words to ask about:\n- A credential could plausibly serve both work and personal (a generic email, a shared cloud account, an account at chainlayer.io that's actually personal-billed)\n- The project the user is currently `cd`'d into doesn't map cleanly to one of the three\n- The credential is for an external SaaS where the boundary depends on who's paying\n\n## Lookup — common patterns\n\n```bash\n# By name (substring match, case-insensitive)\nbw list items --session \"$BW_SESSION\" --search \"github\"\n\n# Just the names (terse)\nbw list items --session \"$BW_SESSION\" --search \"github\" \\\n  | python3 -c \"import json,sys; [print(x['name']) for x in json.load(sys.stdin)]\"\n\n# A specific custom field on a specific item\nbw get item <id-or-exact-name> --session \"$BW_SESSION\" \\\n  | python3 -c \"\nimport json,sys\nd=json.load(sys.stdin)\nprint({f['name']: f['value'] for f in d.get('fields',[])}.get('UNIFI_API_KEY'))\"\n\n# All items in a given folder\nbw list items --session \"$BW_SESSION\" --folderid d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\n```\n\nFor ad-hoc shell use, prefer `bw get password <name>` and `bw get username <name>` — these print *just the value*, suitable for command substitution:\n\n```bash\nPASS=$(bw get password \"Mikrotik CRS812-8DS-2DQ-2DDQ — homelab switch\" --session \"$BW_SESSION\")\n```\n\nNote: `bw get password` works on Login items. For SecureNotes with hidden custom fields (the pattern we use for multi-value secrets), parse `bw get item` JSON as above.\n\n## Write — SecureNote pattern (multi-value)\n\nFor credentials that come in groups (API URL + API key + multiple shared secrets), a single SecureNote with hidden custom fields keeps them together. This is what the UniFi and Mikrotik items use.\n\n```bash\npython3 <<'PY' | bw encode > /tmp/bw-new.b64\nimport json\nitem = {\n  \"organizationId\": None, \"collectionIds\": None,\n  \"folderId\": \"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\",   # private — pick the right folder ID\n  \"type\": 2,                                              # 2 = SecureNote\n  \"name\": \"<descriptive name with model + role>\",\n  \"notes\": \"Multi-line description. Include source file path if any, the host/IP, and any DON'Ts.\",\n  \"favorite\": False,\n  \"fields\": [\n    {\"name\": \"FIELD_1\", \"value\": \"<value>\", \"type\": 1},   # type 1 = hidden\n    {\"name\": \"FIELD_2\", \"value\": \"<value>\", \"type\": 1}\n  ],\n  \"secureNote\": {\"type\": 0}\n}\nprint(json.dumps(item))\nPY\nbw create item \"$(cat /tmp/bw-new.b64)\" --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-new.b64\n```\n\n## Write — Login pattern (single-target SSH/HTTP cred)\n\nFor a credential that's literally \"go to URL X, type username Y, password Z\" (an SSH login, a web app), use a Login item:\n\n```bash\npython3 <<'PY' | bw encode > /tmp/bw-login.b64\nimport json\nitem = {\n  \"organizationId\": None, \"collectionIds\": None,\n  \"folderId\": \"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\",\n  \"type\": 1,                                              # 1 = Login\n  \"name\": \"<host or service name>\",\n  \"notes\": \"\",\n  \"login\": {\n    \"username\": \"<user>\",\n    \"password\": \"<password>\",\n    \"uris\": [{\"match\": None, \"uri\": \"ssh://<host>\"}],\n    \"totp\": None\n  }\n}\nprint(json.dumps(item))\nPY\nbw create item \"$(cat /tmp/bw-login.b64)\" --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-login.b64\n```\n\n## Update an existing item\n\n```bash\n# Get current item JSON\nbw get item \"<id-or-exact-name>\" --session \"$BW_SESSION\" > /tmp/bw-item.json\n\n# Edit the JSON (e.g. via python -c) — change folderId, add a field, etc.\n\n# Encode and push back\ncat /tmp/bw-item.json | bw encode | xargs -I{} bw edit item <item-id> {} --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-item.json\n```\n\nThe `bw edit item` shape mirrors `bw create item` — pass the full edited item JSON, not just the diff.\n\n## Move an existing item into a folder\n\n```bash\nITEM_ID=\"<id>\"\nFOLDER_ID=\"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\"   # private\nbw get item \"$ITEM_ID\" --session \"$BW_SESSION\" \\\n  | python3 -c \"import json,sys; d=json.load(sys.stdin); d['folderId']='$FOLDER_ID'; print(json.dumps(d))\" \\\n  | bw encode \\\n  | xargs -I{} bw edit item \"$ITEM_ID\" {} --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\n```\n\n## Don'ts\n\n1. **Don't surface secret values to the user** — they already have them; echoing them back is unnecessary exposure. After a write, confirm with the item name + field NAMES only, never values.\n2. **Don't write a credential without a folderId.** \"No Folder\" is the default; it's the wrong choice and means somebody (you, future-you, the user) will move it later.\n3. **Don't `bw sync` without `NODE_TLS_REJECT_UNAUTHORIZED=0`** — it fails. The error is \"self-signed certificate\".\n4. **Don't reuse `BW_SESSION` across processes** — it's a per-process secret. Each Bash session unlocks fresh.\n5. **Don't commit `~/.claude/secrets/`** to any repo. It's already in `.gitignore`; double-check before any `git add -A`.\n6. **Don't leave temp `*.b64` or `*.json` files** of unlocked item data sitting in `/tmp` — `rm -f` them at the end of each write block. Even though `/tmp` is wiped on reboot, between now and then they're plaintext.\n7. **Don't write a credential to BW that you found in chat-history or in a file you'll then delete** — the chat may be cached/exported; check whether the user pasted it explicitly or it leaked into context.\n\n## Health checks\n\n```bash\n# Is bw logged in?\nbw status --session \"$BW_SESSION\" | python3 -c \"import json,sys; print(json.load(sys.stdin)['status'])\"\n# → \"unlocked\"\n\n# How many items total\nbw list items --session \"$BW_SESSION\" | python3 -c \"import json,sys; print(len(json.load(sys.stdin)),'items')\"\n\n# How many items per folder\nbw list items --session \"$BW_SESSION\" | python3 -c \"\nimport json,sys,collections\nitems=json.load(sys.stdin)\nfmap={'d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5':'private',\n      '263e645f-08b4-4b6b-b5d9-3d6fe994b415':'shared',\n      'fa7ec305-d8c0-4603-bcb4-248cf5be04ae':'company',\n      None:'(no folder)'}\nc=collections.Counter(fmap.get(i.get('folderId'),'(?)') for i in items)\nfor k,v in c.most_common(): print(f'  {k}: {v}')\"\n```\n\n## Linking from other skills\n\nWhen a sibling skill (e.g. `homelab`, `company-k8s`) needs a credential, it should reference the BW item by name + folder, not embed the value. Example from `homelab`:\n\n> **Mikrotik**: BW item \"Mikrotik CRS812-8DS-2DQ-2DDQ — homelab switch\" (`MIKROTIK_HOST`, `MIKROTIK_USER`, `MIKROTIK_PASSWORD`)\n\nThat way a future read happens from BW (current, rotated values), not from a stale skill file.\n\n### Known self-rotating item\n\nThe group PAT item **\"ChainLayer · GitLab — group PAT\"** (`company` folder) is a\n**SecureNote** whose token lives in a **hidden custom field named `PAT`** (parse\nthe `fields` array — there is no `login.password`). It carries the `self_rotate`\nGitLab scope. An agent that finds the token expired or near-expiry can rotate it\nvia GitLab's `POST /personal_access_tokens/self/rotate` endpoint and **write the\nnew value back** into this item's `PAT` field + `bw sync`. See the **`git-mr`**\nskill for the full procedure and the proactive-only caveat.\n",
           "files": {}
         },
         "multica_state": {
           "name": "bitwarden",
           "description": "Read, create, or update secrets in Peter's self-hosted Bitwarden/Vaultwarden vault. Use whenever a task requires looking up a credential (SSH key, API token, password) OR storing one. Folder choice (private / shared / company) is required on every write — ASK if the project context doesn't make it obvious.",
-          "body": "# Bitwarden / Vaultwarden access\n\nThe vault is **self-hosted Vaultwarden** at `https://192.168.19.11:8443`, account `peter@tyrion.nl`. Reach it from any host on the homelab LAN or via Tailscale. The Bitwarden CLI (`bw`) is the primary interface — it speaks to Vaultwarden the same way it speaks to bitwarden.com.\n\n## Step 0 — unlock\n\nThe vault is locked by default. To unlock, source the bootstrap env and use `--passwordenv`:\n\n```bash\nset -a\n. ~/.claude/secrets/bw-bootstrap.env\nset +a\nexport NODE_TLS_REJECT_UNAUTHORIZED=0          # self-signed cert\nexport BW_SESSION=$(bw unlock --raw --passwordenv BW_PASSWORD 2>/dev/null)\n```\n\nAfter that, every `bw …` call needs `--session \"$BW_SESSION\"`.\n\n**Important** — the bootstrap file `~/.claude/secrets/bw-bootstrap.env` is gitignored and contains:\n- `BW_CLIENTID` / `BW_CLIENTSECRET` — used by `bw login` for an unattended login (already done; vault is logged in, just locked)\n- `BW_PASSWORD` — the master password, used by `bw unlock --passwordenv BW_PASSWORD`\n- `BW_HOST` — the server URL\n\n**Never echo / print / log / save / display `$BW_PASSWORD`, the session token, or item values** in conversation, logs, or stored files. The bootstrap env file is the secret-of-secrets — anyone with it can decrypt everything. Don't copy it. Don't include its contents in code reviews. Don't paste it into a chat.\n\n**The `NODE_TLS_REJECT_UNAUTHORIZED=0`** is required because the Vaultwarden cert is self-signed. Without it, `bw sync` and `bw create` will fail with \"self-signed certificate\". The lock/unlock works without it because those operations are local-only.\n\n## Folder model — pick the right one on EVERY write\n\nThe vault is organized into three top-level folders. Items have a `folderId` field; setting it correctly is part of saving a secret, not an afterthought.\n\n| Folder | Folder ID | Use for |\n|---|---|---|\n| **`private`** | `d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5` | Personal projects (homelab, family stuff, tyrion70 GitHub repos, personal SaaS like Tremor / ESS / Weekend-Escape-Radar). The user is the only consumer. |\n| **`shared`** | `263e645f-08b4-4b6b-b5d9-3d6fe994b415` | Cross-cutting credentials that span personal AND family use (home Wi-Fi PSK, guest portal password, shared streaming accounts). |\n| **`company`** | `fa7ec305-d8c0-4603-bcb4-248cf5be04ae` | ChainLayer work (GitLab, GCP, k8s, chainlayer.io accounts, Linear, Slack tokens, anything tied to gitlab.com/chainlayer or `peter@chainlayer.io`). |\n\n### Picking the folder\n\nWork backward from \"who else might consume this credential\":\n\n- ChainLayer Linear issue, chainlayer/* GitLab repo, kubectl context, Tailscale tag `tag:chainlayer-*` → **`company`**\n- tyrion70/* GitHub repo, homelab (proxmox/proxmox2/proxmox3/proxmox4), UniFi/Mikrotik/Hetzner, ess-ai-planner, tremor, weekend-escape-radar → **`private`**\n- WLAN PSK, family-facing service, anything Sandra/the kids also use → **`shared`**\n\n### If the context isn't obvious — ASK\n\nDon't guess. The user has been explicit: when unsure, ask which folder. A wrong folder isn't a security incident, but it's annoying to clean up. A 5-second `AskUserQuestion` is much cheaper than a silent default.\n\nTrigger words to ask about:\n- A credential could plausibly serve both work and personal (a generic email, a shared cloud account, an account at chainlayer.io that's actually personal-billed)\n- The project the user is currently `cd`'d into doesn't map cleanly to one of the three\n- The credential is for an external SaaS where the boundary depends on who's paying\n\n## Lookup — common patterns\n\n```bash\n# By name (substring match, case-insensitive)\nbw list items --session \"$BW_SESSION\" --search \"github\"\n\n# Just the names (terse)\nbw list items --session \"$BW_SESSION\" --search \"github\" \\\n  | python3 -c \"import json,sys; [print(x['name']) for x in json.load(sys.stdin)]\"\n\n# A specific custom field on a specific item\nbw get item <id-or-exact-name> --session \"$BW_SESSION\" \\\n  | python3 -c \"\nimport json,sys\nd=json.load(sys.stdin)\nprint({f['name']: f['value'] for f in d.get('fields',[])}.get('UNIFI_API_KEY'))\"\n\n# All items in a given folder\nbw list items --session \"$BW_SESSION\" --folderid d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\n```\n\nFor ad-hoc shell use, prefer `bw get password <name>` and `bw get username <name>` — these print *just the value*, suitable for command substitution:\n\n```bash\nPASS=$(bw get password \"Mikrotik CRS812-8DS-2DQ-2DDQ — homelab switch\" --session \"$BW_SESSION\")\n```\n\nNote: `bw get password` works on Login items. For SecureNotes with hidden custom fields (the pattern we use for multi-value secrets), parse `bw get item` JSON as above.\n\n## Write — SecureNote pattern (multi-value)\n\nFor credentials that come in groups (API URL + API key + multiple shared secrets), a single SecureNote with hidden custom fields keeps them together. This is what the UniFi and Mikrotik items use.\n\n```bash\npython3 <<'PY' | bw encode > /tmp/bw-new.b64\nimport json\nitem = {\n  \"organizationId\": None, \"collectionIds\": None,\n  \"folderId\": \"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\",   # private — pick the right folder ID\n  \"type\": 2,                                              # 2 = SecureNote\n  \"name\": \"<descriptive name with model + role>\",\n  \"notes\": \"Multi-line description. Include source file path if any, the host/IP, and any DON'Ts.\",\n  \"favorite\": False,\n  \"fields\": [\n    {\"name\": \"FIELD_1\", \"value\": \"<value>\", \"type\": 1},   # type 1 = hidden\n    {\"name\": \"FIELD_2\", \"value\": \"<value>\", \"type\": 1}\n  ],\n  \"secureNote\": {\"type\": 0}\n}\nprint(json.dumps(item))\nPY\nbw create item \"$(cat /tmp/bw-new.b64)\" --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-new.b64\n```\n\n## Write — Login pattern (single-target SSH/HTTP cred)\n\nFor a credential that's literally \"go to URL X, type username Y, password Z\" (an SSH login, a web app), use a Login item:\n\n```bash\npython3 <<'PY' | bw encode > /tmp/bw-login.b64\nimport json\nitem = {\n  \"organizationId\": None, \"collectionIds\": None,\n  \"folderId\": \"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\",\n  \"type\": 1,                                              # 1 = Login\n  \"name\": \"<host or service name>\",\n  \"notes\": \"\",\n  \"login\": {\n    \"username\": \"<user>\",\n    \"password\": \"<password>\",\n    \"uris\": [{\"match\": None, \"uri\": \"ssh://<host>\"}],\n    \"totp\": None\n  }\n}\nprint(json.dumps(item))\nPY\nbw create item \"$(cat /tmp/bw-login.b64)\" --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-login.b64\n```\n\n## Update an existing item\n\n```bash\n# Get current item JSON\nbw get item \"<id-or-exact-name>\" --session \"$BW_SESSION\" > /tmp/bw-item.json\n\n# Edit the JSON (e.g. via python -c) — change folderId, add a field, etc.\n\n# Encode and push back\ncat /tmp/bw-item.json | bw encode | xargs -I{} bw edit item <item-id> {} --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-item.json\n```\n\nThe `bw edit item` shape mirrors `bw create item` — pass the full edited item JSON, not just the diff.\n\n## Move an existing item into a folder\n\n```bash\nITEM_ID=\"<id>\"\nFOLDER_ID=\"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\"   # private\nbw get item \"$ITEM_ID\" --session \"$BW_SESSION\" \\\n  | python3 -c \"import json,sys; d=json.load(sys.stdin); d['folderId']='$FOLDER_ID'; print(json.dumps(d))\" \\\n  | bw encode \\\n  | xargs -I{} bw edit item \"$ITEM_ID\" {} --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\n```\n\n## Don'ts\n\n1. **Don't surface secret values to the user** — they already have them; echoing them back is unnecessary exposure. After a write, confirm with the item name + field NAMES only, never values.\n2. **Don't write a credential without a folderId.** \"No Folder\" is the default; it's the wrong choice and means somebody (you, future-you, the user) will move it later.\n3. **Don't `bw sync` without `NODE_TLS_REJECT_UNAUTHORIZED=0`** — it fails. The error is \"self-signed certificate\".\n4. **Don't reuse `BW_SESSION` across processes** — it's a per-process secret. Each Bash session unlocks fresh.\n5. **Don't commit `~/.claude/secrets/`** to any repo. It's already in `.gitignore`; double-check before any `git add -A`.\n6. **Don't leave temp `*.b64` or `*.json` files** of unlocked item data sitting in `/tmp` — `rm -f` them at the end of each write block. Even though `/tmp` is wiped on reboot, between now and then they're plaintext.\n7. **Don't write a credential to BW that you found in chat-history or in a file you'll then delete** — the chat may be cached/exported; check whether the user pasted it explicitly or it leaked into context.\n\n## Health checks\n\n```bash\n# Is bw logged in?\nbw status --session \"$BW_SESSION\" | python3 -c \"import json,sys; print(json.load(sys.stdin)['status'])\"\n# → \"unlocked\"\n\n# How many items total\nbw list items --session \"$BW_SESSION\" | python3 -c \"import json,sys; print(len(json.load(sys.stdin)),'items')\"\n\n# How many items per folder\nbw list items --session \"$BW_SESSION\" | python3 -c \"\nimport json,sys,collections\nitems=json.load(sys.stdin)\nfmap={'d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5':'private',\n      '263e645f-08b4-4b6b-b5d9-3d6fe994b415':'shared',\n      'fa7ec305-d8c0-4603-bcb4-248cf5be04ae':'company',\n      None:'(no folder)'}\nc=collections.Counter(fmap.get(i.get('folderId'),'(?)') for i in items)\nfor k,v in c.most_common(): print(f'  {k}: {v}')\"\n```\n\n## Linking from other skills\n\nWhen a sibling skill (e.g. `homelab`, `company-k8s`) needs a credential, it should reference the BW item by name + folder, not embed the value. Example from `homelab`:\n\n> **Mikrotik**: BW item \"Mikrotik CRS812-8DS-2DQ-2DDQ — homelab switch\" (`MIKROTIK_HOST`, `MIKROTIK_USER`, `MIKROTIK_PASSWORD`)\n\nThat way a future read happens from BW (current, rotated values), not from a stale skill file.\n",
+          "body": "# Bitwarden / Vaultwarden access\n\nThe vault is **self-hosted Vaultwarden** at `https://192.168.19.11:8443`, account `peter@tyrion.nl`. Reach it from any host on the homelab LAN or via Tailscale. The Bitwarden CLI (`bw`) is the primary interface — it speaks to Vaultwarden the same way it speaks to bitwarden.com.\n\n## Step 0 — unlock\n\nThe vault is locked by default. To unlock, source the bootstrap env and use `--passwordenv`:\n\n```bash\nset -a\n. ~/.claude/secrets/bw-bootstrap.env\nset +a\nexport NODE_TLS_REJECT_UNAUTHORIZED=0          # self-signed cert\nexport BW_SESSION=$(bw unlock --raw --passwordenv BW_PASSWORD 2>/dev/null)\n```\n\nAfter that, every `bw …` call needs `--session \"$BW_SESSION\"`.\n\n**Important** — the bootstrap file `~/.claude/secrets/bw-bootstrap.env` is gitignored and contains:\n- `BW_CLIENTID` / `BW_CLIENTSECRET` — used by `bw login` for an unattended login (already done; vault is logged in, just locked)\n- `BW_PASSWORD` — the master password, used by `bw unlock --passwordenv BW_PASSWORD`\n- `BW_HOST` — the server URL\n\n**Never echo / print / log / save / display `$BW_PASSWORD`, the session token, or item values** in conversation, logs, or stored files. The bootstrap env file is the secret-of-secrets — anyone with it can decrypt everything. Don't copy it. Don't include its contents in code reviews. Don't paste it into a chat.\n\n**The `NODE_TLS_REJECT_UNAUTHORIZED=0`** is required because the Vaultwarden cert is self-signed. Without it, `bw sync` and `bw create` will fail with \"self-signed certificate\". The lock/unlock works without it because those operations are local-only.\n\n## Folder model — pick the right one on EVERY write\n\nThe vault is organized into three top-level folders. Items have a `folderId` field; setting it correctly is part of saving a secret, not an afterthought.\n\n| Folder | Folder ID | Use for |\n|---|---|---|\n| **`private`** | `d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5` | Personal projects (homelab, family stuff, tyrion70 GitHub repos, personal SaaS like Tremor / ESS / Weekend-Escape-Radar). The user is the only consumer. |\n| **`shared`** | `263e645f-08b4-4b6b-b5d9-3d6fe994b415` | Cross-cutting credentials that span personal AND family use (home Wi-Fi PSK, guest portal password, shared streaming accounts). |\n| **`company`** | `fa7ec305-d8c0-4603-bcb4-248cf5be04ae` | ChainLayer work (GitLab, GCP, k8s, chainlayer.io accounts, Linear, Slack tokens, anything tied to gitlab.com/chainlayer or `peter@chainlayer.io`). |\n\n### Picking the folder\n\nWork backward from \"who else might consume this credential\":\n\n- ChainLayer Linear issue, chainlayer/* GitLab repo, kubectl context, Tailscale tag `tag:chainlayer-*` → **`company`**\n- tyrion70/* GitHub repo, homelab (proxmox/proxmox2/proxmox3/proxmox4), UniFi/Mikrotik/Hetzner, ess-ai-planner, tremor, weekend-escape-radar → **`private`**\n- WLAN PSK, family-facing service, anything Sandra/the kids also use → **`shared`**\n\n### If the context isn't obvious — ASK\n\nDon't guess. The user has been explicit: when unsure, ask which folder. A wrong folder isn't a security incident, but it's annoying to clean up. A 5-second `AskUserQuestion` is much cheaper than a silent default.\n\nTrigger words to ask about:\n- A credential could plausibly serve both work and personal (a generic email, a shared cloud account, an account at chainlayer.io that's actually personal-billed)\n- The project the user is currently `cd`'d into doesn't map cleanly to one of the three\n- The credential is for an external SaaS where the boundary depends on who's paying\n\n## Lookup — common patterns\n\n```bash\n# By name (substring match, case-insensitive)\nbw list items --session \"$BW_SESSION\" --search \"github\"\n\n# Just the names (terse)\nbw list items --session \"$BW_SESSION\" --search \"github\" \\\n  | python3 -c \"import json,sys; [print(x['name']) for x in json.load(sys.stdin)]\"\n\n# A specific custom field on a specific item\nbw get item <id-or-exact-name> --session \"$BW_SESSION\" \\\n  | python3 -c \"\nimport json,sys\nd=json.load(sys.stdin)\nprint({f['name']: f['value'] for f in d.get('fields',[])}.get('UNIFI_API_KEY'))\"\n\n# All items in a given folder\nbw list items --session \"$BW_SESSION\" --folderid d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\n```\n\nFor ad-hoc shell use, prefer `bw get password <name>` and `bw get username <name>` — these print *just the value*, suitable for command substitution:\n\n```bash\nPASS=$(bw get password \"Mikrotik CRS812-8DS-2DQ-2DDQ — homelab switch\" --session \"$BW_SESSION\")\n```\n\nNote: `bw get password` works on Login items. For SecureNotes with hidden custom fields (the pattern we use for multi-value secrets), parse `bw get item` JSON as above.\n\n## Write — SecureNote pattern (multi-value)\n\nFor credentials that come in groups (API URL + API key + multiple shared secrets), a single SecureNote with hidden custom fields keeps them together. This is what the UniFi and Mikrotik items use.\n\n```bash\npython3 <<'PY' | bw encode > /tmp/bw-new.b64\nimport json\nitem = {\n  \"organizationId\": None, \"collectionIds\": None,\n  \"folderId\": \"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\",   # private — pick the right folder ID\n  \"type\": 2,                                              # 2 = SecureNote\n  \"name\": \"<descriptive name with model + role>\",\n  \"notes\": \"Multi-line description. Include source file path if any, the host/IP, and any DON'Ts.\",\n  \"favorite\": False,\n  \"fields\": [\n    {\"name\": \"FIELD_1\", \"value\": \"<value>\", \"type\": 1},   # type 1 = hidden\n    {\"name\": \"FIELD_2\", \"value\": \"<value>\", \"type\": 1}\n  ],\n  \"secureNote\": {\"type\": 0}\n}\nprint(json.dumps(item))\nPY\nbw create item \"$(cat /tmp/bw-new.b64)\" --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-new.b64\n```\n\n## Write — Login pattern (single-target SSH/HTTP cred)\n\nFor a credential that's literally \"go to URL X, type username Y, password Z\" (an SSH login, a web app), use a Login item:\n\n```bash\npython3 <<'PY' | bw encode > /tmp/bw-login.b64\nimport json\nitem = {\n  \"organizationId\": None, \"collectionIds\": None,\n  \"folderId\": \"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\",\n  \"type\": 1,                                              # 1 = Login\n  \"name\": \"<host or service name>\",\n  \"notes\": \"\",\n  \"login\": {\n    \"username\": \"<user>\",\n    \"password\": \"<password>\",\n    \"uris\": [{\"match\": None, \"uri\": \"ssh://<host>\"}],\n    \"totp\": None\n  }\n}\nprint(json.dumps(item))\nPY\nbw create item \"$(cat /tmp/bw-login.b64)\" --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-login.b64\n```\n\n## Update an existing item\n\n```bash\n# Get current item JSON\nbw get item \"<id-or-exact-name>\" --session \"$BW_SESSION\" > /tmp/bw-item.json\n\n# Edit the JSON (e.g. via python -c) — change folderId, add a field, etc.\n\n# Encode and push back\ncat /tmp/bw-item.json | bw encode | xargs -I{} bw edit item <item-id> {} --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\nrm -f /tmp/bw-item.json\n```\n\nThe `bw edit item` shape mirrors `bw create item` — pass the full edited item JSON, not just the diff.\n\n## Move an existing item into a folder\n\n```bash\nITEM_ID=\"<id>\"\nFOLDER_ID=\"d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5\"   # private\nbw get item \"$ITEM_ID\" --session \"$BW_SESSION\" \\\n  | python3 -c \"import json,sys; d=json.load(sys.stdin); d['folderId']='$FOLDER_ID'; print(json.dumps(d))\" \\\n  | bw encode \\\n  | xargs -I{} bw edit item \"$ITEM_ID\" {} --session \"$BW_SESSION\"\nbw sync --session \"$BW_SESSION\"\n```\n\n## Don'ts\n\n1. **Don't surface secret values to the user** — they already have them; echoing them back is unnecessary exposure. After a write, confirm with the item name + field NAMES only, never values.\n2. **Don't write a credential without a folderId.** \"No Folder\" is the default; it's the wrong choice and means somebody (you, future-you, the user) will move it later.\n3. **Don't `bw sync` without `NODE_TLS_REJECT_UNAUTHORIZED=0`** — it fails. The error is \"self-signed certificate\".\n4. **Don't reuse `BW_SESSION` across processes** — it's a per-process secret. Each Bash session unlocks fresh.\n5. **Don't commit `~/.claude/secrets/`** to any repo. It's already in `.gitignore`; double-check before any `git add -A`.\n6. **Don't leave temp `*.b64` or `*.json` files** of unlocked item data sitting in `/tmp` — `rm -f` them at the end of each write block. Even though `/tmp` is wiped on reboot, between now and then they're plaintext.\n7. **Don't write a credential to BW that you found in chat-history or in a file you'll then delete** — the chat may be cached/exported; check whether the user pasted it explicitly or it leaked into context.\n\n## Health checks\n\n```bash\n# Is bw logged in?\nbw status --session \"$BW_SESSION\" | python3 -c \"import json,sys; print(json.load(sys.stdin)['status'])\"\n# → \"unlocked\"\n\n# How many items total\nbw list items --session \"$BW_SESSION\" | python3 -c \"import json,sys; print(len(json.load(sys.stdin)),'items')\"\n\n# How many items per folder\nbw list items --session \"$BW_SESSION\" | python3 -c \"\nimport json,sys,collections\nitems=json.load(sys.stdin)\nfmap={'d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5':'private',\n      '263e645f-08b4-4b6b-b5d9-3d6fe994b415':'shared',\n      'fa7ec305-d8c0-4603-bcb4-248cf5be04ae':'company',\n      None:'(no folder)'}\nc=collections.Counter(fmap.get(i.get('folderId'),'(?)') for i in items)\nfor k,v in c.most_common(): print(f'  {k}: {v}')\"\n```\n\n## Linking from other skills\n\nWhen a sibling skill (e.g. `homelab`, `company-k8s`) needs a credential, it should reference the BW item by name + folder, not embed the value. Example from `homelab`:\n\n> **Mikrotik**: BW item \"Mikrotik CRS812-8DS-2DQ-2DDQ — homelab switch\" (`MIKROTIK_HOST`, `MIKROTIK_USER`, `MIKROTIK_PASSWORD`)\n\nThat way a future read happens from BW (current, rotated values), not from a stale skill file.\n\n### Known self-rotating item\n\nThe group PAT item **\"ChainLayer · GitLab — group PAT\"** (`company` folder) is a\n**SecureNote** whose token lives in a **hidden custom field named `PAT`** (parse\nthe `fields` array — there is no `login.password`). It carries the `self_rotate`\nGitLab scope. An agent that finds the token expired or near-expiry can rotate it\nvia GitLab's `POST /personal_access_tokens/self/rotate` endpoint and **write the\nnew value back** into this item's `PAT` field + `bw sync`. See the **`git-mr`**\nskill for the full procedure and the proactive-only caveat.\n",
           "files": {}
         }
       },
@@ -4841,13 +5157,13 @@
         "repo_state": {
           "name": "git-pr",
           "description": "Ship a PRIVATE code change as a GitHub PR. Use whenever committing, pushing, or creating a pull request in a github.com/tyrion70 repo. Enforces Multica-issue-first, issue-derived branch names, rebase-before-push, SSH-signed commits, and linking the PR back to the Multica issue. For company gitlab.com/chainlayer MRs use the `git-mr` skill instead.",
-          "body": "# Shipping changes — GitHub PR workflow (private)\n\nPrivate side only: `github.com/tyrion70/*` repos, shipped via `gh` PRs.\n**Company `gitlab.com/chainlayer/*` repos use the `git-mr` skill** — different\nforge, CLI, and tracker. If `git remote get-url origin` is neither, ask the user.\n\nCompanion to the `multica-private` skill: that one decides *which issue*, this one\ndecides *how the change lands*. Private/personal work is tracked in **Multica**,\nnot Linear (the `linear-private` skill is just a guardrail that redirects any\nprivate-Linear attempt to Multica). If no Multica issue exists yet, **invoke the\n`multica-private` skill first** — issue-before-code, no exceptions unless the user\nexplicitly waives it (then note the waiver in the PR description). Some private\nprojects deliberately use no tracker at all — respect the project's notes if so.\n\n## Step 1 — confirm the remote is private\n\n```bash\ngit remote get-url origin   # must be github.com/tyrion70/*\n```\n\n| Remote | Forge | CLI | Tracker | Link-back |\n|---|---|---|---|---|\n| `github.com/tyrion70/*` | GitHub | `gh` | Multica (`multica-private` skill) | link & close in Multica |\n| `gitlab.com/chainlayer/*` | → use the **`git-mr`** skill | | | |\n| anything else | **ask the user** | | | |\n\n## Step 2 — pre-flight (mandatory, every push)\n\n1. **Git identity**: `git config user.email` must be `peter@chainlayer.io`.\n   Fix repo-locally if wrong — never commit as a hostname email.\n2. **Fetch**: `git fetch origin main`.\n3. **Existing PR state** for the branch:\n   - `gh pr list --head <branch>`\n   - PR **open** → rebase on `origin/main`, then push.\n   - PR **merged** → do NOT push to the old branch; new branch off\n     `origin/main` with a suffix (`-cleanup`, `-v2`).\n   - none → continue.\n4. **Branch name**: from the Multica issue — use the issue identifier as the\n   slug (e.g. `peter/tre-58-<slug>`). New branches start from `origin/main`,\n   never from local main: `git checkout -b <branch> origin/main`.\n5. **Rebase right before EVERY push** — including the first one. The sequence\n   is always:\n\n   ```bash\n   git fetch origin main\n   git rebase origin/main\n   git push -u origin <branch>\n   ```\n\n   PRs behind main cause conflicts and block merging.\n\n## Step 3 — commits\n\n- Conventional commits: `<type>: <description>` (feat, fix, refactor, docs,\n  test, chore, perf, ci). Short and to the point — don't over-explain.\n- **No `Co-Authored-By: Claude` lines.** Peter wants only his own name.\n- **Signing**: commits are SSH-signed with `~/.ssh/id_ed25519_signing`\n  (`gpg.format ssh`, `commit.gpgsign true`); auth uses `~/.ssh/id_ed25519_peter`.\n  Keep the roles separate — full setup in the **ssh** skill. If\n  `git log --show-signature` isn't `Good`, fix the signing config there rather\n  than committing unsigned.\n- Never commit secrets; human-held credentials live in the vault (use the\n  **bitwarden** skill — `private` folder), local caches only in the gitignored\n  `~/.claude/secrets/`.\n\n## Step 4 — GitHub PR\n\n```bash\ngit push -u origin <branch>\ngh pr create --title \"<type>: <title>\" --body \"$(cat <<'EOF'\n## Summary\n<1-2 sentences>\n\nTracked in Multica: <issue identifier / URL>\nEOF\n)\"\n```\n\nThere is **no Linear closing magic word** for private work — the tracking issue\nlives in Multica, not Linear. A GitHub-side `Closes #NN` may still be used to\nclose an issue in the *code* repo itself, when one exists.\n\n## After the PR exists\n\n- Link the PR URL back on the Multica issue (`multica issue comment add`, and\n  `pr_url` metadata if a future run will read it) and report it to the user.\n- For squad-managed Multica issues, do not leave the issue assigned to the\n  individual coder. After the result comment, leave the status in `in_review`\n  unless the role/user says otherwise, then assign the issue back to the owning\n  squad/team so the standing router wakes and sends it to QA/deploy. Use the\n  squad id/name from the issue, project notes, or runtime context; if no owning\n  squad is clear, state that instead of guessing. Do not @mention QA as a\n  substitute unless the user explicitly asked for a direct mention.\n- Close the Multica issue (`multica issue status <id> done`) when the PR merges.\n- After the branch merges: check out main, drop stale stashes.\n\n## When to ask the user (explicit list)\n\n- Remote is not `github.com/tyrion70` (and not `gitlab.com/chainlayer`, which\n  is the `git-mr` skill's job).\n- Any force-push, push directly to `main`/protected branches, or history rewrite.\n- Closing/merging someone else's PR, or deleting branches you didn't create.\n- The user wants to skip the Multica issue (confirm once, note it in the PR).\n",
+          "body": "# Shipping changes — GitHub PR workflow (private)\n\nPrivate side only: `github.com/tyrion70/*` repos, shipped via `gh` PRs.\n**Company `gitlab.com/chainlayer/*` repos use the `git-mr` skill** — different\nforge, CLI, and tracker. If `git remote get-url origin` is neither, ask the user.\n\nCompanion to the `multica-private` skill: that one decides *which issue*, this one\ndecides *how the change lands*. Private/personal work is tracked in **Multica**,\nnot Linear (the `linear-private` skill is just a guardrail that redirects any\nprivate-Linear attempt to Multica). If no Multica issue exists yet, **invoke the\n`multica-private` skill first** — issue-before-code, no exceptions unless the user\nexplicitly waives it (then note the waiver in the PR description). Some private\nprojects deliberately use no tracker at all — respect the project's notes if so.\n\n## Step 1 — confirm the remote is private\n\n```bash\ngit remote get-url origin   # must be github.com/tyrion70/*\n```\n\n| Remote | Forge | CLI | Tracker | Link-back |\n|---|---|---|---|---|\n| `github.com/tyrion70/*` | GitHub | `gh` | Multica (`multica-private` skill) | link & close in Multica |\n| `gitlab.com/chainlayer/*` | → use the **`git-mr`** skill | | | |\n| anything else | **ask the user** | | | |\n\n## Step 2 — pre-flight (mandatory, every push)\n\n1. **Git identity**: `git config user.email` must be `peter@chainlayer.io`.\n   Fix repo-locally if wrong — never commit as a hostname email.\n2. **Fetch**: `git fetch origin main`.\n3. **Existing PR state** for the branch:\n   - `gh pr list --head <branch>`\n   - PR **open** → rebase on `origin/main`, then push.\n   - PR **merged** → do NOT push to the old branch; new branch off\n     `origin/main` with a suffix (`-cleanup`, `-v2`).\n   - none → continue.\n4. **Branch name**: from the Multica issue — use the issue identifier as the\n   slug (e.g. `peter/tre-58-<slug>`). New branches start from `origin/main`,\n   never from local main: `git checkout -b <branch> origin/main`.\n5. **Rebase right before EVERY push** — including the first one. The sequence\n   is always:\n\n   ```bash\n   git fetch origin main\n   git rebase origin/main\n   git push -u origin <branch>\n   ```\n\n   PRs behind main cause conflicts and block merging.\n\n## Step 3 — commits\n\n- Conventional commits: `<type>: <description>` (feat, fix, refactor, docs,\n  test, chore, perf, ci). Short and to the point — don't over-explain.\n- **No `Co-Authored-By: Claude` lines.** Peter wants only his own name.\n- **Signing**: commits are SSH-signed with `~/.ssh/id_ed25519_signing`\n  (`gpg.format ssh`, `commit.gpgsign true`); auth uses `~/.ssh/id_ed25519_peter`.\n  Keep the roles separate — full setup in the **ssh** skill. If\n  `git log --show-signature` isn't `Good`, fix the signing config there rather\n  than committing unsigned.\n- Never commit secrets; human-held credentials live in the vault (use the\n  **bitwarden** skill — `private` folder), local caches only in the gitignored\n  `~/.claude/secrets/`.\n\n## Step 4 — GitHub PR\n\n```bash\ngit push -u origin <branch>\ngh pr create --title \"<type>: <title>\" --body \"$(cat <<'EOF'\n## Summary\n<1-2 sentences>\n\nTracked in Multica: <issue identifier / URL>\nEOF\n)\"\n```\n\nThere is **no Linear closing magic word** for private work — the tracking issue\nlives in Multica, not Linear. A GitHub-side `Closes #NN` may still be used to\nclose an issue in the *code* repo itself, when one exists.\n\n## Approval gates — never self-approve (human-only)\n\nIf a PR carries a **required-approval gate** (a GitHub branch-protection rule\nrequiring N approving reviews / required reviewers), an agent must **not**\napprove it — not its own PR, and not another agent's (no \"cross-approval\").\nThe gate exists to enforce a second-party **code review**, and no agent stands\nin for that.\n\n- **Route the approval to a human via the Tech Lead.** A human clicking\n  **Approve** in GitHub — or explicitly telling you \"merge it\" — satisfies the\n  gate. Nothing an agent does can.\n- **A verbal go-live \"go\" (or \"go, direct\") authorizes the _deploy_, not the\n  code-review gate.** It does not let you approve your own or another agent's\n  PR, and it does not let you bypass a required reviewer. If a go-live is\n  blocked only on the approval, surface that to the Tech Lead and set the\n  issue `blocked` for Peter — do **not** submit an approving review yourself.\n\n(Set after CHA-719, where a fleet agent self-approved a required-approval MR\nunder a verbal \"Go, direct\". Codified in CHA-779.)\n\n## After the PR exists\n\n- Link the PR URL back on the Multica issue (`multica issue comment add`, and\n  `pr_url` metadata if a future run will read it) and report it to the user.\n- For squad-managed Multica issues, do not leave the issue assigned to the\n  individual coder. After the result comment, leave the status in `in_review`\n  unless the role/user says otherwise, then assign the issue back to the owning\n  squad/team so the standing router wakes and sends it to QA/deploy. Use the\n  squad id/name from the issue, project notes, or runtime context; if no owning\n  squad is clear, state that instead of guessing. Do not @mention QA as a\n  substitute unless the user explicitly asked for a direct mention.\n- Close the Multica issue (`multica issue status <id> done`) when the PR merges.\n- After the branch merges: check out main, drop stale stashes.\n\n## When to ask the user (explicit list)\n\n- Remote is not `github.com/tyrion70` (and not `gitlab.com/chainlayer`, which\n  is the `git-mr` skill's job).\n- Any force-push, push directly to `main`/protected branches, or history rewrite.\n- Closing/merging someone else's PR, or deleting branches you didn't create.\n- A PR carries a **required-approval gate** — never self-approve or\n  cross-approve; route to a human via the Tech Lead (see \"Approval gates\" above).\n- The user wants to skip the Multica issue (confirm once, note it in the PR).\n",
           "files": {}
         },
         "multica_state": {
           "name": "git-pr",
           "description": "Ship a PRIVATE code change as a GitHub PR. Use whenever committing, pushing, or creating a pull request in a github.com/tyrion70 repo. Enforces Multica-issue-first, issue-derived branch names, rebase-before-push, SSH-signed commits, and linking the PR back to the Multica issue. For company gitlab.com/chainlayer MRs use the `git-mr` skill instead.",
-          "body": "# Shipping changes — GitHub PR workflow (private)\n\nPrivate side only: `github.com/tyrion70/*` repos, shipped via `gh` PRs.\n**Company `gitlab.com/chainlayer/*` repos use the `git-mr` skill** — different\nforge, CLI, and tracker. If `git remote get-url origin` is neither, ask the user.\n\nCompanion to the `multica-private` skill: that one decides *which issue*, this one\ndecides *how the change lands*. Private/personal work is tracked in **Multica**,\nnot Linear (the `linear-private` skill is just a guardrail that redirects any\nprivate-Linear attempt to Multica). If no Multica issue exists yet, **invoke the\n`multica-private` skill first** — issue-before-code, no exceptions unless the user\nexplicitly waives it (then note the waiver in the PR description). Some private\nprojects deliberately use no tracker at all — respect the project's notes if so.\n\n## Step 1 — confirm the remote is private\n\n```bash\ngit remote get-url origin   # must be github.com/tyrion70/*\n```\n\n| Remote | Forge | CLI | Tracker | Link-back |\n|---|---|---|---|---|\n| `github.com/tyrion70/*` | GitHub | `gh` | Multica (`multica-private` skill) | link & close in Multica |\n| `gitlab.com/chainlayer/*` | → use the **`git-mr`** skill | | | |\n| anything else | **ask the user** | | | |\n\n## Step 2 — pre-flight (mandatory, every push)\n\n1. **Git identity**: `git config user.email` must be `peter@chainlayer.io`.\n   Fix repo-locally if wrong — never commit as a hostname email.\n2. **Fetch**: `git fetch origin main`.\n3. **Existing PR state** for the branch:\n   - `gh pr list --head <branch>`\n   - PR **open** → rebase on `origin/main`, then push.\n   - PR **merged** → do NOT push to the old branch; new branch off\n     `origin/main` with a suffix (`-cleanup`, `-v2`).\n   - none → continue.\n4. **Branch name**: from the Multica issue — use the issue identifier as the\n   slug (e.g. `peter/tre-58-<slug>`). New branches start from `origin/main`,\n   never from local main: `git checkout -b <branch> origin/main`.\n5. **Rebase right before EVERY push** — including the first one. The sequence\n   is always:\n\n   ```bash\n   git fetch origin main\n   git rebase origin/main\n   git push -u origin <branch>\n   ```\n\n   PRs behind main cause conflicts and block merging.\n\n## Step 3 — commits\n\n- Conventional commits: `<type>: <description>` (feat, fix, refactor, docs,\n  test, chore, perf, ci). Short and to the point — don't over-explain.\n- **No `Co-Authored-By: Claude` lines.** Peter wants only his own name.\n- **Signing**: commits are SSH-signed with `~/.ssh/id_ed25519_signing`\n  (`gpg.format ssh`, `commit.gpgsign true`); auth uses `~/.ssh/id_ed25519_peter`.\n  Keep the roles separate — full setup in the **ssh** skill. If\n  `git log --show-signature` isn't `Good`, fix the signing config there rather\n  than committing unsigned.\n- Never commit secrets; human-held credentials live in the vault (use the\n  **bitwarden** skill — `private` folder), local caches only in the gitignored\n  `~/.claude/secrets/`.\n\n## Step 4 — GitHub PR\n\n```bash\ngit push -u origin <branch>\ngh pr create --title \"<type>: <title>\" --body \"$(cat <<'EOF'\n## Summary\n<1-2 sentences>\n\nTracked in Multica: <issue identifier / URL>\nEOF\n)\"\n```\n\nThere is **no Linear closing magic word** for private work — the tracking issue\nlives in Multica, not Linear. A GitHub-side `Closes #NN` may still be used to\nclose an issue in the *code* repo itself, when one exists.\n\n## After the PR exists\n\n- Link the PR URL back on the Multica issue (`multica issue comment add`, and\n  `pr_url` metadata if a future run will read it) and report it to the user.\n- For squad-managed Multica issues, do not leave the issue assigned to the\n  individual coder. After the result comment, leave the status in `in_review`\n  unless the role/user says otherwise, then assign the issue back to the owning\n  squad/team so the standing router wakes and sends it to QA/deploy. Use the\n  squad id/name from the issue, project notes, or runtime context; if no owning\n  squad is clear, state that instead of guessing. Do not @mention QA as a\n  substitute unless the user explicitly asked for a direct mention.\n- Close the Multica issue (`multica issue status <id> done`) when the PR merges.\n- After the branch merges: check out main, drop stale stashes.\n\n## When to ask the user (explicit list)\n\n- Remote is not `github.com/tyrion70` (and not `gitlab.com/chainlayer`, which\n  is the `git-mr` skill's job).\n- Any force-push, push directly to `main`/protected branches, or history rewrite.\n- Closing/merging someone else's PR, or deleting branches you didn't create.\n- The user wants to skip the Multica issue (confirm once, note it in the PR).\n",
+          "body": "# Shipping changes — GitHub PR workflow (private)\n\nPrivate side only: `github.com/tyrion70/*` repos, shipped via `gh` PRs.\n**Company `gitlab.com/chainlayer/*` repos use the `git-mr` skill** — different\nforge, CLI, and tracker. If `git remote get-url origin` is neither, ask the user.\n\nCompanion to the `multica-private` skill: that one decides *which issue*, this one\ndecides *how the change lands*. Private/personal work is tracked in **Multica**,\nnot Linear (the `linear-private` skill is just a guardrail that redirects any\nprivate-Linear attempt to Multica). If no Multica issue exists yet, **invoke the\n`multica-private` skill first** — issue-before-code, no exceptions unless the user\nexplicitly waives it (then note the waiver in the PR description). Some private\nprojects deliberately use no tracker at all — respect the project's notes if so.\n\n## Step 1 — confirm the remote is private\n\n```bash\ngit remote get-url origin   # must be github.com/tyrion70/*\n```\n\n| Remote | Forge | CLI | Tracker | Link-back |\n|---|---|---|---|---|\n| `github.com/tyrion70/*` | GitHub | `gh` | Multica (`multica-private` skill) | link & close in Multica |\n| `gitlab.com/chainlayer/*` | → use the **`git-mr`** skill | | | |\n| anything else | **ask the user** | | | |\n\n## Step 2 — pre-flight (mandatory, every push)\n\n1. **Git identity**: `git config user.email` must be `peter@chainlayer.io`.\n   Fix repo-locally if wrong — never commit as a hostname email.\n2. **Fetch**: `git fetch origin main`.\n3. **Existing PR state** for the branch:\n   - `gh pr list --head <branch>`\n   - PR **open** → rebase on `origin/main`, then push.\n   - PR **merged** → do NOT push to the old branch; new branch off\n     `origin/main` with a suffix (`-cleanup`, `-v2`).\n   - none → continue.\n4. **Branch name**: from the Multica issue — use the issue identifier as the\n   slug (e.g. `peter/tre-58-<slug>`). New branches start from `origin/main`,\n   never from local main: `git checkout -b <branch> origin/main`.\n5. **Rebase right before EVERY push** — including the first one. The sequence\n   is always:\n\n   ```bash\n   git fetch origin main\n   git rebase origin/main\n   git push -u origin <branch>\n   ```\n\n   PRs behind main cause conflicts and block merging.\n\n## Step 3 — commits\n\n- Conventional commits: `<type>: <description>` (feat, fix, refactor, docs,\n  test, chore, perf, ci). Short and to the point — don't over-explain.\n- **No `Co-Authored-By: Claude` lines.** Peter wants only his own name.\n- **Signing**: commits are SSH-signed with `~/.ssh/id_ed25519_signing`\n  (`gpg.format ssh`, `commit.gpgsign true`); auth uses `~/.ssh/id_ed25519_peter`.\n  Keep the roles separate — full setup in the **ssh** skill. If\n  `git log --show-signature` isn't `Good`, fix the signing config there rather\n  than committing unsigned.\n- Never commit secrets; human-held credentials live in the vault (use the\n  **bitwarden** skill — `private` folder), local caches only in the gitignored\n  `~/.claude/secrets/`.\n\n## Step 4 — GitHub PR\n\n```bash\ngit push -u origin <branch>\ngh pr create --title \"<type>: <title>\" --body \"$(cat <<'EOF'\n## Summary\n<1-2 sentences>\n\nTracked in Multica: <issue identifier / URL>\nEOF\n)\"\n```\n\nThere is **no Linear closing magic word** for private work — the tracking issue\nlives in Multica, not Linear. A GitHub-side `Closes #NN` may still be used to\nclose an issue in the *code* repo itself, when one exists.\n\n## Approval gates — never self-approve (human-only)\n\nIf a PR carries a **required-approval gate** (a GitHub branch-protection rule\nrequiring N approving reviews / required reviewers), an agent must **not**\napprove it — not its own PR, and not another agent's (no \"cross-approval\").\nThe gate exists to enforce a second-party **code review**, and no agent stands\nin for that.\n\n- **Route the approval to a human via the Tech Lead.** A human clicking\n  **Approve** in GitHub — or explicitly telling you \"merge it\" — satisfies the\n  gate. Nothing an agent does can.\n- **A verbal go-live \"go\" (or \"go, direct\") authorizes the _deploy_, not the\n  code-review gate.** It does not let you approve your own or another agent's\n  PR, and it does not let you bypass a required reviewer. If a go-live is\n  blocked only on the approval, surface that to the Tech Lead and set the\n  issue `blocked` for Peter — do **not** submit an approving review yourself.\n\n(Set after CHA-719, where a fleet agent self-approved a required-approval MR\nunder a verbal \"Go, direct\". Codified in CHA-779.)\n\n## After the PR exists\n\n- Link the PR URL back on the Multica issue (`multica issue comment add`, and\n  `pr_url` metadata if a future run will read it) and report it to the user.\n- For squad-managed Multica issues, do not leave the issue assigned to the\n  individual coder. After the result comment, leave the status in `in_review`\n  unless the role/user says otherwise, then assign the issue back to the owning\n  squad/team so the standing router wakes and sends it to QA/deploy. Use the\n  squad id/name from the issue, project notes, or runtime context; if no owning\n  squad is clear, state that instead of guessing. Do not @mention QA as a\n  substitute unless the user explicitly asked for a direct mention.\n- Close the Multica issue (`multica issue status <id> done`) when the PR merges.\n- After the branch merges: check out main, drop stale stashes.\n\n## When to ask the user (explicit list)\n\n- Remote is not `github.com/tyrion70` (and not `gitlab.com/chainlayer`, which\n  is the `git-mr` skill's job).\n- Any force-push, push directly to `main`/protected branches, or history rewrite.\n- Closing/merging someone else's PR, or deleting branches you didn't create.\n- A PR carries a **required-approval gate** — never self-approve or\n  cross-approve; route to a human via the Tech Lead (see \"Approval gates\" above).\n- The user wants to skip the Multica issue (confirm once, note it in the PR).\n",
           "files": {}
         }
       },
@@ -4957,13 +5273,13 @@
         "repo_state": {
           "name": "ssh",
           "description": "Peter's SSH key setup — which key does what (auth/login vs signing), how to reach private homelab vs company hosts, git auth to GitHub/GitLab, and SSH commit signing. Use whenever SSHing to a machine, cloning/pushing over SSH, configuring git auth or commit signing, or wiring keys onto a new host. Keys live in the vault `shared` folder.",
-          "body": "# SSH keys & access\n\nTwo purpose-built ed25519 keys (plus YubiKey FIDO2 fallbacks). Keep their\nroles separate — auth/login is one key, signing is another.\n\n| Key | Role | Used for |\n|---|---|---|\n| `~/.ssh/id_ed25519_peter` (`peter@chainlayer`) | **auth + login** | SSH login to machines (private homelab + company), and git auth to GitHub (tyrion70) + GitLab (gitlab.com/chainlayer) |\n| `~/.ssh/id_ed25519_signing` (`git-signing`) | **signing** | SSH-format git commit/tag signing. (Also accepted for GitHub/GitLab auth, but its job is signing.) |\n| `~/.ssh/id_ed25519_sk_yk_*` | fallback | FIDO2 YubiKey keys for other/ad-hoc hosts (PIN-gated) |\n\nBoth git keys are registered on GitHub **and** GitLab. Confirmed working:\n`id_ed25519_peter` → GitHub/GitLab auth + machine login (private + company);\n`id_ed25519_signing` → produces a Good commit signature.\n\n## Reaching machines\n\n- **Private homelab** (Proxmox VMs): `192.168.16/17/18/19.x`, user `peter` or\n  `root`, **port 22**, key `id_ed25519_peter`. See the `homelab` skill.\n- **Company hosts**: `*.chosts.io`, user `peter`, **port 2822**, key\n  `id_ed25519_peter`. Not reachable from the laptop's plain network the same\n  way — mind the non-standard port.\n\n`~/.ssh/config` should carry these so you don't pass flags by hand:\n\n```\nHost *.chosts.io\n    User peter\n    Port 2822\n    IdentityFile ~/.ssh/id_ed25519_peter\n    IdentitiesOnly yes\n\nHost github.com gitlab.com\n    IdentityFile ~/.ssh/id_ed25519_peter\n    IdentitiesOnly yes\n```\n\n## Git commit signing\n\nSSH-format signing with the dedicated signing key:\n\n```bash\ngit config --global gpg.format ssh\ngit config --global user.signingkey ~/.ssh/id_ed25519_signing.pub\ngit config --global commit.gpgsign true\n# verify locally: add your pubkey to an allowed-signers file\ngit config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers\n#   ~/.ssh/allowed_signers:  peter@chainlayer.io <contents of id_ed25519_signing.pub>\n```\n\n`git log --show-signature` should report `Good \"git\" signature for\npeter@chainlayer.io`. Add the signing key to GitHub/GitLab as a **signing**\nkey (separate from the auth key) for the green \"Verified\" badge.\n\n## Keys in the vault\n\nBoth private keys are stored in the Bitwarden **`shared`** folder (see the\n`bitwarden` skill) as file-type items, so any context (private or company)\ncan use them:\n\n- `ssh/id_ed25519_peter`   → `~/.ssh/id_ed25519_peter` (mode 600)\n- `ssh/id_ed25519_signing` → `~/.ssh/id_ed25519_signing` (mode 600)\n\nTo wire a fresh host: write each key to its path (`chmod 600`), drop the\n`~/.ssh/config` snippet above, and `chmod 644` the regenerated `.pub`\n(`ssh-keygen -y -f <key> > <key>.pub`).\n\n## Don'ts\n\n- Don't use the signing key as the primary auth identity in config, or the\n  auth key for signing — keep the roles split.\n- Don't commit private keys to git; they live in the vault and `~/.ssh` only.\n- Don't forget `IdentitiesOnly yes` — without it SSH may offer the YubiKey\n  keys first and trigger spurious PIN prompts.\n",
+          "body": "# SSH keys & access\n\nTwo purpose-built ed25519 keys (plus YubiKey FIDO2 fallbacks). Keep their\nroles separate — auth/login is one key, signing is another.\n\n| Key | Role | Used for |\n|---|---|---|\n| `~/.ssh/id_ed25519_peter` (`peter@chainlayer`) | **auth + login** | SSH login to machines (private homelab + company), and git auth to **GitHub** (tyrion70) |\n| `~/.ssh/id_ed25519_signing` (`git-signing`) | **signing** (+ GitLab auth) | SSH-format git commit/tag signing. **Also the key GitLab accepts for auth** (see note below). |\n| `~/.ssh/id_ed25519_sk_yk_*` | fallback | FIDO2 YubiKey keys for other/ad-hoc hosts (PIN-gated) |\n\nConfirmed working (multica-02 runtime, 2026-06-29):\n- **GitHub** auth → `id_ed25519_peter` (`ssh -T git@github.com` → \"Hi tyrion70!\").\n- **GitLab** auth → `id_ed25519_signing` only. `id_ed25519_peter` is **rejected**\n  by gitlab.com (`Permission denied (publickey)`) — it is not (or no longer)\n  registered there. Don't assume the auth key works for both forges.\n- `id_ed25519_signing` → produces a Good commit signature.\n\n> **GitLab auth ≠ GitLab repo access for the `chainlayer` group.** Authenticating\n> is necessary but not sufficient — the group enforces SAML SSO on git transport.\n> See \"Git over SSO-enforced GitLab groups\" below before trying to clone/fetch a\n> `gitlab.com/chainlayer/*` repo.\n\n## Reaching machines\n\n- **Private homelab** (Proxmox VMs): `192.168.16/17/18/19.x`, user `peter` or\n  `root`, **port 22**, key `id_ed25519_peter`. See the `homelab` skill.\n- **Company hosts**: `*.chosts.io`, user `peter`, **port 2822**, key\n  `id_ed25519_peter`. Not reachable from the laptop's plain network the same\n  way — mind the non-standard port.\n\n`~/.ssh/config` should carry these so you don't pass flags by hand:\n\n```\nHost *.chosts.io\n    User peter\n    Port 2822\n    IdentityFile ~/.ssh/id_ed25519_peter\n    IdentitiesOnly yes\n\nHost github.com\n    IdentityFile ~/.ssh/id_ed25519_peter\n    IdentitiesOnly yes\n\n# GitLab accepts the signing key for auth, NOT id_ed25519_peter.\nHost gitlab.com\n    IdentityFile ~/.ssh/id_ed25519_signing\n    IdentitiesOnly yes\n```\n\n## Git over SSO-enforced GitLab groups (chainlayer)\n\nThe `gitlab.com/chainlayer` group enforces **SAML SSO on git transport**. This\nbites hard and has caught us before, so know it up front:\n\n- A fresh `git clone`/`git fetch` of any `chainlayer/*` repo over **SSH _or_\n  HTTPS** fails with `remote: Cannot find valid SSO session. Please login via\n  your group's SSO at …` (HTTP 403) **unless there is an active browser SSO\n  session** for the account behind the credential. A valid SSH key or a valid\n  group PAT is **not** enough on its own.\n- This applies to **every credential available headlessly**: the SSH keys, the\n  vault group PAT (`ChainLayer · GitLab — group PAT`), and even\n  `multica repo checkout` — they all resolve to the same SSO-gated GitLab\n  account. An agent cannot complete the browser SAML flow, so it cannot\n  establish the session itself.\n- `multica repo checkout` only succeeds for repos that were **already synced**\n  into the workspace's bare mirrors while a session was live. Adding a new repo\n  (`multica repo add`) and then checking it out triggers a fresh fetch → SSO\n  403. So \"SSH-clone any repo regardless of workspace config\" is **false** for\n  this group.\n- **What still works headlessly:** the GitLab **REST API** with the group PAT\n  (e.g. `GET /projects/:id/repository/files/<path>/raw`). Use it to *read*\n  source when you only need to inspect a repo you can't clone.\n- **The group PAT has `self_rotate` — keep it alive yourself.** The PAT\n  (`ChainLayer · GitLab — group PAT`, Bitwarden `company` folder) carries the\n  `self_rotate` scope. Rotate it with\n  `POST https://gitlab.com/api/v4/personal_access_tokens/self/rotate` using the\n  current token as `PRIVATE-TOKEN`, then **write the new token back** into\n  Bitwarden (the item is a SecureNote; the token is in its hidden `PAT` field)\n  and `bw sync`. See the **`git-mr`** skill for the full procedure and the\n  important caveat (only works while still valid — rotate proactively).\n- **To actually clone/push** a `chainlayer/*` repo from an agent runtime, a human\n  must refresh the group's SSO session for the workspace credential (or the repo\n  must be pre-synced). Surface this as a blocker rather than burning time on key\n  permutations — none of them defeat SSO.\n\n**Rule (Peter):** IF you encounter `Cannot find valid SSO session`, prompt Peter\nwith the precise url so he can login UNLESS you have a different way to\ncircumvent the SSO issue.\n\nThe \"precise url\" is the `https://gitlab.com/groups/chainlayer/-/saml/sso?token=…`\nlink printed in the `remote:` error — surface that exact URL to Peter, don't\nparaphrase it. (A \"different way to circumvent\" means something that gets the\nwork done without his login, e.g. reading the file you need via the REST API\nabove — not another SSH-key/PAT permutation, which won't work.)\n\n(GitHub `tyrion70/*` repos have no such enforcement — clone/push works with\n`id_ed25519_peter` directly.)\n\n## Git commit signing\n\nSSH-format signing with the dedicated signing key:\n\n```bash\ngit config --global gpg.format ssh\ngit config --global user.signingkey ~/.ssh/id_ed25519_signing.pub\ngit config --global commit.gpgsign true\n# verify locally: add your pubkey to an allowed-signers file\ngit config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers\n#   ~/.ssh/allowed_signers:  peter@chainlayer.io <contents of id_ed25519_signing.pub>\n```\n\n`git log --show-signature` should report `Good \"git\" signature for\npeter@chainlayer.io`. Add the signing key to GitHub/GitLab as a **signing**\nkey (separate from the auth key) for the green \"Verified\" badge.\n\n## Keys in the vault\n\nBoth private keys are stored in the Bitwarden **`shared`** folder (see the\n`bitwarden` skill) as file-type items, so any context (private or company)\ncan use them:\n\n- `ssh/id_ed25519_peter`   → `~/.ssh/id_ed25519_peter` (mode 600)\n- `ssh/id_ed25519_signing` → `~/.ssh/id_ed25519_signing` (mode 600)\n\nTo wire a fresh host: write each key to its path (`chmod 600`), drop the\n`~/.ssh/config` snippet above, and `chmod 644` the regenerated `.pub`\n(`ssh-keygen -y -f <key> > <key>.pub`).\n\n## Don'ts\n\n- Don't use the signing key as the primary auth identity in config, or the\n  auth key for signing — keep the roles split.\n- Don't commit private keys to git; they live in the vault and `~/.ssh` only.\n- Don't forget `IdentitiesOnly yes` — without it SSH may offer the YubiKey\n  keys first and trigger spurious PIN prompts.\n",
           "files": {}
         },
         "multica_state": {
           "name": "ssh",
           "description": "Peter's SSH key setup — which key does what (auth/login vs signing), how to reach private homelab vs company hosts, git auth to GitHub/GitLab, and SSH commit signing. Use whenever SSHing to a machine, cloning/pushing over SSH, configuring git auth or commit signing, or wiring keys onto a new host. Keys live in the vault `shared` folder.",
-          "body": "# SSH keys & access\n\nTwo purpose-built ed25519 keys (plus YubiKey FIDO2 fallbacks). Keep their\nroles separate — auth/login is one key, signing is another.\n\n| Key | Role | Used for |\n|---|---|---|\n| `~/.ssh/id_ed25519_peter` (`peter@chainlayer`) | **auth + login** | SSH login to machines (private homelab + company), and git auth to GitHub (tyrion70) + GitLab (gitlab.com/chainlayer) |\n| `~/.ssh/id_ed25519_signing` (`git-signing`) | **signing** | SSH-format git commit/tag signing. (Also accepted for GitHub/GitLab auth, but its job is signing.) |\n| `~/.ssh/id_ed25519_sk_yk_*` | fallback | FIDO2 YubiKey keys for other/ad-hoc hosts (PIN-gated) |\n\nBoth git keys are registered on GitHub **and** GitLab. Confirmed working:\n`id_ed25519_peter` → GitHub/GitLab auth + machine login (private + company);\n`id_ed25519_signing` → produces a Good commit signature.\n\n## Reaching machines\n\n- **Private homelab** (Proxmox VMs): `192.168.16/17/18/19.x`, user `peter` or\n  `root`, **port 22**, key `id_ed25519_peter`. See the `homelab` skill.\n- **Company hosts**: `*.chosts.io`, user `peter`, **port 2822**, key\n  `id_ed25519_peter`. Not reachable from the laptop's plain network the same\n  way — mind the non-standard port.\n\n`~/.ssh/config` should carry these so you don't pass flags by hand:\n\n```\nHost *.chosts.io\n    User peter\n    Port 2822\n    IdentityFile ~/.ssh/id_ed25519_peter\n    IdentitiesOnly yes\n\nHost github.com gitlab.com\n    IdentityFile ~/.ssh/id_ed25519_peter\n    IdentitiesOnly yes\n```\n\n## Git commit signing\n\nSSH-format signing with the dedicated signing key:\n\n```bash\ngit config --global gpg.format ssh\ngit config --global user.signingkey ~/.ssh/id_ed25519_signing.pub\ngit config --global commit.gpgsign true\n# verify locally: add your pubkey to an allowed-signers file\ngit config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers\n#   ~/.ssh/allowed_signers:  peter@chainlayer.io <contents of id_ed25519_signing.pub>\n```\n\n`git log --show-signature` should report `Good \"git\" signature for\npeter@chainlayer.io`. Add the signing key to GitHub/GitLab as a **signing**\nkey (separate from the auth key) for the green \"Verified\" badge.\n\n## Keys in the vault\n\nBoth private keys are stored in the Bitwarden **`shared`** folder (see the\n`bitwarden` skill) as file-type items, so any context (private or company)\ncan use them:\n\n- `ssh/id_ed25519_peter`   → `~/.ssh/id_ed25519_peter` (mode 600)\n- `ssh/id_ed25519_signing` → `~/.ssh/id_ed25519_signing` (mode 600)\n\nTo wire a fresh host: write each key to its path (`chmod 600`), drop the\n`~/.ssh/config` snippet above, and `chmod 644` the regenerated `.pub`\n(`ssh-keygen -y -f <key> > <key>.pub`).\n\n## Don'ts\n\n- Don't use the signing key as the primary auth identity in config, or the\n  auth key for signing — keep the roles split.\n- Don't commit private keys to git; they live in the vault and `~/.ssh` only.\n- Don't forget `IdentitiesOnly yes` — without it SSH may offer the YubiKey\n  keys first and trigger spurious PIN prompts.\n",
+          "body": "# SSH keys & access\n\nTwo purpose-built ed25519 keys (plus YubiKey FIDO2 fallbacks). Keep their\nroles separate — auth/login is one key, signing is another.\n\n| Key | Role | Used for |\n|---|---|---|\n| `~/.ssh/id_ed25519_peter` (`peter@chainlayer`) | **auth + login** | SSH login to machines (private homelab + company), and git auth to **GitHub** (tyrion70) |\n| `~/.ssh/id_ed25519_signing` (`git-signing`) | **signing** (+ GitLab auth) | SSH-format git commit/tag signing. **Also the key GitLab accepts for auth** (see note below). |\n| `~/.ssh/id_ed25519_sk_yk_*` | fallback | FIDO2 YubiKey keys for other/ad-hoc hosts (PIN-gated) |\n\nConfirmed working (multica-02 runtime, 2026-06-29):\n- **GitHub** auth → `id_ed25519_peter` (`ssh -T git@github.com` → \"Hi tyrion70!\").\n- **GitLab** auth → `id_ed25519_signing` only. `id_ed25519_peter` is **rejected**\n  by gitlab.com (`Permission denied (publickey)`) — it is not (or no longer)\n  registered there. Don't assume the auth key works for both forges.\n- `id_ed25519_signing` → produces a Good commit signature.\n\n> **GitLab auth ≠ GitLab repo access for the `chainlayer` group.** Authenticating\n> is necessary but not sufficient — the group enforces SAML SSO on git transport.\n> See \"Git over SSO-enforced GitLab groups\" below before trying to clone/fetch a\n> `gitlab.com/chainlayer/*` repo.\n\n## Reaching machines\n\n- **Private homelab** (Proxmox VMs): `192.168.16/17/18/19.x`, user `peter` or\n  `root`, **port 22**, key `id_ed25519_peter`. See the `homelab` skill.\n- **Company hosts**: `*.chosts.io`, user `peter`, **port 2822**, key\n  `id_ed25519_peter`. Not reachable from the laptop's plain network the same\n  way — mind the non-standard port.\n\n`~/.ssh/config` should carry these so you don't pass flags by hand:\n\n```\nHost *.chosts.io\n    User peter\n    Port 2822\n    IdentityFile ~/.ssh/id_ed25519_peter\n    IdentitiesOnly yes\n\nHost github.com\n    IdentityFile ~/.ssh/id_ed25519_peter\n    IdentitiesOnly yes\n\n# GitLab accepts the signing key for auth, NOT id_ed25519_peter.\nHost gitlab.com\n    IdentityFile ~/.ssh/id_ed25519_signing\n    IdentitiesOnly yes\n```\n\n## Git over SSO-enforced GitLab groups (chainlayer)\n\nThe `gitlab.com/chainlayer` group enforces **SAML SSO on git transport**. This\nbites hard and has caught us before, so know it up front:\n\n- A fresh `git clone`/`git fetch` of any `chainlayer/*` repo over **SSH _or_\n  HTTPS** fails with `remote: Cannot find valid SSO session. Please login via\n  your group's SSO at …` (HTTP 403) **unless there is an active browser SSO\n  session** for the account behind the credential. A valid SSH key or a valid\n  group PAT is **not** enough on its own.\n- This applies to **every credential available headlessly**: the SSH keys, the\n  vault group PAT (`ChainLayer · GitLab — group PAT`), and even\n  `multica repo checkout` — they all resolve to the same SSO-gated GitLab\n  account. An agent cannot complete the browser SAML flow, so it cannot\n  establish the session itself.\n- `multica repo checkout` only succeeds for repos that were **already synced**\n  into the workspace's bare mirrors while a session was live. Adding a new repo\n  (`multica repo add`) and then checking it out triggers a fresh fetch → SSO\n  403. So \"SSH-clone any repo regardless of workspace config\" is **false** for\n  this group.\n- **What still works headlessly:** the GitLab **REST API** with the group PAT\n  (e.g. `GET /projects/:id/repository/files/<path>/raw`). Use it to *read*\n  source when you only need to inspect a repo you can't clone.\n- **The group PAT has `self_rotate` — keep it alive yourself.** The PAT\n  (`ChainLayer · GitLab — group PAT`, Bitwarden `company` folder) carries the\n  `self_rotate` scope. Rotate it with\n  `POST https://gitlab.com/api/v4/personal_access_tokens/self/rotate` using the\n  current token as `PRIVATE-TOKEN`, then **write the new token back** into\n  Bitwarden (the item is a SecureNote; the token is in its hidden `PAT` field)\n  and `bw sync`. See the **`git-mr`** skill for the full procedure and the\n  important caveat (only works while still valid — rotate proactively).\n- **To actually clone/push** a `chainlayer/*` repo from an agent runtime, a human\n  must refresh the group's SSO session for the workspace credential (or the repo\n  must be pre-synced). Surface this as a blocker rather than burning time on key\n  permutations — none of them defeat SSO.\n\n**Rule (Peter):** IF you encounter `Cannot find valid SSO session`, prompt Peter\nwith the precise url so he can login UNLESS you have a different way to\ncircumvent the SSO issue.\n\nThe \"precise url\" is the `https://gitlab.com/groups/chainlayer/-/saml/sso?token=…`\nlink printed in the `remote:` error — surface that exact URL to Peter, don't\nparaphrase it. (A \"different way to circumvent\" means something that gets the\nwork done without his login, e.g. reading the file you need via the REST API\nabove — not another SSH-key/PAT permutation, which won't work.)\n\n(GitHub `tyrion70/*` repos have no such enforcement — clone/push works with\n`id_ed25519_peter` directly.)\n\n## Git commit signing\n\nSSH-format signing with the dedicated signing key:\n\n```bash\ngit config --global gpg.format ssh\ngit config --global user.signingkey ~/.ssh/id_ed25519_signing.pub\ngit config --global commit.gpgsign true\n# verify locally: add your pubkey to an allowed-signers file\ngit config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers\n#   ~/.ssh/allowed_signers:  peter@chainlayer.io <contents of id_ed25519_signing.pub>\n```\n\n`git log --show-signature` should report `Good \"git\" signature for\npeter@chainlayer.io`. Add the signing key to GitHub/GitLab as a **signing**\nkey (separate from the auth key) for the green \"Verified\" badge.\n\n## Keys in the vault\n\nBoth private keys are stored in the Bitwarden **`shared`** folder (see the\n`bitwarden` skill) as file-type items, so any context (private or company)\ncan use them:\n\n- `ssh/id_ed25519_peter`   → `~/.ssh/id_ed25519_peter` (mode 600)\n- `ssh/id_ed25519_signing` → `~/.ssh/id_ed25519_signing` (mode 600)\n\nTo wire a fresh host: write each key to its path (`chmod 600`), drop the\n`~/.ssh/config` snippet above, and `chmod 644` the regenerated `.pub`\n(`ssh-keygen -y -f <key> > <key>.pub`).\n\n## Don'ts\n\n- Don't use the signing key as the primary auth identity in config, or the\n  auth key for signing — keep the roles split.\n- Don't commit private keys to git; they live in the vault and `~/.ssh` only.\n- Don't forget `IdentitiesOnly yes` — without it SSH may offer the YubiKey\n  keys first and trigger spurious PIN prompts.\n",
           "files": {}
         }
       },
