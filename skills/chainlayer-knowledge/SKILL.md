@@ -73,6 +73,16 @@ Endpoints are `https://<prefix>.<network>.quiknode.pro/<token>`:
   `mythic-fulcrum-424015-f9`** (surfaced via the `k8s-shared` ClusterSecretStore on
   nl-oven), secret name `quiknode-rpc-key`. Prefix + slug are non-secret (chart values).
 
+## Data-feeds fleet — ChainLayer is the Chainlink node operator
+
+ChainLayer **is** the Chainlink node operator for the data-feeds fleet. The
+external adapters (EAs/bridges) run in our own `chainlink-ea` k8s namespace on
+nl-oven — we hold the API-key secrets and own the bridge job specs.
+Config/operation (job specs, ticker→exchange-suffix mapping, pod lifecycle) is
+ours to fix directly. A genuine defect in the EA **software** goes as an **MR
+against the Chainlink `external-adapters` repo** — never a bespoke
+reimplementation adapter in our repo.
+
 ## Chainlink node job spec retrieval — use the operator UI / API
 
 Job specs for data-feeds (and other `FeedsManager = true`) nodes live in the
