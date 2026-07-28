@@ -21,43 +21,12 @@
   ],
   "mcp_config": {
     "mcpServers": {
-      "incidentio": {
-        "headers": {
-          "Authorization": "Bearer #ChainLayer \u00b7 incident.io \u2014 API key#"
-        },
-        "type": "http",
-        "url": "https://mcp.incident.io/mcp"
-      },
       "linear": {
         "headers": {
           "Authorization": "Bearer #ChainLayer \u00b7 Linear \u2014 API key#"
         },
         "type": "http",
         "url": "https://mcp.linear.app/mcp"
-      },
-      "slack": {
-        "command": "npx",
-        "args": [
-          "-y",
-          "slack-mcp-server@latest",
-          "-no-cache"
-        ],
-        "env": {
-          "SLACK_MCP_ADD_MESSAGE_TOOL": "true",
-          "SLACK_MCP_REACTION_TOOL": "true",
-          "SLACK_MCP_XOXP_TOKEN": "#ChainLayer \u00b7 Slack \u2014 personal token (xoxp)#"
-        }
-      },
-      "gdrive": {
-        "command": "npx",
-        "args": [
-          "-y",
-          "@piotr-agier/google-drive-mcp"
-        ],
-        "env": {
-          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json",
-          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "/home/peter/.config/google-drive-mcp/tokens.json"
-        }
       },
       "rag": {
         "type": "sse",
