@@ -485,13 +485,28 @@ def _bw_get_secret(item_name: str) -> Optional[str]:
     if not bw_session:
         return None
     try:
+        # Use list+search and exact-name match instead of `bw get item <name>`,
+        # which does substring matching and fails when multiple items match
+        # (e.g. "grafana" also matches "InfluxDB prod — mqtt bucket token (grafana.252h.org)").
         result = subprocess.run(
-            ["bw", "get", "item", item_name, "--session", bw_session],
+            ["bw", "list", "items", "--search", item_name, "--session", bw_session],
             capture_output=True, text=True, timeout=15,
         )
         if result.returncode != 0:
             return None
-        data = json.loads(result.stdout)
+        if not result.stdout.strip():
+            return None
+        candidates = json.loads(result.stdout)
+        data: Optional[Dict[str, Any]] = None
+        for c in candidates:
+            if c.get("name") == item_name:
+                data = c
+                break
+        if data is None and len(candidates) == 1:
+            data = candidates[0]
+        if data is None:
+            return None
+
         if field_name:
             for field in (data.get("fields") or []):
                 if field.get("name") == field_name:
