@@ -490,10 +490,12 @@ def _bw_get_secret(item_name: str) -> Optional[str]:
     """Resolve a Bitwarden secret.
 
     Supports two formats:
-      #Item Name#              — fetch the item by name, return the first hidden field.
-      #Item Name:Field Name#   — fetch the item by name, return the named field.
+      #Item Name#              — the item (exact name), return the first hidden field.
+      #Item Name:Field Name#   — the item (exact name), return the named field.
 
-    Uses BW_SESSION from the environment (set by sync.sh after unlock).
+    Looks the item up with `bw list items --search` + exact-name match (not
+    `bw get item`, whose substring matching collides on shared substrings), using
+    BW_SESSION from the environment (set by sync.sh after unlock).
 
     Returns None only for a *genuine miss* — the item (or the named field) does
     not exist. A dead/stale/locked session raises BitwardenAuthError so it can
@@ -510,13 +512,23 @@ def _bw_get_secret(item_name: str) -> Optional[str]:
         # No session at all is handled loudly upstream (sync.sh already printed
         # the unlock error); keep the historical fail-closed skip for this case.
         return None
+
+    # Resolve via `bw list items --search` + exact-name match, not `bw get item
+    # <name>`: get does substring matching and fails (or returns the wrong item)
+    # when several items share a substring — e.g. "grafana" also matches
+    # "InfluxDB prod — mqtt bucket token (grafana.252h.org)". list+search returns
+    # every candidate so we can pick the exact name. A genuine no-match is a
+    # well-formed empty array `[]` (rc=0), which stays cleanly distinct from the
+    # empty/locked stdout a stale session produces — so fail-loud still holds.
+    cmd_desc = f"bw list items --search '{item_name}'"
     try:
         result = subprocess.run(
-            ["bw", "get", "item", item_name, "--session", bw_session, "--nointeraction"],
+            ["bw", "list", "items", "--search", item_name,
+             "--session", bw_session, "--nointeraction"],
             capture_output=True, text=True, timeout=15,
         )
     except Exception as e:
-        raise BitwardenAuthError(f"`bw get item '{item_name}'` failed to run: {e}")
+        raise BitwardenAuthError(f"`{cmd_desc}` failed to run: {e}")
 
     stderr = (result.stderr or "").strip()
     stderr_l = stderr.lower()
@@ -528,28 +540,39 @@ def _bw_get_secret(item_name: str) -> Optional[str]:
             f"bw session is not usable while resolving '{item_name}': {stderr}"
         )
     if result.returncode != 0:
-        # A genuine "not found" is the only non-zero exit we treat as a miss.
-        if "not found" in stderr_l:
-            return None
+        # `list items` reports a no-match as rc=0 `[]`, so any non-zero exit is a
+        # real failure (network/session), never a plain miss — fail LOUD.
         raise BitwardenAuthError(
-            f"`bw get item '{item_name}'` exited {result.returncode}: "
-            f"{stderr or '(no stderr)'}"
+            f"`{cmd_desc}` exited {result.returncode}: {stderr or '(no stderr)'}"
         )
     if not stdout:
         # rc=0 with empty stdout is the stale-session silent-prompt signature —
-        # never treat it as a resolved-or-missing item.
+        # a real no-match is `[]`, never empty — so empty means auth failure.
         raise BitwardenAuthError(
-            f"`bw get item '{item_name}'` returned empty output (stale session?)"
+            f"`{cmd_desc}` returned empty output (stale session?)"
         )
     try:
-        data = json.loads(stdout)
+        candidates = json.loads(stdout)
     except json.JSONDecodeError as e:
         raise BitwardenAuthError(
-            f"`bw get item '{item_name}'` returned non-JSON output ({e}); "
+            f"`{cmd_desc}` returned non-JSON output ({e}); "
             "treating as an auth failure rather than a missing item"
         )
 
-    # From here we have valid item JSON: a missing field IS a genuine miss.
+    # Pick the exact-name match; fall back to the sole candidate only when the
+    # search is unambiguous (one hit). No match is a genuine miss (None), which
+    # the caller fails closed on — never a key-wipe.
+    data: Optional[Dict[str, Any]] = None
+    for candidate in candidates:
+        if candidate.get("name") == item_name:
+            data = candidate
+            break
+    if data is None and len(candidates) == 1:
+        data = candidates[0]
+    if data is None:
+        return None
+
+    # From here we have the resolved item: a missing field IS a genuine miss.
     if field_name:
         for field in (data.get("fields") or []):
             if field.get("name") == field_name:

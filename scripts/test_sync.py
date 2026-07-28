@@ -149,7 +149,7 @@ class FakeBw:
         self._concurrent_unlock_done = False
 
     def __call__(self, cmd, *args, **kwargs):
-        assert cmd[:3] == ["bw", "get", "item"], f"unexpected bw call: {cmd}"
+        assert cmd[:4] == ["bw", "list", "items", "--search"], f"unexpected bw call: {cmd}"
         # Fail-loud contract: sync.py must always pass --nointeraction so a stale
         # session errors out instead of hanging on a master-password prompt.
         assert "--nointeraction" in cmd, "bw call must pass --nointeraction"
@@ -158,9 +158,12 @@ class FakeBw:
             self.current["DEF"] = "DEF:2"  # another host process re-keys default
         tok = cmd[cmd.index("--session") + 1]
         dir_key = tok.split(":", 1)[0]
+        search = cmd[cmd.index("--search") + 1]
         if self.current.get(dir_key) == tok:
-            item = {"name": cmd[3], "fields": [{"name": "API", "value": "REALKEY", "type": 1}]}
-            return mock.Mock(returncode=0, stdout=json.dumps(item), stderr="")
+            # `list items --search` returns an array; the item's name matches the
+            # search term so the exact-name match in _bw_get_secret picks it.
+            item = {"name": search, "fields": [{"name": "API", "value": "REALKEY", "type": 1}]}
+            return mock.Mock(returncode=0, stdout=json.dumps([item]), stderr="")
         # Stale session under --nointeraction: non-zero, locked, empty stdout.
         return mock.Mock(returncode=1, stdout="", stderr="Vault is locked.")
 
@@ -419,28 +422,61 @@ class BwSecretResolutionTest(unittest.TestCase):
             self._get("Some Item", returncode=0, stdout="? Master password:")
 
     def test_genuine_not_found_returns_none(self):
-        val, _ = self._get("Ghost Item", returncode=1, stderr="Not found.")
+        """A real no-match from `list items --search` is a well-formed `[]`."""
+        val, _ = self._get("Ghost Item", returncode=0, stdout="[]")
         self.assertIsNone(val)
 
     def test_missing_field_returns_none(self):
-        body = json.dumps({"fields": [{"name": "Other", "value": "x", "type": 1}]})
+        body = json.dumps([{"name": "Item", "fields": [{"name": "Other", "value": "x", "type": 1}]}])
         val, _ = self._get("Item:Absent", returncode=0, stdout=body)
         self.assertIsNone(val)
 
     def test_hidden_field_resolves(self):
-        body = json.dumps({"fields": [{"name": "n", "value": "SEKRET", "type": 1}]})
+        body = json.dumps([{"name": "Item", "fields": [{"name": "n", "value": "SEKRET", "type": 1}]}])
         val, _ = self._get("Item", returncode=0, stdout=body)
         self.assertEqual(val, "SEKRET")
 
     def test_named_field_resolves(self):
-        body = json.dumps({"fields": [{"name": "API", "value": "V", "type": 0}]})
+        body = json.dumps([{"name": "Item", "fields": [{"name": "API", "value": "V", "type": 0}]}])
         val, _ = self._get("Item:API", returncode=0, stdout=body)
         self.assertEqual(val, "V")
 
-    def test_passes_nointeraction(self):
-        body = json.dumps({"fields": [{"name": "n", "value": "x", "type": 1}]})
+    def test_exact_name_match_beats_substring_collision(self):
+        """The substring-collision fix (folded from PR #79): when the search
+        returns several items, the exact-name match wins — not the first hit."""
+        body = json.dumps([
+            {"name": "InfluxDB prod — mqtt bucket token (grafana.252h.org)",
+             "fields": [{"name": "n", "value": "WRONG", "type": 1}]},
+            {"name": "Grafana",
+             "fields": [{"name": "n", "value": "RIGHT", "type": 1}]},
+        ])
+        val, run = self._get("Grafana", returncode=0, stdout=body)
+        self.assertEqual(val, "RIGHT")
+        # And it went through list+search, not `bw get item`.
+        cmd = run.call_args[0][0]
+        self.assertEqual(cmd[:4], ["bw", "list", "items", "--search"])
+
+    def test_single_candidate_fallback_resolves(self):
+        """One unambiguous hit resolves even without an exact-name match."""
+        body = json.dumps([{"name": "Item (renamed)", "fields": [{"name": "n", "value": "V", "type": 1}]}])
+        val, _ = self._get("Item", returncode=0, stdout=body)
+        self.assertEqual(val, "V")
+
+    def test_multiple_no_exact_match_returns_none(self):
+        """Ambiguous (>1 hit, none exact) is a genuine miss — never guess."""
+        body = json.dumps([
+            {"name": "Item A", "fields": [{"name": "n", "value": "a", "type": 1}]},
+            {"name": "Item B", "fields": [{"name": "n", "value": "b", "type": 1}]},
+        ])
+        val, _ = self._get("Item", returncode=0, stdout=body)
+        self.assertIsNone(val)
+
+    def test_passes_nointeraction_and_uses_list_search(self):
+        body = json.dumps([{"name": "Item", "fields": [{"name": "n", "value": "x", "type": 1}]}])
         _, run = self._get("Item", returncode=0, stdout=body)
-        self.assertIn("--nointeraction", run.call_args[0][0])
+        cmd = run.call_args[0][0]
+        self.assertIn("--nointeraction", cmd)
+        self.assertEqual(cmd[:4], ["bw", "list", "items", "--search"])
 
     def test_no_session_returns_none(self):
         """Missing BW_SESSION keeps the historical fail-closed skip (already
