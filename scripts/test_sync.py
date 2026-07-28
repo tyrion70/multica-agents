@@ -395,6 +395,7 @@ class BwSecretResolutionTest(unittest.TestCase):
     (return None), and never silently returns None on a stale session."""
 
     def _get(self, item, *, returncode=0, stdout="", stderr="", session="S1"):
+        sync._bw_cache_clear()  # each case must hit the (mocked) backend fresh
         cp = mock.Mock(returncode=returncode, stdout=stdout, stderr=stderr)
         environ = dict(os.environ)
         environ.pop("BW_SESSION", None)
@@ -483,6 +484,101 @@ class BwSecretResolutionTest(unittest.TestCase):
         reported loudly by sync.sh) — not an exception."""
         val, _ = self._get("Item", session=None)
         self.assertIsNone(val)
+
+    def test_resolution_is_memoised_within_a_run(self):
+        """The same placeholder resolves via a single `bw` call; a full sync
+        reuses ~8 vault items across ~44 agents, so repeats must not re-hit bw."""
+        sync._bw_cache_clear()
+        body = json.dumps([{"name": "Item", "fields": [{"name": "API", "value": "REALKEY", "type": 1}]}])
+        cp = mock.Mock(returncode=0, stdout=body, stderr="")
+        with mock.patch.dict(os.environ, {"BW_SESSION": "S1"}), \
+             mock.patch.object(sync.subprocess, "run", return_value=cp) as run:
+            self.assertEqual(sync._bw_get_secret("Item:API"), "REALKEY")
+            self.assertEqual(sync._bw_get_secret("Item:API"), "REALKEY")
+            self.assertEqual(sync._bw_get_secret("Item:API"), "REALKEY")
+        self.assertEqual(run.call_count, 1, "memoised lookup re-hit bw")
+
+    def test_auth_error_is_not_memoised(self):
+        """A BitwardenAuthError must never be cached — a later placeholder must
+        still fail loud on the same stale session, not read a poisoned cache."""
+        sync._bw_cache_clear()
+        cp = mock.Mock(returncode=1, stdout="", stderr="Vault is locked.")
+        with mock.patch.dict(os.environ, {"BW_SESSION": "S1"}), \
+             mock.patch.object(sync.subprocess, "run", return_value=cp):
+            with self.assertRaises(sync.BitwardenAuthError):
+                sync._bw_get_secret("Item")
+            with self.assertRaises(sync.BitwardenAuthError):
+                sync._bw_get_secret("Item")
+
+
+class RepoSecretLeakGuardTest(unittest.TestCase):
+    """A resolved secret must never be written back into a repo agent.json
+    (CHA-85). The leak was the live→repo pull dumping resolved `custom_env`
+    values (raw NetBox token + Postgres DSN) into the repo via 15868d7. Repo
+    files hold #Item:Field# placeholders only; secrets resolve on push."""
+
+    def setUp(self):
+        self.tmp = pathlib.Path(__import__("tempfile").mkdtemp())
+
+    def tearDown(self):
+        __import__("shutil").rmtree(self.tmp, ignore_errors=True)
+
+    def test_pull_keeps_repo_placeholder_over_resolved_live_value(self):
+        """The core leak: a live agent carrying a *resolved* custom_env must not
+        overwrite the repo's #Item:Field# placeholder on live→repo."""
+        existing = {"custom_env": {"NETBOX_API_TOKEN": "#readonly chainlayer credentials:NETBOX_TOKEN#"}}
+        live = {
+            "name": "Maintainer", "runtime_id": "rt-1", "description": "d",
+            # what `agent env get` returns — the RESOLVED secret:
+            "custom_env": {"NETBOX_API_TOKEN": "vhEatZgTpsKYbcQJdEdHHT1a3NNbuH5ZT8HTW6lh"},
+        }
+        result = sync.multica_to_agent_json(live, existing)
+        self.assertEqual(
+            result["custom_env"],
+            {"NETBOX_API_TOKEN": "#readonly chainlayer credentials:NETBOX_TOKEN#"},
+            "resolved live custom_env overwrote the repo placeholder",
+        )
+
+    def test_write_agent_json_rejects_resolved_value(self):
+        """write_agent_json must fail closed if a resolved (non-placeholder)
+        custom_env value would land in a repo file — e.g. a raw value left in the
+        repo file is preserved on pull and would otherwise be re-committed."""
+        path = self.tmp / "agent.json"
+        path.write_text(json.dumps({
+            "name": "A", "runtime_id": "rt-1",
+            "custom_env": {"DATAFEEDS_HEALTH_DSN": "postgresql://u:p@host/db"},
+        }), encoding="utf-8")
+        live = {"name": "A", "runtime_id": "rt-1"}
+        with self.assertRaises(sync.RepoSecretLeakError):
+            sync.write_agent_json(path, live, dry_run=False)
+
+    def test_write_agent_json_rejects_malformed_nested_custom_env(self):
+        """The malformed {"agent_id": …, "custom_env": {…}} shape (also the
+        CHA-876 schema error) is rejected — its values are not placeholders."""
+        path = self.tmp / "agent.json"
+        # Pre-seed a repo file in the malformed shape; a plain pull re-writes it.
+        path.write_text(json.dumps({
+            "name": "A", "runtime_id": "rt-1",
+            "custom_env": {"agent_id": "x", "custom_env": {"K": "#Item:F#"}},
+        }), encoding="utf-8")
+        live = {"name": "A", "runtime_id": "rt-1"}
+        with self.assertRaises(sync.RepoSecretLeakError):
+            sync.write_agent_json(path, live, dry_run=False)
+
+    def test_write_agent_json_allows_placeholder(self):
+        """A well-formed flat placeholder map is accepted and written."""
+        path = self.tmp / "agent.json"
+        path.write_text(json.dumps({
+            "name": "A", "runtime_id": "rt-1",
+            "custom_env": {"DATAFEEDS_HEALTH_DSN": "#DATAFEEDS_HEALTH_DSN:DATAFEEDS_HEALTH_DSN#"},
+        }), encoding="utf-8")
+        live = {"name": "A", "runtime_id": "rt-1"}
+        sync.write_agent_json(path, live, dry_run=False)
+        written = json.loads(path.read_text())
+        self.assertEqual(
+            written["custom_env"],
+            {"DATAFEEDS_HEALTH_DSN": "#DATAFEEDS_HEALTH_DSN:DATAFEEDS_HEALTH_DSN#"},
+        )
 
 
 if __name__ == "__main__":

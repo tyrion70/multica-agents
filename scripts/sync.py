@@ -333,29 +333,74 @@ def multica_to_agent_json(
     existing: Optional[Dict[str, Any]],
 ) -> Dict[str, Any]:
     result: Dict[str, Any] = {}
+    # custom_env and mcp_config are secret-bearing: the repo holds #Item:Field#
+    # placeholders that are resolved ONLY when pushing repo→live. Never source
+    # them from `live` — the live values are the *resolved* secrets, and writing
+    # those into a repo file is the leak that put a raw NetBox token and a
+    # datafeeds Postgres DSN onto `main` (CHA-85, commit 15868d7). So on
+    # live→repo we only ever preserve the existing repo placeholders (mirrors the
+    # mcp_config handling from #78); the fail-closed guard in write_agent_json is
+    # the backstop if a resolved value ever reaches this path.
     if existing:
         for key in ("custom_env", "mcp_config"):
             if key in existing:
                 result[key] = existing[key]
-    # If custom_env is present on the live agent data (e.g. fetched via env get),
-    # use it instead of the stale existing value
-    if live.get("custom_env") is not None:
-        result["custom_env"] = live["custom_env"]
     for field in COMPARABLE_FIELDS:
         if field == "skills":
             result["skills"] = _norm_agent_field("skills", live.get("skills"))
         elif field in ("model", "thinking_level"):
             val = live.get(field)
             result[field] = val if val != "" else None
-        elif field == "mcp_config":
-            pass
-        elif field == "custom_env":
-            pass  # handled above
+        elif field in ("mcp_config", "custom_env"):
+            pass  # preserved from the existing repo file above; never from live
         else:
             val = live.get(field)
             if val is not None:
                 result[field] = val
     return result
+
+
+class RepoSecretLeakError(RuntimeError):
+    """Raised when a *resolved* secret value would be written into a repo
+    agent.json. Repo files must only ever hold #Item:Field# placeholders for
+    secret-bearing fields; resolution happens solely on push (repo→live). This
+    guard makes the live→repo leak (CHA-85, commit 15868d7 — a raw NetBox token
+    and a Postgres DSN with embedded creds) structurally impossible: a run fails
+    loud on the offending agent rather than committing a plaintext secret."""
+
+    def __init__(self, field: str, keys: List[str]):
+        self.field = field
+        self.keys = sorted(keys)
+        super().__init__(
+            f"refusing to write resolved secret value(s) into repo {field}: "
+            f"{', '.join(self.keys)} — repo files must hold #Item:Field# "
+            f"placeholders only (secrets resolve on push, never on pull)"
+        )
+
+
+def _assert_custom_env_placeholders(custom_env: Any) -> None:
+    """Fail closed if custom_env carries any non-placeholder (resolved) value.
+
+    A repo custom_env must be a flat {KEY: "#Item:Field#"} map — every value a
+    string containing a #…# placeholder. Anything else (a raw secret, or the
+    malformed {"agent_id": …, "custom_env": {…}} nesting the leak produced) is
+    rejected before it can reach a repo file.
+    """
+    if custom_env is None:
+        return
+    if isinstance(custom_env, str):
+        try:
+            custom_env = json.loads(custom_env)
+        except (json.JSONDecodeError, TypeError):
+            return
+    if not isinstance(custom_env, dict):
+        raise RepoSecretLeakError("custom_env", ["<non-object custom_env>"])
+    leaked = [
+        str(k) for k, v in custom_env.items()
+        if not (isinstance(v, str) and _PLACEHOLDER_RE.search(v))
+    ]
+    if leaked:
+        raise RepoSecretLeakError("custom_env", leaked)
 
 
 def write_agent_json(
@@ -368,6 +413,8 @@ def write_agent_json(
         with open(agent_json_path) as f:
             existing = json.load(f)
     new_data = multica_to_agent_json(live_agent, existing)
+    # Backstop: never persist a resolved secret to a repo file (CHA-85).
+    _assert_custom_env_placeholders(new_data.get("custom_env"))
     if dry_run:
         print(f"      [DRY-RUN] would write {agent_json_path}", file=sys.stderr)
         return
@@ -486,7 +533,35 @@ class BitwardenAuthError(RuntimeError):
     skipping every agent as if all their secrets had vanished (CHA-873)."""
 
 
+# Per-run memo of resolved Bitwarden lookups. The same handful of vault items
+# (~8: the MCP tokens + the two custom_env secrets) appears across all ~44
+# agents' mcp_config/custom_env, so without this a single full sync fires
+# hundreds of slow `bw list items` calls against the self-hosted Vaultwarden and
+# blows every timeout. Keyed by the raw placeholder body ("Item" or
+# "Item:Field"); stores the resolved value or None for a genuine miss. Auth
+# failures are never cached (they are transient); the cache is cleared at the
+# start of each sync run.
+_BW_SECRET_CACHE: Dict[str, Optional[str]] = {}
+
+
+def _bw_cache_clear() -> None:
+    _BW_SECRET_CACHE.clear()
+
+
 def _bw_get_secret(item_name: str) -> Optional[str]:
+    """Resolve a Bitwarden secret, memoised per run (see _BW_SECRET_CACHE).
+
+    A BitwardenAuthError from the underlying lookup propagates uncached so a
+    stale session still fails loud on every subsequent placeholder.
+    """
+    if item_name in _BW_SECRET_CACHE:
+        return _BW_SECRET_CACHE[item_name]
+    val = _bw_get_secret_uncached(item_name)
+    _BW_SECRET_CACHE[item_name] = val
+    return val
+
+
+def _bw_get_secret_uncached(item_name: str) -> Optional[str]:
     """Resolve a Bitwarden secret.
 
     Supports two formats:
@@ -924,6 +999,10 @@ def sync_agents_workspace(
     workspace_name = workspace_dir.name
     print(f"\n── Agents: {workspace_name} ──", file=sys.stderr)
 
+    # Fresh memo per run: vault values are stable within a run but may have
+    # changed since a previous one, and clearing keeps tests independent.
+    _bw_cache_clear()
+
     counts: Dict[str, int] = defaultdict(int)
     conflicts: List[Dict[str, Any]] = []
     state_agents = state.setdefault("agents", {})
@@ -1138,12 +1217,9 @@ def sync_agents_workspace(
 
             elif action == "pull_to_repo":
                 print(f"    → writing repo (Multica changed)", file=sys.stderr)
-                # Fetch custom_env from Multica for write-back
-                if live_agent:
-                    live_custom_env = _fetch_agent_custom_env(live_agent["id"])
-                    if live_custom_env:
-                        live_agent = dict(live_agent)
-                        live_agent["custom_env"] = live_custom_env
+                # Do NOT fetch live custom_env: those are resolved secrets, and
+                # the repo must keep its #Item:Field# placeholders (CHA-85).
+                # write_agent_json preserves the existing repo custom_env/mcp_config.
                 try:
                     write_agent_json(agent_json_path, live_agent, dry_run)
                     counts["repo_updated"] += 1
@@ -1308,12 +1384,18 @@ def sync_agents_workspace(
 
             print(f"  {rel_path}")
             print(f"    → writing repo (new agent discovered in Multica)", file=sys.stderr)
-            # Fetch custom_env from Multica for write-back
+            # A newly-discovered agent may have custom_env set live, but those are
+            # resolved secrets — we must not write them to the repo (CHA-85). Warn
+            # the operator which keys need #Item:Field# placeholders added by hand.
             if agent_id:
                 live_custom_env = _fetch_agent_custom_env(agent_id)
                 if live_custom_env:
-                    live_agent = dict(live_agent)
-                    live_agent["custom_env"] = live_custom_env
+                    keys = ", ".join(sorted(live_custom_env.keys()))
+                    print(
+                        f"    ⚠ live custom_env present ({keys}); NOT written to repo "
+                        f"— add #Item:Field# placeholder(s) to {rel_path} by hand",
+                        file=sys.stderr,
+                    )
             try:
                 write_agent_json(agent_json_path, live_agent, dry_run)
                 counts["repo_updated"] += 1
