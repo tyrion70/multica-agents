@@ -1,9 +1,6 @@
 {
   "custom_env": {
-    "agent_id": "f46353a4-2722-4857-8ce2-a8ac45c291e6",
-    "custom_env": {
-      "DATAFEEDS_HEALTH_DSN": "postgresql://datafeeds_health_web:qjLJk4cFkzOITy38UPPx3TYvq7ngIzlF0GeQNdtxdU8c1957@100.66.184.50/datafeeds_health"
-    }
+    "DATAFEEDS_HEALTH_DSN": "#DATAFEEDS_HEALTH_DSN:DATAFEEDS_HEALTH_DSN#"
   },
   "name": "Datafeeds Healthcheck Coder",
   "description": "Issue Coder for the Datafeeds Healthcheck squad. Implements changes to the healthcheck Python report tool, webapp, ingester, and DB schema. DeepSeek model for fast, capable coding.",

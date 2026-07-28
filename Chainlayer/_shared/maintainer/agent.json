@@ -1,9 +1,6 @@
 {
   "custom_env": {
-    "agent_id": "a5ac100a-182a-44a4-9d35-ae82f9992f87",
-    "custom_env": {
-      "NETBOX_API_TOKEN": "vhEatZgTpsKYbcQJdEdHHT1a3NNbuH5ZT8HTW6lh"
-    }
+    "NETBOX_API_TOKEN": "#readonly chainlayer credentials:NETBOX_TOKEN#"
   },
   "name": "Chainlayer Maintainer",
   "description": "Single workspace-wide maintainer for the Chainlayer Multica workspace. Runs on multica-02. Member of every Chainlayer squad.",
