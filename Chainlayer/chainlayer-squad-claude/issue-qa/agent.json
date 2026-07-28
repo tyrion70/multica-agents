@@ -13,11 +13,11 @@
     "bitwarden",
     "chainlayer-knowledge",
     "company-k8s",
+    "git-mr",
     "git-pr",
     "linear-company",
     "rag-consumer",
     "rag-ops",
-    "ssh",
-    "git-mr"
+    "ssh"
   ]
 }

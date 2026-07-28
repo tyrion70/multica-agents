@@ -12,9 +12,9 @@
   "skills": [
     "bitwarden",
     "chainlayer-knowledge",
+    "git-mr",
     "git-pr",
     "rag-consumer",
-    "ssh",
-    "git-mr"
+    "ssh"
   ]
 }

@@ -11,10 +11,10 @@
   "max_concurrent_tasks": 6,
   "skills": [
     "bitwarden",
+    "git-mr",
     "git-pr",
     "multica-sync",
     "rag-consumer",
-    "ssh",
-    "git-mr"
+    "ssh"
   ]
 }

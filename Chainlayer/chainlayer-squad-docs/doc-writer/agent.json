@@ -14,9 +14,9 @@
     "chainlayer-knowledge",
     "company-k8s",
     "git-mr",
+    "git-pr",
     "grafana-monitoring",
     "rag-consumer",
-    "ssh",
-    "git-pr"
+    "ssh"
   ]
 }
