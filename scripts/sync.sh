@@ -21,18 +21,21 @@ for var in MULTICA_AGENT_ID MULTICA_AGENT_NAME MULTICA_DAEMON_PORT \
 done
 
 # Single EXIT cleanup for everything below (daemon-ctx restore + bw teardown).
-# Both steps are opt-in: the vars stay empty until their block populates them,
-# so this is a no-op if neither runs. bw teardown goes first, then the ctx
+# Both steps are opt-in: the arrays/vars stay empty until their block populates
+# them, so this is a no-op if neither runs. bw teardown goes first, then the ctx
 # restore, so the isolated vault is logged out and removed before we hand the
-# workdir back.
-DAEMON_CTX=""; DAEMON_CTX_BAK=""; BW_DATADIR=""
+# workdir back. DAEMON_CTXS / DAEMON_CTX_BAKS are parallel arrays — one entry per
+# ancestor marker we moved aside (see the walk-all-ancestors block below).
+DAEMON_CTXS=(); DAEMON_CTX_BAKS=(); BW_DATADIR=""
 _cleanup() {
   if [ -n "$BW_DATADIR" ]; then
     bw logout >/dev/null 2>&1 || true
     rm -rf "$BW_DATADIR"
   fi
-  if [ -n "$DAEMON_CTX_BAK" ] && [ -n "$DAEMON_CTX" ]; then
-    mv -f "$DAEMON_CTX_BAK" "$DAEMON_CTX"
+  if [ "${#DAEMON_CTXS[@]}" -gt 0 ]; then
+    for _i in "${!DAEMON_CTXS[@]}"; do
+      mv -f "${DAEMON_CTX_BAKS[$_i]}" "${DAEMON_CTXS[$_i]}"
+    done
   fi
 }
 trap _cleanup EXIT
@@ -41,23 +44,28 @@ trap _cleanup EXIT
 # .multica/daemon_task_context.json, which it discovers by walking UP from the
 # CWD through ancestor dirs (not just the CWD). It is the on-disk twin of the
 # MULTICA_* vars we just unset, so a leftover one from a prior task re-scopes the
-# CLI (or makes it reject calls) and defeats the host-login fallback. Find it the
-# same way the CLI does — nearest ancestor wins — move it aside for the duration
-# of this script, and restore it on exit (_cleanup above).
+# CLI (or makes it reject calls) and defeats the host-login fallback.
+#
+# The CLI stops at the FIRST marker it finds, but a nested task workdir can carry
+# MORE than one on its ancestor path — e.g. the task's own marker plus a stale
+# one higher up under .../multica_workspaces/. Neutralising only the nearest
+# leaves the higher one still re-scoping the CLI (CHA-874, surfaced during
+# CHA-873's deploy where sync had to be run from /home/peter to dodge it). So
+# walk ALL ancestors and move every marker aside for the duration of this
+# script, restoring them all on exit (_cleanup above).
 _d="$PWD"
 while [ -n "$_d" ]; do
   if [ -f "$_d/.multica/daemon_task_context.json" ]; then
-    DAEMON_CTX="$_d/.multica/daemon_task_context.json"
-    break
+    _ctx="$_d/.multica/daemon_task_context.json"
+    _bak="$(mktemp)"
+    mv "$_ctx" "$_bak"
+    DAEMON_CTXS+=("$_ctx")
+    DAEMON_CTX_BAKS+=("$_bak")
+    echo "  → moved aside stale $_ctx (restored on exit) so CLI falls back to host login" >&2
   fi
   [ "$_d" = "/" ] && break
   _d="$(dirname "$_d")"
 done
-if [ -n "$DAEMON_CTX" ]; then
-  DAEMON_CTX_BAK="$(mktemp)"
-  mv "$DAEMON_CTX" "$DAEMON_CTX_BAK"
-  echo "  → moved aside stale $DAEMON_CTX (restored on exit) so CLI falls back to host login" >&2
-fi
 
 # Resolve MCP secrets from Bitwarden.
 #
