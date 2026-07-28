@@ -1,9 +1,6 @@
 {
   "custom_env": {
-    "agent_id": "3716c6ae-fab9-4e30-82e0-e18680ed4069",
-    "custom_env": {
-      "DATAFEEDS_HEALTH_DSN": "postgresql://datafeeds_health_web:qjLJk4cFkzOITy38UPPx3TYvq7ngIzlF0GeQNdtxdU8c1957@100.66.184.50/datafeeds_health"
-    }
+    "DATAFEEDS_HEALTH_DSN": "postgresql://datafeeds_health_web:qjLJk4cFkzOITy38UPPx3TYvq7ngIzlF0GeQNdtxdU8c1957@100.66.184.50/datafeeds_health"
   },
   "name": "Datafeeds Healthcheck QA",
   "description": "Issue QA for the Datafeeds Healthcheck squad. Tests PRs against acceptance criteria, verifies against live Prometheus/Grafana data, and gates the deploy. Claude Opus for thorough analysis.",
@@ -22,5 +19,29 @@
     "git-pr",
     "rag-consumer",
     "ssh"
-  ]
+  ],
+  "mcp_config": {
+    "mcpServers": {
+      "github": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-github"
+        ],
+        "env": {
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "#readonly chainlayer credentials / GITHUB_PAT#"
+        }
+      },
+      "gitlab": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-gitlab"
+        ],
+        "env": {
+          "GITLAB_PERSONAL_ACCESS_TOKEN": "#ChainLayer · GitLab — group PAT#"
+        }
+      }
+    }
+  }
 }
