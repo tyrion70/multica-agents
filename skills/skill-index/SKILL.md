@@ -27,8 +27,9 @@ and `Chainlayer/skills.json`.
 | **deploy-app** | Deploy new apps to k8s GitOps pipeline: repo, CI, secrets, ArgoCD, Renovate. | — | Issue Deployer (Claude/ChatGPT). |
 | **deploy-verify-rollback** | Generic deploy/verify/rollback for approved changes. | — | Issue Deployer (Claude/ChatGPT). |
 | **fortigate** | Operate Fortigate firewalls (nl2, no1): address objects, allowlisting, API. | — | *(No agent currently bound — gap)* |
-| **git-mr** | Ship company code to GitLab: Linear-first, MR template, SSH-signed commits. | — | Most lifecycle agents. *Not bound:* Lead (uses index), Communicator (Claude), Doc Writer. |
-| **grafana-monitoring** | Build dashboards, run PromQL/LogQL, manage Alertmanager silences, operate monitoring stacks. | — | Monitoring Operator (all squads), Doc Reviewer/Publisher, Doc Writer. |
+| **git-mr** | Ship company code to GitLab: Linear-first, MR template, SSH-signed commits. | `mcpServers.gitlab` | Every lifecycle/repo agent across all 7 squads. |
+| **git-pr** | Ship private code to GitHub: Multica-issue-first, PR template, SSH-signed commits. | `mcpServers.github` | Every lifecycle/repo agent across all 7 squads. |
+| **grafana-monitoring** | Build dashboards, run PromQL/LogQL, manage Alertmanager silences, operate monitoring stacks. | `mcpServers.grafana` | Monitoring Operator (all squads), Doc Reviewer/Publisher, Doc Writer. |
 | **haproxy** | HAProxy RPC load balancing: bare-metal fleet + k8s Ingress Controller. | — | CF/HAProxy expert (all squads). |
 | **incidentio** | incident.io: incident management, alerts, on-call schedules, follow-ups. | `mcpServers.incidentio` | Communicators (all squads), all lifecycle agents (all squads). |
 | **linear-company** | ChainLayer Linear workspace (OPS/CLL/MAN): issue-first rule before any code change. | `mcpServers.linear` | All lifecycle agents except Maintainer. *Not bound:* Docs squad, Maintainer, Maintainer Private. |
@@ -45,7 +46,7 @@ and `Chainlayer/skills.json`.
 These exist in the multica-agents repo but belong to the Private workspace.
 ChainLayer agents should NOT route company work to them:
 
-`cloudflare`, `eryndal-*`, `homelab`, `homeassistant`, `tremor-*`,
+`cloudflare` (`mcpServers.cloudflare` — ChainLayer CF/HAProxy Expert), `eryndal-*`, `homelab`, `homeassistant`, `tremor-*`,
 `cancer-*`, `private-knowledge`, `linear-private`, `new-repo-private`,
 `multica-private`
 
