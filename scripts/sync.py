@@ -464,16 +464,42 @@ def build_update_args(agent_id: str, agent_data: Dict[str, Any]) -> List[str]:
 
 _PLACEHOLDER_RE = re.compile(r"#([^#]+)#")
 
+# stderr fragments (lowercased) that mean the bw session is dead/unusable — an
+# AUTH failure, not a missing item. A stale session on this shared host is the
+# CHA-873 root cause: with `--nointeraction` bw exits non-zero with one of these
+# instead of silently dropping to a `? Master password:` prompt and printing
+# nothing (rc=0, empty stdout), which used to masquerade as "item not found".
+_BW_AUTH_MARKERS = (
+    "vault is locked",
+    "you are not logged in",
+    "not logged in",
+    "session key",
+    "invalid master password",
+    "mac failed",
+)
+
+
+class BitwardenAuthError(RuntimeError):
+    """The bw session is missing/stale/locked — an auth failure that affects
+    *every* item, distinct from a single item being absent. Raised (never
+    swallowed as a None "not found") so the sync aborts loudly instead of
+    skipping every agent as if all their secrets had vanished (CHA-873)."""
+
 
 def _bw_get_secret(item_name: str) -> Optional[str]:
     """Resolve a Bitwarden secret.
 
     Supports two formats:
-      #Item Name#              — fetch the item by name, return the first hidden field.
-      #Item Name:Field Name#   — fetch the item by name, return the named field.
+      #Item Name#              — the item (exact name), return the first hidden field.
+      #Item Name:Field Name#   — the item (exact name), return the named field.
 
-    Uses BW_SESSION from the environment (set by sync.sh after unlock).
-    Returns None if the item can't be resolved or the session is expired.
+    Looks the item up with `bw list items --search` + exact-name match (not
+    `bw get item`, whose substring matching collides on shared substrings), using
+    BW_SESSION from the environment (set by sync.sh after unlock).
+
+    Returns None only for a *genuine miss* — the item (or the named field) does
+    not exist. A dead/stale/locked session raises BitwardenAuthError so it can
+    never be mistaken for a missing item and silently skipped fail-closed.
     """
     field_name: Optional[str] = None
     if ":" in item_name:
@@ -483,28 +509,80 @@ def _bw_get_secret(item_name: str) -> Optional[str]:
 
     bw_session = os.environ.get("BW_SESSION")
     if not bw_session:
+        # No session at all is handled loudly upstream (sync.sh already printed
+        # the unlock error); keep the historical fail-closed skip for this case.
         return None
+
+    # Resolve via `bw list items --search` + exact-name match, not `bw get item
+    # <name>`: get does substring matching and fails (or returns the wrong item)
+    # when several items share a substring — e.g. "grafana" also matches
+    # "InfluxDB prod — mqtt bucket token (grafana.252h.org)". list+search returns
+    # every candidate so we can pick the exact name. A genuine no-match is a
+    # well-formed empty array `[]` (rc=0), which stays cleanly distinct from the
+    # empty/locked stdout a stale session produces — so fail-loud still holds.
+    cmd_desc = f"bw list items --search '{item_name}'"
     try:
         result = subprocess.run(
-            ["bw", "get", "item", item_name, "--session", bw_session],
+            ["bw", "list", "items", "--search", item_name,
+             "--session", bw_session, "--nointeraction"],
             capture_output=True, text=True, timeout=15,
         )
-        if result.returncode != 0:
-            return None
-        data = json.loads(result.stdout)
-        if field_name:
-            for field in (data.get("fields") or []):
-                if field.get("name") == field_name:
-                    return field.get("value")
-            return None
-        for field in (data.get("fields") or []):
-            if field.get("type") == 1:
-                return field.get("value")
-        notes = (data.get("notes") or "").strip()
-        return notes if notes else None
     except Exception as e:
-        print(f"      WARNING: _bw_get_secret error for '{item_name}': {e}", file=sys.stderr)
+        raise BitwardenAuthError(f"`{cmd_desc}` failed to run: {e}")
+
+    stderr = (result.stderr or "").strip()
+    stderr_l = stderr.lower()
+    stdout = (result.stdout or "").strip()
+
+    # Auth failure: a locked/stale/invalid session. Fail LOUD.
+    if any(marker in stderr_l for marker in _BW_AUTH_MARKERS):
+        raise BitwardenAuthError(
+            f"bw session is not usable while resolving '{item_name}': {stderr}"
+        )
+    if result.returncode != 0:
+        # `list items` reports a no-match as rc=0 `[]`, so any non-zero exit is a
+        # real failure (network/session), never a plain miss — fail LOUD.
+        raise BitwardenAuthError(
+            f"`{cmd_desc}` exited {result.returncode}: {stderr or '(no stderr)'}"
+        )
+    if not stdout:
+        # rc=0 with empty stdout is the stale-session silent-prompt signature —
+        # a real no-match is `[]`, never empty — so empty means auth failure.
+        raise BitwardenAuthError(
+            f"`{cmd_desc}` returned empty output (stale session?)"
+        )
+    try:
+        candidates = json.loads(stdout)
+    except json.JSONDecodeError as e:
+        raise BitwardenAuthError(
+            f"`{cmd_desc}` returned non-JSON output ({e}); "
+            "treating as an auth failure rather than a missing item"
+        )
+
+    # Pick the exact-name match; fall back to the sole candidate only when the
+    # search is unambiguous (one hit). No match is a genuine miss (None), which
+    # the caller fails closed on — never a key-wipe.
+    data: Optional[Dict[str, Any]] = None
+    for candidate in candidates:
+        if candidate.get("name") == item_name:
+            data = candidate
+            break
+    if data is None and len(candidates) == 1:
+        data = candidates[0]
+    if data is None:
         return None
+
+    # From here we have the resolved item: a missing field IS a genuine miss.
+    if field_name:
+        for field in (data.get("fields") or []):
+            if field.get("name") == field_name:
+                return field.get("value")
+        return None
+    for field in (data.get("fields") or []):
+        if field.get("type") == 1:
+            return field.get("value")
+    notes = (data.get("notes") or "").strip()
+    return notes if notes else None
 
 
 class SecretResolutionError(RuntimeError):
@@ -964,6 +1042,13 @@ def sync_agents_workspace(
                 try:
                     mcp_file = _write_mcp_config_tempfile(repo_data)
                     custom_env_file = _write_custom_env_tempfile(repo_data)
+                except BitwardenAuthError:
+                    # A dead/stale session affects every agent — aborting loudly
+                    # is correct (skipping each one hides the real cause). Clean
+                    # the temp file and let it propagate to the top-level abort.
+                    if mcp_file:
+                        os.unlink(mcp_file)
+                    raise
                 except SecretResolutionError as e:
                     # Fail closed: never push an unresolved #…# placeholder over a
                     # live agent's config (the CHA-790 key-wipe). Skip + report,
@@ -1090,6 +1175,11 @@ def sync_agents_workspace(
                     try:
                         mcp_file = _write_mcp_config_tempfile(merged_repo_data)
                         custom_env_file = _write_custom_env_tempfile(merged_repo_data)
+                    except BitwardenAuthError:
+                        # Dead/stale session — abort loudly (see the push path).
+                        if mcp_file:
+                            os.unlink(mcp_file)
+                        raise
                     except SecretResolutionError as e:
                         # Fail closed: same guard as the push path — never write an
                         # unresolved placeholder over a live agent while reconciling.
@@ -1697,6 +1787,17 @@ def main() -> None:
     except CreateBudgetExceeded as e:
         aborted = str(e)
         print(f"\n✗ ABORTED: {e}", file=sys.stderr)
+    except BitwardenAuthError as e:
+        # A stale/locked bw session fails every item identically. Abort loudly
+        # with the real cause instead of skipping every agent as "not found".
+        aborted = f"Bitwarden auth/session failure — {e}"
+        print(f"\n✗ ABORTED (Bitwarden session): {e}", file=sys.stderr)
+        print(
+            "    The session went stale or locked mid-run. sync.sh now isolates "
+            "the session in a private data-dir; if you still hit this, re-run and "
+            "check the bw unlock/liveness output above.",
+            file=sys.stderr,
+        )
 
     mode = "DRY-RUN" if args.dry_run else "SYNC"
     print(f"\n==> {mode} COMPLETE", file=sys.stderr)
@@ -1719,7 +1820,7 @@ def main() -> None:
     if aborted:
         print(
             "==> Run aborted before completion — sync state NOT saved. "
-            "Fix the cause (likely a mis-scoped agent list) and re-run.",
+            "Fix the cause and re-run.",
             file=sys.stderr,
         )
         sys.exit(1)

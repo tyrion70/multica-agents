@@ -11,7 +11,10 @@ twice back-to-back must not mint fresh UUIDs on the second run.
 Run with:  python3 -m pytest scripts/test_sync.py   (or: python3 scripts/test_sync.py)
 """
 
+import contextlib
+import io
 import json
+import os
 import pathlib
 import sys
 import unittest
@@ -126,6 +129,43 @@ class FakeMulticaBackend:
             return []
 
         raise AssertionError(f"unexpected multica call: {args}")
+
+
+class FakeBw:
+    """Models the `bw` CLI session lifecycle at the subprocess boundary (CHA-873).
+
+    A session token encodes its data-dir: ``ISO:n`` for this run's *isolated*
+    data-dir, ``DEF:n`` for the shared *default* dir. ``bw get item --session
+    TOK`` succeeds only while TOK is the *current* token for its data-dir; a
+    ``bw unlock`` in a dir mints a new token and invalidates the prior one FOR
+    THAT DIR ONLY. That is precisely why sync.sh's isolated data-dir survives a
+    concurrent unlock that re-keys the default dir, and why a shared session does
+    not. The first `bw get` triggers a simulated concurrent unlock of the default
+    dir, modelling a second `bw unlock` landing mid-run.
+    """
+
+    def __init__(self):
+        self.current = {"ISO": "ISO:1", "DEF": "DEF:1"}
+        self._concurrent_unlock_done = False
+
+    def __call__(self, cmd, *args, **kwargs):
+        assert cmd[:4] == ["bw", "list", "items", "--search"], f"unexpected bw call: {cmd}"
+        # Fail-loud contract: sync.py must always pass --nointeraction so a stale
+        # session errors out instead of hanging on a master-password prompt.
+        assert "--nointeraction" in cmd, "bw call must pass --nointeraction"
+        if not self._concurrent_unlock_done:
+            self._concurrent_unlock_done = True
+            self.current["DEF"] = "DEF:2"  # another host process re-keys default
+        tok = cmd[cmd.index("--session") + 1]
+        dir_key = tok.split(":", 1)[0]
+        search = cmd[cmd.index("--search") + 1]
+        if self.current.get(dir_key) == tok:
+            # `list items --search` returns an array; the item's name matches the
+            # search term so the exact-name match in _bw_get_secret picks it.
+            item = {"name": search, "fields": [{"name": "API", "value": "REALKEY", "type": 1}]}
+            return mock.Mock(returncode=0, stdout=json.dumps([item]), stderr="")
+        # Stale session under --nointeraction: non-zero, locked, empty stdout.
+        return mock.Mock(returncode=1, stdout="", stderr="Vault is locked.")
 
 
 class SyncIdentityTest(unittest.TestCase):
@@ -301,6 +341,148 @@ class SyncIdentityTest(unittest.TestCase):
         self.assertEqual(code, 1, "should abort over threshold")
         # Hard cap respected: never mints more than the threshold.
         self.assertLessEqual(self.backend.created_calls, 2)
+
+    # --- Session isolation vs concurrent `bw unlock` (CHA-873) ---
+
+    def test_isolated_session_survives_concurrent_unlock(self):
+        """AC: with sync.sh's per-run isolated data-dir, a second `bw unlock`
+        landing mid-run does NOT invalidate this run's session, so every
+        placeholder resolves and there are 0 fail-closed skips."""
+        self._write_agent("squad-a/coder", {
+            "name": "Test Coder", "runtime_id": "rt-1", "description": "d",
+            "mcp_config": self._MCP_PLACEHOLDER,
+        })
+        fake = FakeBw()
+        with mock.patch.dict(os.environ, {"BW_SESSION": "ISO:1"}), \
+             mock.patch.object(sync.subprocess, "run", side_effect=fake):
+            code = self._run("--allow-create")
+        self.assertEqual(code, 0, "isolated session should survive the concurrent unlock")
+        self.assertEqual(self.backend.created_calls, 1)
+        aid = next(iter(self.backend.agents))
+        self.assertEqual(
+            self.backend.agents[aid]["mcp_config"]["mcpServers"]["svc"]["env"]["TOKEN"],
+            "REALKEY", "secret did not resolve to the live value",
+        )
+
+    def test_shared_session_concurrent_unlock_aborts_loud(self):
+        """Regression teeth: a NON-isolated (default-dir) session IS invalidated
+        by a concurrent unlock — the exact CHA-873 failure. It must now abort
+        LOUDLY (BitwardenAuthError → non-zero exit), never silently skip every
+        agent as 'item not found', and never push a placeholder."""
+        self._write_agent("squad-a/coder", {
+            "name": "Test Coder", "runtime_id": "rt-1", "description": "d",
+            "mcp_config": self._MCP_PLACEHOLDER,
+        })
+        fake = FakeBw()
+        err = io.StringIO()
+        with mock.patch.dict(os.environ, {"BW_SESSION": "DEF:1"}), \
+             mock.patch.object(sync.subprocess, "run", side_effect=fake), \
+             contextlib.redirect_stderr(err):
+            code = self._run("--allow-create")
+        self.assertEqual(code, 1, "a stale session must fail the run")
+        self.assertEqual(self.backend.created_calls, 0, "pushed with an unusable session")
+        # Teeth: it must ABORT loudly as an auth failure, NOT take the silent
+        # fail-closed skip path (which the old return-None behavior did, hiding
+        # the real cause behind a "could not resolve placeholder" skip).
+        log = err.getvalue()
+        self.assertIn("ABORTED (Bitwarden session)", log)
+        self.assertNotIn("SKIPPING push (fail-closed)", log)
+
+
+class BwSecretResolutionTest(unittest.TestCase):
+    """Fail-loud secret resolution (CHA-873): _bw_get_secret distinguishes an
+    auth/session failure (raise BitwardenAuthError) from a genuine missing item
+    (return None), and never silently returns None on a stale session."""
+
+    def _get(self, item, *, returncode=0, stdout="", stderr="", session="S1"):
+        cp = mock.Mock(returncode=returncode, stdout=stdout, stderr=stderr)
+        environ = dict(os.environ)
+        environ.pop("BW_SESSION", None)
+        if session is not None:
+            environ["BW_SESSION"] = session
+        with mock.patch.dict(os.environ, environ, clear=True), \
+             mock.patch.object(sync.subprocess, "run", return_value=cp) as run:
+            return sync._bw_get_secret(item), run
+
+    def test_stale_session_empty_stdout_raises(self):
+        """rc=0 + empty stdout is the stale-session silent-prompt signature."""
+        with self.assertRaises(sync.BitwardenAuthError):
+            self._get("Some Item", returncode=0, stdout="")
+
+    def test_locked_session_raises(self):
+        with self.assertRaises(sync.BitwardenAuthError):
+            self._get("Some Item", returncode=1, stderr="Vault is locked.")
+
+    def test_not_logged_in_raises(self):
+        with self.assertRaises(sync.BitwardenAuthError):
+            self._get("Some Item", returncode=1, stderr="You are not logged in.")
+
+    def test_non_json_stdout_raises(self):
+        with self.assertRaises(sync.BitwardenAuthError):
+            self._get("Some Item", returncode=0, stdout="? Master password:")
+
+    def test_genuine_not_found_returns_none(self):
+        """A real no-match from `list items --search` is a well-formed `[]`."""
+        val, _ = self._get("Ghost Item", returncode=0, stdout="[]")
+        self.assertIsNone(val)
+
+    def test_missing_field_returns_none(self):
+        body = json.dumps([{"name": "Item", "fields": [{"name": "Other", "value": "x", "type": 1}]}])
+        val, _ = self._get("Item:Absent", returncode=0, stdout=body)
+        self.assertIsNone(val)
+
+    def test_hidden_field_resolves(self):
+        body = json.dumps([{"name": "Item", "fields": [{"name": "n", "value": "SEKRET", "type": 1}]}])
+        val, _ = self._get("Item", returncode=0, stdout=body)
+        self.assertEqual(val, "SEKRET")
+
+    def test_named_field_resolves(self):
+        body = json.dumps([{"name": "Item", "fields": [{"name": "API", "value": "V", "type": 0}]}])
+        val, _ = self._get("Item:API", returncode=0, stdout=body)
+        self.assertEqual(val, "V")
+
+    def test_exact_name_match_beats_substring_collision(self):
+        """The substring-collision fix (folded from PR #79): when the search
+        returns several items, the exact-name match wins — not the first hit."""
+        body = json.dumps([
+            {"name": "InfluxDB prod — mqtt bucket token (grafana.252h.org)",
+             "fields": [{"name": "n", "value": "WRONG", "type": 1}]},
+            {"name": "Grafana",
+             "fields": [{"name": "n", "value": "RIGHT", "type": 1}]},
+        ])
+        val, run = self._get("Grafana", returncode=0, stdout=body)
+        self.assertEqual(val, "RIGHT")
+        # And it went through list+search, not `bw get item`.
+        cmd = run.call_args[0][0]
+        self.assertEqual(cmd[:4], ["bw", "list", "items", "--search"])
+
+    def test_single_candidate_fallback_resolves(self):
+        """One unambiguous hit resolves even without an exact-name match."""
+        body = json.dumps([{"name": "Item (renamed)", "fields": [{"name": "n", "value": "V", "type": 1}]}])
+        val, _ = self._get("Item", returncode=0, stdout=body)
+        self.assertEqual(val, "V")
+
+    def test_multiple_no_exact_match_returns_none(self):
+        """Ambiguous (>1 hit, none exact) is a genuine miss — never guess."""
+        body = json.dumps([
+            {"name": "Item A", "fields": [{"name": "n", "value": "a", "type": 1}]},
+            {"name": "Item B", "fields": [{"name": "n", "value": "b", "type": 1}]},
+        ])
+        val, _ = self._get("Item", returncode=0, stdout=body)
+        self.assertIsNone(val)
+
+    def test_passes_nointeraction_and_uses_list_search(self):
+        body = json.dumps([{"name": "Item", "fields": [{"name": "n", "value": "x", "type": 1}]}])
+        _, run = self._get("Item", returncode=0, stdout=body)
+        cmd = run.call_args[0][0]
+        self.assertIn("--nointeraction", cmd)
+        self.assertEqual(cmd[:4], ["bw", "list", "items", "--search"])
+
+    def test_no_session_returns_none(self):
+        """Missing BW_SESSION keeps the historical fail-closed skip (already
+        reported loudly by sync.sh) — not an exception."""
+        val, _ = self._get("Item", session=None)
+        self.assertIsNone(val)
 
 
 if __name__ == "__main__":

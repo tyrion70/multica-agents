@@ -20,23 +20,61 @@ for var in MULTICA_AGENT_ID MULTICA_AGENT_NAME MULTICA_DAEMON_PORT \
   unset "$var"
 done
 
+# Single EXIT cleanup for everything below (daemon-ctx restore + bw teardown).
+# Both steps are opt-in: the vars stay empty until their block populates them,
+# so this is a no-op if neither runs. bw teardown goes first, then the ctx
+# restore, so the isolated vault is logged out and removed before we hand the
+# workdir back.
+DAEMON_CTX=""; DAEMON_CTX_BAK=""; BW_DATADIR=""
+_cleanup() {
+  if [ -n "$BW_DATADIR" ]; then
+    bw logout >/dev/null 2>&1 || true
+    rm -rf "$BW_DATADIR"
+  fi
+  if [ -n "$DAEMON_CTX_BAK" ] && [ -n "$DAEMON_CTX" ]; then
+    mv -f "$DAEMON_CTX_BAK" "$DAEMON_CTX"
+  fi
+}
+trap _cleanup EXIT
+
 # The multica CLI also reads a file-based task context from
-# .multica/daemon_task_context.json in the workdir. It is the on-disk twin of
-# the MULTICA_* vars we just unset, so a leftover one from a prior task re-scopes
-# the CLI (or makes it reject calls) and defeats the host-login fallback. Move it
-# aside for the duration of this script and restore it on exit, so we fall back
-# cleanly without disturbing anything else that shares the workdir.
-DAEMON_CTX=".multica/daemon_task_context.json"
-if [ -f "$DAEMON_CTX" ]; then
+# .multica/daemon_task_context.json, which it discovers by walking UP from the
+# CWD through ancestor dirs (not just the CWD). It is the on-disk twin of the
+# MULTICA_* vars we just unset, so a leftover one from a prior task re-scopes the
+# CLI (or makes it reject calls) and defeats the host-login fallback. Find it the
+# same way the CLI does — nearest ancestor wins — move it aside for the duration
+# of this script, and restore it on exit (_cleanup above).
+_d="$PWD"
+while [ -n "$_d" ]; do
+  if [ -f "$_d/.multica/daemon_task_context.json" ]; then
+    DAEMON_CTX="$_d/.multica/daemon_task_context.json"
+    break
+  fi
+  [ "$_d" = "/" ] && break
+  _d="$(dirname "$_d")"
+done
+if [ -n "$DAEMON_CTX" ]; then
   DAEMON_CTX_BAK="$(mktemp)"
   mv "$DAEMON_CTX" "$DAEMON_CTX_BAK"
-  # shellcheck disable=SC2064
-  trap "mv -f '$DAEMON_CTX_BAK' '$DAEMON_CTX'" EXIT
   echo "  → moved aside stale $DAEMON_CTX (restored on exit) so CLI falls back to host login" >&2
 fi
 
-# Resolve MCP secrets from Bitwarden (runs under the host local login
-# after the unset above, so bw unlock authenticates as peter@tyrion.nl).
+# Resolve MCP secrets from Bitwarden.
+#
+# Session isolation (CHA-873): the bw CLI keeps ONE active session per user
+# data-dir, and every `bw unlock` mints a fresh session key that invalidates all
+# prior ones for that data-dir. On this shared host other bw consumers (the
+# Private-workspace sync autopilot, the datafeeds watchdog, any agent using the
+# `bitwarden` skill, even an overlapping run of this same autopilot) periodically
+# re-key the default data-dir, silently invalidating a BW_SESSION captured here
+# mid-run — `bw get` then returns rc=0 with empty stdout and sync.py resolves
+# every placeholder to None, skipping every agent fail-closed.
+#
+# Fix: give this run a PRIVATE BITWARDENCLI_APPDATA_DIR that no other bw consumer
+# touches, log in there with the API key, unlock, and probe the vault once to
+# confirm the session is live before trusting it. The isolated data-dir is
+# preferred over a host-wide flock: it needs no shared lock file and can't be
+# starved by a long-running peer holding the lock.
 BOOTSTRAP="${BW_BOOTSTRAP:-$HOME/.claude/secrets/bw-bootstrap.env}"
 if [ -f "$BOOTSTRAP" ]; then
   set -a
@@ -44,21 +82,37 @@ if [ -f "$BOOTSTRAP" ]; then
   source "$BOOTSTRAP"
   set +a
   export NODE_TLS_REJECT_UNAUTHORIZED=0
-  # Capture the real bw error instead of swallowing it with 2>/dev/null — a
-  # silently-failed unlock is what let unresolved #…# placeholders get pushed
-  # over live MCP keys (CHA-790). A failed unlock is a hard stop for the
-  # MCP-push path: we leave BW_SESSION unset so sync.py fails closed (skips +
-  # reports every agent whose config needs a secret, and exits non-zero) rather
-  # than warning and pushing placeholders.
+
+  # Private per-run data-dir — logged out and removed by _cleanup on exit.
+  BW_DATADIR="$(mktemp -d)"
+  export BITWARDENCLI_APPDATA_DIR="$BW_DATADIR"
+
+  # config server → apikey login → unlock → sync → liveness probe, all inside the
+  # isolated dir. --nointeraction makes a bad/stale session fail loud (non-zero)
+  # instead of dropping to a silent `? Master password:` prompt (the CHA-873
+  # signature). The `bw list items` probe confirms the session can actually
+  # decrypt the vault, so a rc=0-but-broken unlock is caught here rather than
+  # surfacing as "every item missing" downstream. Capture the real bw error
+  # instead of swallowing it — a silently-failed unlock is what let unresolved
+  # #…# placeholders get pushed over live MCP keys (CHA-790). On any failure we
+  # leave BW_SESSION unset so sync.py fails closed (skips + reports every agent
+  # whose config needs a secret, exits non-zero) rather than pushing placeholders.
   bw_err="$(mktemp)"
-  if BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw 2>"$bw_err")"; then
+  if bw config server "$BW_HOST" >/dev/null 2>"$bw_err" \
+     && bw login --apikey --nointeraction >/dev/null 2>"$bw_err" \
+     && BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw --nointeraction 2>"$bw_err")" \
+     && [ -n "$BW_SESSION" ] \
+     && bw sync --session "$BW_SESSION" --nointeraction >/dev/null 2>"$bw_err" \
+     && bw list items --session "$BW_SESSION" --nointeraction >/dev/null 2>"$bw_err"; then
     export BW_SESSION
+    echo "  → bw session ready in isolated data-dir (survives concurrent unlocks on the host)" >&2
   else
-    echo "  ERROR: bw unlock failed — MCP secret placeholders cannot be resolved." >&2
+    echo "  ERROR: bw unlock/liveness failed — MCP secret placeholders cannot be resolved." >&2
     echo "         bw reported:" >&2
     sed 's/^/           /' "$bw_err" >&2
     echo "         Continuing without BW_SESSION; sync.py will fail closed and" >&2
     echo "         SKIP (never overwrite) any agent whose config needs a secret." >&2
+    unset BW_SESSION || true
   fi
   rm -f "$bw_err"
 fi
