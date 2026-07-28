@@ -1,9 +1,6 @@
 {
   "custom_env": {
-    "agent_id": "a5ac100a-182a-44a4-9d35-ae82f9992f87",
-    "custom_env": {
-      "NETBOX_API_TOKEN": "vhEatZgTpsKYbcQJdEdHHT1a3NNbuH5ZT8HTW6lh"
-    }
+    "NETBOX_API_TOKEN": "vhEatZgTpsKYbcQJdEdHHT1a3NNbuH5ZT8HTW6lh"
   },
   "name": "Chainlayer Maintainer",
   "description": "Single workspace-wide maintainer for the Chainlayer Multica workspace. Runs on multica-02. Member of every Chainlayer squad.",
@@ -23,5 +20,71 @@
     "multica-sync",
     "rag-consumer",
     "ssh"
-  ]
+  ],
+  "mcp_config": {
+    "mcpServers": {
+      "gdrive": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@piotr-agier/google-drive-mcp"
+        ],
+        "env": {
+          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json",
+          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "/home/peter/.config/google-drive-mcp/tokens.json"
+        }
+      },
+      "github": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-github"
+        ],
+        "env": {
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "#readonly chainlayer credentials / GITHUB_PAT#"
+        }
+      },
+      "gitlab": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-gitlab"
+        ],
+        "env": {
+          "GITLAB_PERSONAL_ACCESS_TOKEN": "#ChainLayer · GitLab — group PAT#"
+        }
+      },
+      "incidentio": {
+        "type": "http",
+        "url": "https://mcp.incident.io/mcp",
+        "headers": {
+          "Authorization": "Bearer #ChainLayer · incident.io — API key#"
+        }
+      },
+      "linear": {
+        "type": "http",
+        "url": "https://mcp.linear.app/mcp",
+        "headers": {
+          "Authorization": "Bearer #ChainLayer · Linear — API key#"
+        }
+      },
+      "rag": {
+        "type": "sse",
+        "url": "http://100.69.200.97:8041/sse"
+      },
+      "slack": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "slack-mcp-server@latest",
+          "-no-cache"
+        ],
+        "env": {
+          "SLACK_MCP_ADD_MESSAGE_TOOL": "true",
+          "SLACK_MCP_REACTION_TOOL": "true",
+          "SLACK_MCP_XOXP_TOKEN": "#ChainLayer · Slack — personal token (xoxp)#"
+        }
+      }
+    }
+  }
 }

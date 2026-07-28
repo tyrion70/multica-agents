@@ -51,9 +51,7 @@
     "custom_env": {
       "type": "object",
       "description": "Secret environment variables injected into the agent's process. Use placeholder strings for actual values: {{VAULT:folder/item-name}} for Bitwarden secrets, {{SECRET:name}} for other secret references. Never commit plaintext secrets.",
-      "additionalProperties": {
-        "type": "string"
-      }
+      "additionalProperties": true
     },
     "mcp_config": {
       "description": "MCP server configuration (e.g. {\"mcpServers\": {...}}). Secret material — use {{VAULT:...}} and {{SECRET:...}} placeholders for API tokens and credentials. Never commit plaintext secrets.",

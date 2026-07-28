@@ -1,9 +1,6 @@
 {
   "custom_env": {
-    "agent_id": "be49ae1e-cb04-44d2-804c-3bb1078dd164",
-    "custom_env": {
-      "DATAFEEDS_HEALTH_DSN": "postgresql://datafeeds_health_web:qjLJk4cFkzOITy38UPPx3TYvq7ngIzlF0GeQNdtxdU8c1957@100.66.184.50/datafeeds_health"
-    }
+    "DATAFEEDS_HEALTH_DSN": "postgresql://datafeeds_health_web:qjLJk4cFkzOITy38UPPx3TYvq7ngIzlF0GeQNdtxdU8c1957@100.66.184.50/datafeeds_health"
   },
   "name": "Datafeeds Healthcheck Deployer",
   "description": "Issue Deployer for the Datafeeds Healthcheck squad. Deploys approved changes to production after human go-ahead. DeepSeek model for efficient deployment.",
@@ -22,5 +19,29 @@
     "git-pr",
     "rag-consumer",
     "ssh"
-  ]
+  ],
+  "mcp_config": {
+    "mcpServers": {
+      "github": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-github"
+        ],
+        "env": {
+          "GITHUB_PERSONAL_ACCESS_TOKEN": "#readonly chainlayer credentials / GITHUB_PAT#"
+        }
+      },
+      "gitlab": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@modelcontextprotocol/server-gitlab"
+        ],
+        "env": {
+          "GITLAB_PERSONAL_ACCESS_TOKEN": "#ChainLayer · GitLab — group PAT#"
+        }
+      }
+    }
+  }
 }
