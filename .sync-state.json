@@ -2641,7 +2641,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"gdrive\", \"github\", \"gitlab\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
-        "custom_env": null
+        "custom_env": [
+          "NETBOX_API_TOKEN"
+        ]
       },
       "multica_state": {
         "name": "Chainlayer Maintainer",
@@ -2664,7 +2666,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"gdrive\", \"github\", \"gitlab\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
-        "custom_env": null
+        "custom_env": [
+          "NETBOX_API_TOKEN"
+        ]
       }
     },
     "Chainlayer~Private Maintainer": {
@@ -2688,7 +2692,7 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"github\", \"gitlab\", \"rag\"]}",
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"github\", \"gitlab\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
         "custom_env": null
       },
       "multica_state": {
@@ -2710,7 +2714,7 @@
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"github\", \"gitlab\", \"rag\"]}",
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"github\", \"gitlab\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
         "custom_env": null
       }
     },
@@ -4194,7 +4198,7 @@
           "datafeeds-health-findings",
           "grafana-monitoring"
         ],
-        "mcp_config": null,
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"github\", \"gitlab\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
         "custom_env": null
       },
       "multica_state": {
@@ -4213,7 +4217,7 @@
           "datafeeds-health-findings",
           "grafana-monitoring"
         ],
-        "mcp_config": null,
+        "mcp_config": "{\"mcpServers\": [\"gdrive\", \"github\", \"gitlab\", \"incidentio\", \"linear\", \"rag\", \"slack\"]}",
         "custom_env": null
       }
     },
@@ -4239,7 +4243,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       },
       "multica_state": {
         "name": "Datafeeds Healthcheck Coder",
@@ -4261,7 +4267,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       }
     },
     "Chainlayer~Datafeeds Healthcheck Deployer": {
@@ -4286,7 +4294,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       },
       "multica_state": {
         "name": "Datafeeds Healthcheck Deployer",
@@ -4308,7 +4318,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       }
     },
     "Chainlayer~Datafeeds Healthcheck QA": {
@@ -4333,7 +4345,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       },
       "multica_state": {
         "name": "Datafeeds Healthcheck QA",
@@ -4355,7 +4369,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       }
     },
     "Chainlayer~Datafeeds Healthcheck Refiner": {
@@ -4380,7 +4396,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       },
       "multica_state": {
         "name": "Datafeeds Healthcheck Refiner",
@@ -4402,7 +4420,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       }
     },
     "Chainlayer~Datafeeds Healthcheck Tech Lead": {
@@ -4427,7 +4447,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       },
       "multica_state": {
         "name": "Datafeeds Healthcheck Tech Lead",
@@ -4449,7 +4471,9 @@
           "ssh"
         ],
         "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
-        "custom_env": null
+        "custom_env": [
+          "DATAFEEDS_HEALTH_DSN"
+        ]
       }
     },
     "Chainlayer~GLM CF/HAProxy Expert": {
