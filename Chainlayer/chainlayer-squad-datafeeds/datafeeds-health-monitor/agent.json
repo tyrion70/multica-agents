@@ -11,6 +11,7 @@
   "max_concurrent_tasks": 6,
   "skills": [
     "bitwarden",
+    "chainlink-ops",
     "datafeeds-health-findings",
     "grafana-monitoring"
   ],
