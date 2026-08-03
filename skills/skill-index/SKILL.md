@@ -20,7 +20,7 @@ and `Chainlayer/skills.json`.
 | **bitwarden** | Read/create/update secrets in Peter's self-hosted Bitwarden vault. | — | All Claude/ChatGPT/DeepSeek lifecycle agents + RAG Tech Lead + Maintainer. *Not bound:* Docs squad. |
 | **chainlayer-docs** | Write, review, publish ChainLayer docs on docs.chainlayer.cloud (Retype). | — | Doc Writer, Doc Reviewer/Publisher (Docs squad). |
 | **chainlayer-knowledge** | Cross-cutting infra facts: chainlink-tools, migrations, Filecoin voter, QuickNode RPCs. | — | Every agent in every squad. |
-| **chainlink-ops** | Operate Chainlink node fleet: RPC config, adapter lifecycle, token refresh, topup. | — | *(No agent currently bound — gap)* |
+| **chainlink-ops** | Operate Chainlink node fleet: RPC config, adapter lifecycle, token refresh, topup. | — | Every agent in every squad (fleet-wide, all agents). |
 | **company-k8s** | Operate k8s clusters (nl-oven, nl-spud, no-fryer): kubectl, manifests, ArgoCD, storage. | — | CF/HAProxy expert (all squads), Monitoring Operator (all squads), Issue Deployer (Claude/ChatGPT), Issue QA (all squads), Doc Reviewer/Publisher, Doc Writer. |
 | **company-proxmox** | Operate Proxmox clusters (Prox7, Prox9): VM migrations, restores, TF IaC. | — | Issue Coder (all squads), Monitoring Operator (all squads). |
 | **datafeeds-health-findings** | Run the chainlink-datafeeds-health report read-only and turn findings into deduped Multica issues (mapping, dedup keys, lifecycle, zero-mutation guardrail). | — | *(Bound in Stage 3 — the periodic datafeeds-health findings sweep agent)* |
