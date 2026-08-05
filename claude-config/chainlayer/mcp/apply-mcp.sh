@@ -20,7 +20,7 @@ ATLASSIAN_EMAIL="${2:-peter@chainlayer.io}"
 SLACK_TEAM_ID="${SLACK_TEAM_ID:-TL8TVRYF8}"
 : "${BW_SESSION:?unlock Bitwarden first and export BW_SESSION (see the bitwarden skill)}"
 
-note() { bw get item "$1" --session "$BW_SESSION" \
+note() { bw get item "$1" \
   | python3 -c 'import json,sys;print((json.load(sys.stdin).get("notes") or "").strip())'; }
 
 LINEAR_KEY="$(note linear)"
