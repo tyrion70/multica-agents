@@ -67,7 +67,7 @@ The CF API token is **never baked into `custom_env`**. Fetch at runtime:
 
 ```bash
 # Via bitwarden skill, company folder:
-CF_TOKEN=$(bw get password "Cloudflare API token - chainlayer write" --session "$BW_SESSION")
+CF_TOKEN=$(bw get password "Cloudflare API token - chainlayer write")
 export CLOUDFLARE_API_TOKEN="$CF_TOKEN"
 ```
 
