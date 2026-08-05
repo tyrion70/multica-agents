@@ -53,9 +53,9 @@ Secrets come from the `bitwarden` skill or GCP Secret Manager — never hardcode
 and never paste a secret into an issue/comment.
 
 ## Updating this config (rules + skills)
-This file (`claude-config/chainlayer/CLAUDE.md`) is the source of truth and your
-`~/.claude/CLAUDE.md` is a symlink into the repo checkout. When you need to change
-an always-on rule or skill wiring:
+This file (`claude-config/chainlayer/CLAUDE.md`) is the source of truth and
+`sync.sh` copies it to `~/.claude/CLAUDE.md` on each host (copy, not symlink).
+When you need to change an always-on rule or skill wiring:
 1. Edit the file under `claude-config/chainlayer/` (or the companion
    `claude-config/private/CLAUDE.md`).
 2. Open a **PR** against `tyrion70/multica-agents` on a branch
@@ -63,7 +63,7 @@ an always-on rule or skill wiring:
    SSH-signed, no `Co-Authored-By`.
 3. **Tell the user**: post a Multica comment / message saying what you changed
    and link the PR, so they can review and merge.
-4. Once merged, the sync autopilot pulls `main` and re-links on every host.
+4. Once merged, the sync autopilot pulls `main` and redeploys the file on every host.
 
 (Durable *facts* go in your runtime memory, above — not here. This repo is for
 rules and skills only.)
