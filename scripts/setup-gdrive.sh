@@ -18,7 +18,7 @@ die() { echo >&2 "error: $*"; exit 1; }
 info() { echo "==> $*"; }
 
 unlock_bw() {
-  if ! bw status --session "${BW_SESSION:-}" 2>/dev/null \
+  if ! bw status 2>/dev/null \
     | python3 -c "import json,sys; exit(0 if json.load(sys.stdin)['status']=='unlocked' else 1)"; then
     set -a; . ~/.claude/secrets/bw-bootstrap.env; set +a
     export NODE_TLS_REJECT_UNAUTHORIZED=0
@@ -60,7 +60,7 @@ esac
 info "Fetching Google OAuth client credentials from Bitwarden …"
 unlock_bw
 
-bw get item "$BW_ITEM" --session "$BW_SESSION" \
+bw get item "$BW_ITEM" \
   | python3 -c "
 import json,sys
 d = json.load(sys.stdin)

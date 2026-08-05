@@ -108,10 +108,10 @@ if [ -f "$BOOTSTRAP" ]; then
   bw_err="$(mktemp)"
   if bw config server "$BW_HOST" >/dev/null 2>"$bw_err" \
      && bw login --apikey --nointeraction >/dev/null 2>"$bw_err" \
-     && BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw --nointeraction 2>"$bw_err")" \
+     && export BW_SESSION="$(bw unlock --passwordenv BW_PASSWORD --raw --nointeraction 2>"$bw_err")" \
      && [ -n "$BW_SESSION" ] \
-     && bw sync --session "$BW_SESSION" --nointeraction >/dev/null 2>"$bw_err" \
-     && bw list items --session "$BW_SESSION" --nointeraction >/dev/null 2>"$bw_err"; then
+     && bw sync --nointeraction >/dev/null 2>"$bw_err" \
+     && bw list items --nointeraction >/dev/null 2>"$bw_err"; then
     export BW_SESSION
     echo "  → bw session ready in isolated data-dir (survives concurrent unlocks on the host)" >&2
   else
