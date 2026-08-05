@@ -91,6 +91,7 @@ Note: `bw get password` works on Login items. For SecureNotes with hidden custom
 For credentials that come in groups (API URL + API key + multiple shared secrets), a single SecureNote with hidden custom fields keeps them together. This is what the UniFi and Mikrotik items use.
 
 ```bash
+umask 077                                   # owner-only temp file (default 0022 umask would make it world-readable)
 python3 <<'PY' | bw encode > /tmp/bw-new.b64
 import json
 item = {
@@ -118,6 +119,7 @@ rm -f /tmp/bw-new.b64
 For a credential that's literally "go to URL X, type username Y, password Z" (an SSH login, a web app), use a Login item:
 
 ```bash
+umask 077                                   # owner-only temp file (default 0022 umask would make it world-readable)
 python3 <<'PY' | bw encode > /tmp/bw-login.b64
 import json
 item = {
@@ -143,7 +145,7 @@ rm -f /tmp/bw-login.b64
 ## Update an existing item
 
 ```bash
-# Get current item JSON
+umask 077                                   # owner-only temp file (default 0022 umask would make it world-readable)
 bw get item "<id-or-exact-name>" --session "$BW_SESSION" > /tmp/bw-item.json
 
 # Edit the JSON (e.g. via python -c) — change folderId, add a field, etc.
@@ -175,7 +177,7 @@ bw sync --session "$BW_SESSION"
 3. **Don't `bw sync` without `NODE_TLS_REJECT_UNAUTHORIZED=0`** — it fails. The error is "self-signed certificate".
 4. **Don't reuse `BW_SESSION` across processes** — it's a per-process secret. Each Bash session unlocks fresh.
 5. **Don't commit `~/.claude/secrets/`** to any repo. It's already in `.gitignore`; double-check before any `git add -A`.
-6. **Don't leave temp `*.b64` or `*.json` files** of unlocked item data sitting in `/tmp` — `rm -f` them at the end of each write block. Even though `/tmp` is wiped on reboot, between now and then they're plaintext.
+6. **Don't leave temp `*.b64` or `*.json` files** of unlocked item data sitting in `/tmp` — `rm -f` them at the end of each write block. Even though `/tmp` is wiped on reboot, between now and then they're plaintext. Any such file must be created with `umask 077` first — the default `0022` umask creates a world-readable `0644` file in shared `/tmp`, the same read exposure as CHA-987.
 7. **Don't write a credential to BW that you found in chat-history or in a file you'll then delete** — the chat may be cached/exported; check whether the user pasted it explicitly or it leaked into context.
 
 ## Health checks
