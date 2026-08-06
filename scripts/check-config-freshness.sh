@@ -19,12 +19,15 @@
 #      CONFIG_FRESHNESS_STALE_HOURS)
 #   3  check itself failed (fetch/clone/hash), i.e. could not determine state
 #
-# Notifier: log-only by default (appends to CONFIG_FRESHNESS_LOG). If
-# CONFIG_FRESHNESS_SLACK_WEBHOOK is set, a Slack message is also posted on any
-# non-zero result. The destination trade-off is a deliberate design decision
-# (see CHA-992) — when agent config itself is broken, Slack is the most
-# independent channel; a Multica comment/autopilot rides on the stack being
-# checked.
+# Notifier: log-only by default (appends to CONFIG_FRESHNESS_LOG). When the
+# 0600 env file ($HOME/.claude/config-freshness.env, sourced at runtime — never
+# the crontab line or argv; CHA-987 exported-env rule) sets
+# CONFIG_FRESHNESS_SLACK_TOKEN + CONFIG_FRESHNESS_SLACK_USER_ID, a Slack DM is
+# posted on any non-zero result via the Web API (conversations.open then
+# chat.postMessage). The legacy CONFIG_FRESHNESS_SLACK_WEBHOOK path is kept as
+# a fallback. Alerting failures never change the exit code and are written to
+# the log file — an unreachable Slack must not silence the detector or fake it
+# healthy.
 set -euo pipefail
 
 PROFILE=""
@@ -34,6 +37,8 @@ STALE_HOURS="${CONFIG_FRESHNESS_STALE_HOURS:-30}"
 LOG_DIR="${CONFIG_FRESHNESS_LOG_DIR:-$HOME/.claude/logs}"
 LOG_FILE="${CONFIG_FRESHNESS_LOG:-$LOG_DIR/config-freshness.log}"
 SLACK_WEBHOOK="${CONFIG_FRESHNESS_SLACK_WEBHOOK:-}"
+SLACK_TOKEN="${CONFIG_FRESHNESS_SLACK_TOKEN:-}"
+SLACK_USER_ID="${CONFIG_FRESHNESS_SLACK_USER_ID:-}"
 HOST="$(hostname)"
 
 while [ $# -gt 0 ]; do
@@ -109,12 +114,89 @@ echo "$LINE" >> "$LOG_FILE"
 echo "$LINE"
 
 # --- notify -------------------------------------------------------------------
-if [ "$RC" -ne 0 ] && [ -n "$SLACK_WEBHOOK" ]; then
+# Alerting failures are logged to the log file and never change RC: an
+# unreachable Slack must not silence the detector or fake it healthy.
+# Source the 0600 env file (token/user) if present. Env file is preferred over
+# the cron line so the token never lives in crontab plaintext (CHA-987 rule:
+# secret reaches the script as an exported env var, never argv).
+if [ -f "$HOME/.claude/config-freshness.env" ]; then
+  # shellcheck disable=SC1091
+  set -a; . "$HOME/.claude/config-freshness.env"; set +a
+  SLACK_TOKEN="${CONFIG_FRESHNESS_SLACK_TOKEN:-$SLACK_TOKEN}"
+  SLACK_USER_ID="${CONFIG_FRESHNESS_SLACK_USER_ID:-$SLACK_USER_ID}"
+  SLACK_WEBHOOK="${CONFIG_FRESHNESS_SLACK_WEBHOOK:-$SLACK_WEBHOOK}"
+fi
+
+if [ "$RC" -ne 0 ]; then
   last_sync="$(date -u -d "@$DEP_MTIME" +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || echo 'unknown')"
   text="Config freshness ALERT on $HOST ($PROFILE): $STATE — deployed $DEP_HASH vs main $MAIN_HASH, sync age ${AGE_HOURS}h (last sync $last_sync)"
-  payload="$(SLACK_TEXT="$text" python3 -c 'import json,os; print(json.dumps({"text": os.environ["SLACK_TEXT"]}))')"
-  curl -fsS -m 10 -H 'Content-Type: application/json' -d "$payload" \
-    "$SLACK_WEBHOOK" >/dev/null 2>&1 || echo "slack notify failed" >&2
+
+  notify_sent=""
+  # Preferred path: DM via Slack Web API (conversations.open + chat.postMessage).
+  if [ -n "$SLACK_TOKEN" ] && [ -n "$SLACK_USER_ID" ]; then
+    open_resp="$(curl -sS -m 15 -H "Authorization: Bearer $SLACK_TOKEN" \
+      --data "users=$SLACK_USER_ID" \
+      https://slack.com/api/conversations.open 2>&1)"
+    ch="$(printf '%s' "$open_resp" | python3 -c '
+import json,sys
+try:
+    d=json.load(sys.stdin)
+    print(d.get("channel",{}).get("id","") if d.get("ok") else "")
+except Exception:
+    print("")')"
+    if [ -n "$ch" ]; then
+      payload="$(SLACK_TEXT="$text" python3 -c '
+import json,os,sys
+print(json.dumps({"channel": "'$ch'", "text": os.environ["SLACK_TEXT"]}))')"
+      post_resp="$(curl -sS -m 15 -H "Authorization: Bearer $SLACK_TOKEN" \
+        -H 'Content-Type: application/json; charset=utf-8' \
+        -d "$payload" https://slack.com/api/chat.postMessage 2>&1)"
+      ok="$(printf '%s' "$post_resp" | python3 -c '
+import json,sys
+try:
+    print(json.load(sys.stdin).get("ok", False))
+except Exception:
+    print(False)')"
+      if [ "$ok" = "True" ]; then
+        notify_sent="dm"
+      else
+        err="$(printf '%s' "$post_resp" | python3 -c '
+import json,sys
+try:
+    print(json.load(sys.stdin).get("error","?"))
+except Exception:
+    print("unparseable response")')"
+        echo "  Slack DM send failed (chat.postMessage: $err) — see log; detector result unchanged" >> "$LOG_FILE"
+      fi
+    else
+      err="$(printf '%s' "$open_resp" | python3 -c '
+import json,sys
+try:
+    print(json.load(sys.stdin).get("error","?"))
+except Exception:
+    print("unparseable response")')"
+      echo "  Slack DM open failed (conversations.open: $err) — see log; detector result unchanged" >> "$LOG_FILE"
+    fi
+  fi
+
+  # Fallback: legacy incoming webhook, kept only if still configured.
+  if [ -z "$notify_sent" ] && [ -n "$SLACK_WEBHOOK" ]; then
+    payload="$(SLACK_TEXT="$text" python3 -c '
+import json,os
+print(json.dumps({"text": os.environ["SLACK_TEXT"]}))')"
+    if curl -fsS -m 15 -H 'Content-Type: application/json' -d "$payload" \
+      "$SLACK_WEBHOOK" >/dev/null 2>&1; then
+      notify_sent="webhook"
+    else
+      echo "  Slack webhook fallback failed — see log; detector result unchanged" >> "$LOG_FILE"
+    fi
+  fi
+
+  if [ -n "$notify_sent" ]; then
+    echo "  Slack notify sent via $notify_sent" >> "$LOG_FILE"
+  elif [ -z "$SLACK_TOKEN" ] && [ -z "$SLACK_WEBHOOK" ]; then
+    echo "  no Slack configured (log-only mode); alert present in this log" >> "$LOG_FILE"
+  fi
 fi
 
 exit "$RC"

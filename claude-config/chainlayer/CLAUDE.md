@@ -63,7 +63,9 @@ When you need to change an always-on rule or skill wiring:
    SSH-signed, no `Co-Authored-By`.
 3. **Tell the user**: post a Multica comment / message saying what you changed
    and link the PR, so they can review and merge.
-4. Once merged, the sync autopilot pulls `main` and redeploys the file on every host.
+4. Once merged, **run `sync.sh` on each host** (or wait for the nightly sync
+   autopilot) to redeploy the file — the nightly sync is the backstop, not the
+   primary deploy path, so don't treat merge as deploy.
 
 (Durable *facts* go in your runtime memory, above — not here. This repo is for
 rules and skills only.)
