@@ -19,7 +19,7 @@ export NODE_TLS_REJECT_UNAUTHORIZED=0          # self-signed cert
 export BW_SESSION=$(bw unlock --raw --passwordenv BW_PASSWORD 2>/dev/null)
 ```
 
-After that, every `bw …` call needs `--session "$BW_SESSION"`.
+After that, `BW_SESSION` is exported into the environment and every `bw …` call reads the session key from it — `bw` uses the `BW_SESSION` env by default, and `--session` only overrides it. **Never pass `--session` on the command line**: the session key decrypts the entire vault, and `--session` puts it into world-readable argv (`/proc/<pid>/cmdline`); exported env lands in `/proc/<pid>/environ` (owner-only, CHA-987).
 
 **Important** — the bootstrap file `~/.claude/secrets/bw-bootstrap.env` is gitignored and contains:
 - `BW_CLIENTID` / `BW_CLIENTSECRET` — used by `bw login` for an unattended login (already done; vault is logged in, just locked)
@@ -61,27 +61,27 @@ Trigger words to ask about:
 
 ```bash
 # By name (substring match, case-insensitive)
-bw list items --session "$BW_SESSION" --search "github"
+bw list items --search "github"
 
 # Just the names (terse)
-bw list items --session "$BW_SESSION" --search "github" \
+bw list items --search "github" \
   | python3 -c "import json,sys; [print(x['name']) for x in json.load(sys.stdin)]"
 
 # A specific custom field on a specific item
-bw get item <id-or-exact-name> --session "$BW_SESSION" \
+bw get item <id-or-exact-name> \
   | python3 -c "
 import json,sys
 d=json.load(sys.stdin)
 print({f['name']: f['value'] for f in d.get('fields',[])}.get('UNIFI_API_KEY'))"
 
 # All items in a given folder
-bw list items --session "$BW_SESSION" --folderid d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5
+bw list items --folderid d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5
 ```
 
 For ad-hoc shell use, prefer `bw get password <name>` and `bw get username <name>` — these print *just the value*, suitable for command substitution:
 
 ```bash
-PASS=$(bw get password "Mikrotik CRS812-8DS-2DQ-2DDQ — homelab switch" --session "$BW_SESSION")
+PASS=$(bw get password "Mikrotik CRS812-8DS-2DQ-2DDQ — homelab switch")
 ```
 
 Note: `bw get password` works on Login items. For SecureNotes with hidden custom fields (the pattern we use for multi-value secrets), parse `bw get item` JSON as above.
@@ -91,6 +91,7 @@ Note: `bw get password` works on Login items. For SecureNotes with hidden custom
 For credentials that come in groups (API URL + API key + multiple shared secrets), a single SecureNote with hidden custom fields keeps them together. This is what the UniFi and Mikrotik items use.
 
 ```bash
+umask 077                                   # owner-only temp file (default 0022 umask would make it world-readable)
 python3 <<'PY' | bw encode > /tmp/bw-new.b64
 import json
 item = {
@@ -108,8 +109,8 @@ item = {
 }
 print(json.dumps(item))
 PY
-bw create item "$(cat /tmp/bw-new.b64)" --session "$BW_SESSION"
-bw sync --session "$BW_SESSION"
+bw create item "$(cat /tmp/bw-new.b64)"
+bw sync
 rm -f /tmp/bw-new.b64
 ```
 
@@ -118,6 +119,7 @@ rm -f /tmp/bw-new.b64
 For a credential that's literally "go to URL X, type username Y, password Z" (an SSH login, a web app), use a Login item:
 
 ```bash
+umask 077                                   # owner-only temp file (default 0022 umask would make it world-readable)
 python3 <<'PY' | bw encode > /tmp/bw-login.b64
 import json
 item = {
@@ -135,22 +137,22 @@ item = {
 }
 print(json.dumps(item))
 PY
-bw create item "$(cat /tmp/bw-login.b64)" --session "$BW_SESSION"
-bw sync --session "$BW_SESSION"
+bw create item "$(cat /tmp/bw-login.b64)"
+bw sync
 rm -f /tmp/bw-login.b64
 ```
 
 ## Update an existing item
 
 ```bash
-# Get current item JSON
-bw get item "<id-or-exact-name>" --session "$BW_SESSION" > /tmp/bw-item.json
+umask 077                                   # owner-only temp file (default 0022 umask would make it world-readable)
+bw get item "<id-or-exact-name>" > /tmp/bw-item.json
 
 # Edit the JSON (e.g. via python -c) — change folderId, add a field, etc.
 
 # Encode and push back
-cat /tmp/bw-item.json | bw encode | xargs -I{} bw edit item <item-id> {} --session "$BW_SESSION"
-bw sync --session "$BW_SESSION"
+cat /tmp/bw-item.json | bw encode | xargs -I{} bw edit item <item-id> {}
+bw sync
 rm -f /tmp/bw-item.json
 ```
 
@@ -161,11 +163,11 @@ The `bw edit item` shape mirrors `bw create item` — pass the full edited item 
 ```bash
 ITEM_ID="<id>"
 FOLDER_ID="d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5"   # private
-bw get item "$ITEM_ID" --session "$BW_SESSION" \
+bw get item "$ITEM_ID" \
   | python3 -c "import json,sys; d=json.load(sys.stdin); d['folderId']='$FOLDER_ID'; print(json.dumps(d))" \
   | bw encode \
-  | xargs -I{} bw edit item "$ITEM_ID" {} --session "$BW_SESSION"
-bw sync --session "$BW_SESSION"
+  | xargs -I{} bw edit item "$ITEM_ID" {}
+bw sync
 ```
 
 ## Don'ts
@@ -175,21 +177,21 @@ bw sync --session "$BW_SESSION"
 3. **Don't `bw sync` without `NODE_TLS_REJECT_UNAUTHORIZED=0`** — it fails. The error is "self-signed certificate".
 4. **Don't reuse `BW_SESSION` across processes** — it's a per-process secret. Each Bash session unlocks fresh.
 5. **Don't commit `~/.claude/secrets/`** to any repo. It's already in `.gitignore`; double-check before any `git add -A`.
-6. **Don't leave temp `*.b64` or `*.json` files** of unlocked item data sitting in `/tmp` — `rm -f` them at the end of each write block. Even though `/tmp` is wiped on reboot, between now and then they're plaintext.
+6. **Don't leave temp `*.b64` or `*.json` files** of unlocked item data sitting in `/tmp` — `rm -f` them at the end of each write block. Even though `/tmp` is wiped on reboot, between now and then they're plaintext. Any such file must be created with `umask 077` first — the default `0022` umask creates a world-readable `0644` file in shared `/tmp`, the same read exposure as CHA-987.
 7. **Don't write a credential to BW that you found in chat-history or in a file you'll then delete** — the chat may be cached/exported; check whether the user pasted it explicitly or it leaked into context.
 
 ## Health checks
 
 ```bash
 # Is bw logged in?
-bw status --session "$BW_SESSION" | python3 -c "import json,sys; print(json.load(sys.stdin)['status'])"
+bw status | python3 -c "import json,sys; print(json.load(sys.stdin)['status'])"
 # → "unlocked"
 
 # How many items total
-bw list items --session "$BW_SESSION" | python3 -c "import json,sys; print(len(json.load(sys.stdin)),'items')"
+bw list items | python3 -c "import json,sys; print(len(json.load(sys.stdin)),'items')"
 
 # How many items per folder
-bw list items --session "$BW_SESSION" | python3 -c "
+bw list items | python3 -c "
 import json,sys,collections
 items=json.load(sys.stdin)
 fmap={'d72b99f9-0a18-4bf8-8eac-8b3b9c66fcc5':'private',

@@ -158,7 +158,7 @@ parsing the `fields` array, per the bitwarden skill's SecureNote pattern.
 ITEM="ChainLayer · GitLab — group PAT"
 
 # 1. Read current token from the PAT hidden field
-OLD_TOKEN=$(bw get item "$ITEM" --session "$BW_SESSION" \
+OLD_TOKEN=$(bw get item "$ITEM" \
   | python3 -c "import json,sys; d=json.load(sys.stdin); print({f['name']:f['value'] for f in d.get('fields',[])}['PAT'])")
 
 # 2. Rotate — returns a new token, revokes the old one
@@ -166,7 +166,8 @@ NEW_TOKEN=$(curl -s -X POST https://gitlab.com/api/v4/personal_access_tokens/sel
   -H "PRIVATE-TOKEN: $OLD_TOKEN" | python3 -c "import json,sys; print(json.load(sys.stdin)['token'])")
 
 # 3. Write the new token back into the PAT field + sync
-bw get item "$ITEM" --session "$BW_SESSION" > /tmp/bw-pat.json
+umask 077                                   # owner-only temp file (default 0022 umask would make it world-readable)
+bw get item "$ITEM" > /tmp/bw-pat.json
 ITEM_ID=$(python3 -c "import json; print(json.load(open('/tmp/bw-pat.json'))['id'])")
 python3 -c "
 import json
@@ -175,8 +176,8 @@ for f in d['fields']:
     if f['name'] == 'PAT':
         f['value'] = '$NEW_TOKEN'
 print(json.dumps(d))
-" | bw encode | xargs -I{} bw edit item "$ITEM_ID" {} --session "$BW_SESSION"
-bw sync --session "$BW_SESSION"
+" | bw encode | xargs -I{} bw edit item "$ITEM_ID" {}
+bw sync
 rm -f /tmp/bw-pat.json
 ```
 
