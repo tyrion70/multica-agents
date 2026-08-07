@@ -153,10 +153,14 @@ class FakeBw:
         # Fail-loud contract: sync.py must always pass --nointeraction so a stale
         # session errors out instead of hanging on a master-password prompt.
         assert "--nointeraction" in cmd, "bw call must pass --nointeraction"
+        # CHA-987: the session key must reach `bw` via the child env, never argv.
+        assert "--session" not in cmd, "session key must not appear in bw argv"
+        env = kwargs.get("env") or {}
+        tok = env.get("BW_SESSION")
+        assert tok, "bw call must pass the session key via env[BW_SESSION]"
         if not self._concurrent_unlock_done:
             self._concurrent_unlock_done = True
             self.current["DEF"] = "DEF:2"  # another host process re-keys default
-        tok = cmd[cmd.index("--session") + 1]
         dir_key = tok.split(":", 1)[0]
         search = cmd[cmd.index("--search") + 1]
         if self.current.get(dir_key) == tok:

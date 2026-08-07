@@ -598,9 +598,12 @@ def _bw_get_secret_uncached(item_name: str) -> Optional[str]:
     cmd_desc = f"bw list items --search '{item_name}'"
     try:
         result = subprocess.run(
-            ["bw", "list", "items", "--search", item_name,
-             "--session", bw_session, "--nointeraction"],
+            ["bw", "list", "items", "--search", item_name, "--nointeraction"],
             capture_output=True, text=True, timeout=15,
+            # CHA-987: hand the session key via the child env (BW_SESSION), never
+            # argv — the --session flag lands the vault-wide key in world-readable
+            # /proc/<pid>/cmdline.
+            env={**os.environ, "BW_SESSION": bw_session},
         )
     except Exception as e:
         raise BitwardenAuthError(f"`{cmd_desc}` failed to run: {e}")
