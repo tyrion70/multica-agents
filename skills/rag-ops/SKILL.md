@@ -29,6 +29,7 @@ into one repo in CHA-106.
 | Embeddings | gx10-f018 GPU | `:8802/v1` `Qwen3-Embedding-0.6B` (1024-dim) | `rag-embed.service` (systemd) |
 | Vector store | claude-readonly-01 | `127.0.0.1:6333` Qdrant v1.18.2 | docker compose |
 | Ingester / CLI / bot | claude-readonly-01 | — / outbound WS | `venv` + `rag_ops` pkg; `rag-slack.service` |
+| Corpus refresh | claude-readonly-01 | — (systemd timer) | `rag-refresh.service` + `rag-refresh.timer` (CHA-96) |
 
 All endpoints are **internal-LAN only** (Qdrant is localhost-bound; the GPU
 endpoints are LAN-only — public exposure is deliberately absent, CHA-97 tracks
@@ -44,7 +45,7 @@ with its own README (read those for detail):
 | Part | What it is |
 |---|---|
 | `core` | shared endpoint clients (`embed`, `chat`, pinned `judge`, timed streaming) + the `RAG_*` config. Everything imports this. |
-| `ingestion` | build the corpus → secret-filter → chunk → embed → Qdrant. `corpus_sources.py` is the source registry; `build_corpus.py` (`rag-build-corpus`) the refresh entrypoint. |
+| `ingestion` | build the corpus → secret-filter → chunk → embed → Qdrant. `corpus_sources.py` is the source registry; `refresh.py` (`rag-refresh`) the scheduled incremental refresh entrypoint (CHA-95/96), wrapping `build_corpus.py` (`rag-build-corpus`); `exporters.py` scripts the export sources. |
 | `secret_filter` | the pre-embed denylist + its 0-leak test. |
 | `cli` | the `rag-ask` command — hybrid retrieval → grounded cited answer. The single answer path. |
 | `slackbot` | Slack (Socket Mode) interface; reuses the CLI answer path verbatim. |
@@ -53,7 +54,8 @@ with its own README (read those for detail):
 | `deploy/` | systemd units + bring-up/restore scripts, split by host. |
 
 Install / run from the deployed checkout's venv (console commands: `rag-ask`,
-`rag-ingest`, `rag-build-corpus`, `rag-eval`, `rag-slackbot`, `rag-bench`):
+`rag-ingest`, `rag-refresh`, `rag-build-corpus`, `rag-export`, `rag-eval`,
+`rag-slackbot`, `rag-bench`):
 
 ```bash
 python3.12 -m venv venv && venv/bin/pip install -r requirements.txt && venv/bin/pip install -e .
@@ -66,8 +68,8 @@ venv/bin/rag-ask "What do I do when WormholeNodeBlockHeightNotIncreasing fires o
 One Qdrant collection, `chainlayer_rag`: 1024-dim cosine vectors + a full-text
 index per chunk (so hybrid retrieval works). Each point's payload carries the
 chunk text, a stable `uuid5` id, a content `sha`, and a `source` label. Chunk
-IDs are content-stable; a `sha` is stored per chunk (the hook for incremental
-re-embed, CHA-95).
+IDs are content-stable; the `sha` is what lets the refresh skip unchanged chunks
+(incremental re-embed, CHA-95).
 
 **Raw source docs are never committed and never embedded raw** — they live under
 the gitignored `corpus/` on the box (they can contain the very secrets the
@@ -75,9 +77,9 @@ filter drops); only filtered embeddings reach Qdrant.
 
 Sources are declared in `ingestion/corpus_sources.py` — the single
 version-controlled answer to "what is indexed?". Each `Source` has a `kind`
-(`repo` = walked by the file ingester; `manual` = external MCP export, listed
-but not yet scripted) and a `category` (`prose` vs `iac` — the secret-safety
-class, see gate below). Current registry:
+(`repo` = walked by the file ingester; `export` = materialized to markdown by a
+scripted exporter, CHA-96; `slack` = workspace channels) and a `category`
+(`prose` vs `iac` — the secret-safety class, see gate below). Current registry:
 
 | Source | Kind | Category | Ingested? |
 |---|---|---|---|
@@ -85,24 +87,34 @@ class, see gate below). Current registry:
 | `rag-ops-assistant` (this repo) | repo | prose | yes — self-docs, so it explains its own pipeline (CHA-100) |
 | `k8s-apps` | repo | iac | **yes — pilot, audit approved** (CHA-120) |
 | `helm-charts`, `clusters`, `haproxy`, `monitoring2`, `proxmox-iac` | repo | iac | no — `enabled=False`, `audit=pending` (gated) |
-| `incident-io`, `linear-ops-cll` (MAN excluded) | manual | prose | yes, but via a **manual** MCP-export step (not scripted) |
+| `incident-io`, `linear-ops-cll` (MAN excluded) | export | prose | yes — scripted exporters (CHA-96), refreshed with the rest |
 
 `claude-skills` and `multica-agents` are **deliberately excluded** (Peter's
 personal repos, not company corpus) — do not add them without his say-so.
 
 ## Ingestion pipeline
 
-`build_corpus` → for each ingestable `repo` source: clone/checkout → walk files
-in scope (`include`/`exclude` globs) → **secret-filter every doc** → chunk
-markdown on natural boundaries → embed → upsert to Qdrant with dense vector +
-full-text. Today every refresh re-embeds the full source (incremental is the
-CHA-95 follow-up).
+`rag-refresh` (wrapping `build_corpus`) → for each ingestable source
+(`repo`/`export`/`slack`): clone/checkout (or run the scripted exporter for
+`export` sources) → walk files in scope (`include`/`exclude` globs) →
+**secret-filter every doc** → chunk markdown on natural boundaries → embed
+**incrementally** (CHA-95: chunks whose stored `sha` is unchanged are skipped,
+deleted ones pruned) → upsert to Qdrant with dense vector + full-text. The
+nightly timer also posts a per-source **digest of what changed to Slack `#rag-ops`**
+on every run, and `--check-freshness` probes the recorded heartbeat (see Refresh
+mechanism).
 
 ```bash
-rag-build-corpus                       # refresh every ingestable source
-rag-build-corpus --plan                # show the resolved plan, build nothing
+rag-refresh                       # incremental refresh of every ingestable source
+rag-refresh --only <src>          # restrict to named sources (repeatable)
+rag-refresh --dry-run             # scope + secret-filter only; still posts a digest
+rag-refresh --no-slack            # run + print digest, do not post (local/debug)
+rag-refresh --check-freshness     # exit non-zero if the last refresh is stale
+rag-build-corpus                  # one-shot builder every ingestable source (full, no skip)
+rag-build-corpus --plan           # show the resolved plan, build nothing
 rag-build-corpus --only <src> --dry-run  # scope + filter only, embed nothing
-rag-build-corpus --check               # CI gate: non-zero if an enabled IaC source is un-audited
+rag-build-corpus --check          # CI gate: non-zero if an enabled IaC source is un-audited
+rag-export incident-io --dest /tmp/inc --limit 5   # run one exporter by hand
 rag-ingest <dir> --source <name> [--repo <url>] [--include <glob> ...]  # one tree
 ```
 
@@ -196,24 +208,38 @@ post-deploy no-regression gate; it exercises the same answer path the bot uses.
 Caveat: the judge is the same model family that writes answers, so correctness
 is a groundedness self-assessment, not a fully independent grade.
 
-## Refresh mechanism — current state + follow-ups
+## Refresh mechanism — nightly, incremental (CHA-95/96)
 
-Refresh today is a **manual one-shot**: re-run `rag-build-corpus` from the box
-venv; it re-ingests every `repo` source full (no skip), secret-filtered. The
-`manual` sources (incident.io, Linear OPS/CLL) are still a hand-run MCP-export
-step, logged-and-skipped by the builder. Two tracked follow-ups make refresh
-cheap + automatic:
+Refresh is **automatic and incremental**. A `rag-refresh.service` unit
+(Type=oneshot, CHA-96) runs nightly via `rag-refresh.timer` (03:00 UTC,
+`Persistent=true` so a missed night catches up at boot), executing from the box
+venv:
 
-- **CHA-95 — incremental re-embed:** skip chunks whose stored `sha` is unchanged
-  (the `sha` is already in the payload); an unchanged corpus should embed 0
-  chunks. Prerequisite for cheap scheduling.
-- **CHA-96 — scheduled refresh:** a systemd timer / cron re-ingesting all sources
-  on cadence (nightly docs/incidents/Linear, weekly repos), incrementally, with
-  the secret filter on every run, counts logged, and an alert on miss/failure.
-  Depends on CHA-95 landing first.
+```bash
+python -m rag_ops.ingestion.refresh      # what the timer runs each night
+```
 
-Until those land: **a stale index is the failure mode** — re-run `rag-build-corpus`
-after a meaningful docs change.
+It wraps `build_corpus` in the incremental re-embed (CHA-95): only added/changed
+chunks are embedded and deleted ones pruned, so an unchanged corpus embeds 0
+chunks. Every in-scope source is refreshed — the `export` sources (incident.io,
+Linear OPS/CLL) are materialized by their scripted exporters first, then ingested
+through the same secret filter as everything else. Each run posts a per-source
+**digest of what changed to Slack `#rag-ops`** (on success) or a ⚠️ failure
+alert + non-zero exit (on error), with `OnFailure=rag-refresh-alert.service` as
+the backstop if the runner dies before it can post. `rag-refresh --check-freshness`
+is an explicit staleness probe (non-zero if the recorded heartbeat is too old).
+
+**Manual refresh** (no need to wait for the timer — e.g. right after a meaningful
+docs change):
+
+```bash
+systemctl start rag-refresh.service      # on claude-readonly-01
+rag-refresh                              # or run the command directly from the venv
+```
+
+> Note (awareness only, from the CHA-1062 manual run): the first manual
+> `systemctl start rag-refresh.service` hit a **transient GitLab SSH auth blip**
+> on one source's fetch — it self-resolved on retry and is **not systemic**.
 
 ## Deploy
 
@@ -223,7 +249,9 @@ is a follow-up). Full step-by-step is `deploy/README.md` — summary:
 - **claude-readonly-01:** clone to `/home/peter/rag-ops-assistant`, build the
   venv, write the root-only `.slack.env` from Bitwarden (**company** folder, via
   the **bitwarden** skill — never commit it; `*.env` is gitignored),
-  `docker compose up -d` (Qdrant), install/repoint `rag-slack.service`, then
+  `docker compose up -d` (Qdrant), install/repoint `rag-slack.service` **and the
+  nightly refresh units** (`rag-refresh.service` + `rag-refresh.timer` +
+  `rag-refresh-alert.service`, enable the timer), then
   verify: 0-leak test → a cited `rag-ask` → `rag-eval --judge` → `/ops` in Slack.
 - **gx10-f018:** `deploy/gx10-f018/gx-f018-deploy.sh` brings up chat (`:8801`) +
   embed (`:8802`); `gx-f018-restore-baseline.sh` restores the baseline RAG 30B
@@ -251,7 +279,7 @@ is a follow-up). Full step-by-step is `deploy/README.md` — summary:
 | | |
 |---|---|
 | ✅ | Run `rag-ask` / `rag-eval` / dry-run ingests; read Qdrant; edit code behind a PR. |
-| 🔶 | `rag-build-corpus` (re-embeds the live index); restart `rag-slack.service`; restart f018 chat/embed (shared, causes a bot blip). |
+| 🔶 | `rag-refresh` / `rag-build-corpus` (touch the live index); restart `rag-slack.service` / `rag-refresh.service`; restart f018 chat/embed (shared, causes a bot blip). |
 | 🛑 | Enable an `iac` source without the dry-run audit + Peter's approval; commit `corpus/`, `.slack.env`, or any token; expose an endpoint publicly; add a personal repo (`claude-skills`, `multica-agents`) to the corpus. |
 
 ## Provenance & related
@@ -259,8 +287,9 @@ is a follow-up). Full step-by-step is `deploy/README.md` — summary:
 CHA-42 (baseline PoC) → CHA-93 (chain-id allowlist + entropy backstop) → CHA-94
 (Slack bot) → CHA-100 (self-documentation) → CHA-106 (productionize into the
 repo) → CHA-107 (benchmark) → CHA-117 (f018 restore fix) → CHA-120 (company-repo
-list + IaC gate, k8s-apps pilot). Open: CHA-95/96 (refresh), CHA-97 (network
-harden), CHA-98 (base64url-in-path backstop), CHA-88 (Drive→docs curation).
+list + IaC gate, k8s-apps pilot) → CHA-95 (incremental re-embed) → CHA-96
+(nightly `rag-refresh` service/timer). Open: CHA-97 (network harden), CHA-98
+(base64url-in-path backstop), CHA-88 (Drive→docs curation).
 
 Sibling skills: **chainlayer-knowledge** (infra facts the corpus is *about*),
 **ssh** (reach the boxes), **bitwarden** (Slack tokens, company folder),
