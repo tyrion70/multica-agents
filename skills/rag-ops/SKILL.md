@@ -85,9 +85,12 @@ scripted exporter, CHA-96; `slack` = workspace channels) and a `category`
 |---|---|---|---|
 | `documentation` (`gitlab.com/chainlayer/documentation`) | repo | prose | yes — primary corpus (CHA-42) |
 | `rag-ops-assistant` (this repo) | repo | prose | yes — self-docs, so it explains its own pipeline (CHA-100) |
-| `k8s-apps` | repo | iac | **yes — pilot, audit approved** (CHA-120) |
-| `helm-charts`, `clusters`, `haproxy`, `monitoring2`, `proxmox-iac` | repo | iac | no — `enabled=False`, `audit=pending` (gated) |
+| 26 prose inventory repos (CHA-142) | repo | prose | yes — no audit gate required |
+| `k8s-apps` (pilot), `helm-charts`, `clusters`, `haproxy`, `monitoring2`, `proxmox-iac`, `gitlab-iac` | repo | iac | yes — all `enabled=True, audit="approved"` (CHA-120/124) |
+| `chainlink-ops`, `chainlink-service-registry`, `chainlink-service-registry-sidecar`, `chainlink-topup` | repo | iac | yes — all `enabled=True, audit="approved"` (CHA-124) |
+| 134 IaC inventory repos (CHA-142, batches 1–9) | repo | iac | yes — all `enabled=True, audit="approved"` (per-batch dry-run + Peter sign-off) |
 | `incident-io`, `linear-ops-cll` (MAN excluded) | export | prose | yes — scripted exporters (CHA-96), refreshed with the rest |
+| `slack` (`xnetwork-`/`xinfra-` channel auto-discovery) | slack | prose | yes — workspace channels (CHA-121) |
 
 `claude-skills` and `multica-agents` are **deliberately excluded** (Peter's
 personal repos, not company corpus) — do not add them without his say-so.
