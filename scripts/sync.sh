@@ -14,9 +14,17 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 # local login (peter@tyrion.nl) and whatever workspace is active in
 # config.json.  sync.sh is always executed, never sourced, so the parent
 # process keeps its original env.
+#
+# MULTICA_TASK_CONFIG_ROOT and MULTICA_TASK_WORKSPACES_ROOT were added 2026-08
+# (CHA-1066): the CLI resolves its config file via MULTICA_TASK_CONFIG_ROOT,
+# which points at a per-task path that doesn't exist on the host, so the CLI
+# fails with "No server configured" instead of falling back to
+# ~/.multica/config.json.  They must be dropped alongside the other
+# MULTICA_* vars.
 for var in MULTICA_AGENT_ID MULTICA_AGENT_NAME MULTICA_DAEMON_PORT \
-           MULTICA_SERVER_URL MULTICA_TASK_ID MULTICA_TASK_SLOT \
-           MULTICA_TOKEN MULTICA_WORKSPACE_ID; do
+           MULTICA_SERVER_URL MULTICA_TASK_CONFIG_ROOT MULTICA_TASK_ID \
+           MULTICA_TASK_SLOT MULTICA_TASK_WORKSPACES_ROOT MULTICA_TOKEN \
+           MULTICA_WORKSPACE_ID; do
   unset "$var"
 done
 
