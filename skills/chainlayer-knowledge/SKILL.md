@@ -97,6 +97,35 @@ The `observationSource` field in the response is the full TOML pipeline spec
 (bridge task names, ds1/ds2/ds3, task graph). Full how-to including auth and
 credential location: **`chainlink-ops` skill**, "Chainlink node API" section.
 
+## Datafeeds health app — lives on the **monitoring VM**, not multica-02
+
+The `chainlink-datafeeds-health` app (report, dashboard, DB, sweeps) **moved
+off multica-02** (CHA-1035 migration, cut over 2026-08-13). Current home:
+**monitoring VM** — `192.168.18.232` / `monitoring.252h.org`, VMID 130 on
+proxmox4. The multica-02 containers and its copy of the DB are **stopped and
+abandoned** — do NOT treat multica-02 as the live host for anything datafeeds.
+
+- **Dashboard**: container `datafeeds-health-dashboard` on the monitoring VM,
+  port **8080** (`http://monitoring.252h.org:8080`), `--network host`,
+  restart `unless-stopped`. Served from `/opt/chainlink-datafeeds-health`
+  (repo checkout). The adapter-test button needs the **write path** enabled:
+  `DATAFEEDS_HEALTH_WRITER_DSN` + `WEBAPP_SECRET_KEY` plus
+  `CHAINLINK_NODE_EMAIL`/`CHAINLINK_NODE_PASSWORD`/`REGISTRY_URL` set on the
+  container — if those are present-but-empty, `writes_enabled()` is false and
+  the test adapter reports disabled with that exact reason (CHA-1067).
+- **Postgres**: the `datafeeds_health` schema lives on the **monitoring VM**
+  at `127.0.0.1:5432` (loopback only). Roles exist there (e.g.
+  `datafeeds_readonly`, `datafeeds_health_writer`); the vault DSNs point at
+  the monitoring VM's loopback, not multica-02's.
+- **Sweeps / baseline**: hourly sweep + daily baseline run as root cron on
+  the monitoring VM (`/etc/cron.d/datafeeds-health-sweep`,
+  `/etc/cron.d/datafeeds-health-baseline`), not the Multica autopilots (those
+  are paused). Each `sweep-cron.sh` run pulls the checkout, so **merge to main
+  is the deploy** for the sweep path; the dashboard image is rebuilt separately
+  via `dashboard/deploy.sh` on the VM.
+- **VM access**: `ssh root@192.168.18.232` (LAN, `~/.ssh/id_ed25519_peter`).
+  Tailscale SSH to the monitoring node is denied by tailnet policy.
+
 ## Co-authored-by commit hook — disabled at the workspace setting
 The Multica daemon installs a git `prepare-commit-msg` hook (in each bare repo's
 `hooks/` dir under `.repos/<workspace_id>/<repo>.git/hooks/`) that injects a
