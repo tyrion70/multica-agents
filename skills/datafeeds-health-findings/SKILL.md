@@ -260,7 +260,9 @@ and `SILENT` / `ERRORING` / `DEAD_FROZEN` are never debounced.
   an explicit value only to override.
 
 **The streak is read from the persistence DB** (the CHA-201 `datafeeds_health`
-schema on multica-02). Migration `0004` of the report repo provides the read-time
+schema on the **monitoring VM** — `192.168.18.232`, loopback `127.0.0.1:5432`; the
+multica-02 copy is abandoned, see the `chainlayer-knowledge` skill). Migration
+`0004` of the report repo provides the read-time
 helper `adapter_degraded_streak(bridge, ref_as_of [, gap_tolerance])`, which returns
 the count of **consecutive prior runs** the bridge was in a `DEGRADED_ADAPTER`
 finding, walking `health_run` backwards from `ref_as_of`: a present run **without**
