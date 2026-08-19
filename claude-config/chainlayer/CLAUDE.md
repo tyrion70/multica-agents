@@ -24,6 +24,7 @@ The skill is the source of truth — don't restate its rules here:
 - `linear`     — issue-first, private-TYR vs company-DevOps routing, branch names, comment signing
 - `ssh`        — keys + signing config (universal)
 - `bitwarden`  — secret lookup/storage (universal)
+- `1password`  — 1Password secret lookup (universal; the GitLab PAT lives here)
 - `chainlink-ops`, `company-k8s`, `company-proxmox`, `haproxy`, `grafana-monitoring`,
   `deploy-app`, `fortigate`, `new-repo` — their domains
 
@@ -47,10 +48,13 @@ judgment call and proceed. (Set after an autonomous Proxmox action went wrong.)
 Never read, copy, upload, log, or reference:
 - `~/.claude/.credentials.json` (the host's Claude login token),
 - `/var/lib/tailscale/tailscaled.state` (the host's tailnet device key),
+- `~/.config/op/service-account-token` (the 1Password service-account token —
+  the bootstrap secret unlocking the vault that holds the GitLab PAT; agents may
+  *use* it through `op`, never print it),
 - other users' home directories unless explicitly directed.
 
-Secrets come from the `bitwarden` skill or GCP Secret Manager — never hardcode,
-and never paste a secret into an issue/comment.
+Secrets come from the `bitwarden` or `1password` skills, or GCP Secret Manager —
+never hardcode, and never paste a secret into an issue/comment.
 
 ## Updating this config (rules + skills)
 This file (`claude-config/chainlayer/CLAUDE.md`) is the source of truth and

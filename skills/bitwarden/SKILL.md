@@ -1,9 +1,14 @@
 ---
 name: bitwarden
-description: Read, create, or update secrets in Peter's self-hosted Bitwarden/Vaultwarden vault. Use whenever a task requires looking up a credential (SSH key, API token, password) OR storing one. Folder choice (private / shared / company) is required on every write — ASK if the project context doesn't make it obvious.
+description: Read, create, or update secrets in Peter's self-hosted Bitwarden/Vaultwarden vault. Use whenever a task requires looking up a credential (SSH key, API token, password) OR storing one. Folder choice (private / shared / company) is required on every write — ASK if the project context doesn't make it obvious. Some secrets are migrating to 1Password — if a credential isn't in Bitwarden, check the `1password` skill before concluding it doesn't exist.
 ---
 
 # Bitwarden / Vaultwarden access
+
+> **Migration in progress:** some secrets now live in **1Password** (the `op`
+> CLI) instead of this vault. If a lookup here comes up empty, check the
+> `1password` skill before concluding the credential doesn't exist — during the
+> migration both vaults hold real secrets.
 
 The vault is **self-hosted Vaultwarden** at `https://192.168.19.11:8443`, account `peter@tyrion.nl`. Reach it from any host on the homelab LAN or via Tailscale. The Bitwarden CLI (`bw`) is the primary interface — it speaks to Vaultwarden the same way it speaks to bitwarden.com.
 

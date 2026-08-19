@@ -17,6 +17,7 @@ and `Chainlayer/skills.json`.
 
 | Skill | Description | MCP required | Bound squad members |
 |---|---|---|---|---|
+| **1password** | Read secrets from the 1Password vault via the `op` CLI (currently the new GitLab PAT; migration from Bitwarden in progress — both vaults hold real secrets, check both). | — | Issue Coder + Issue Deployer (ChatGPT, Claude, DeepSeek, GLM squads), Maintainer, Maintainer Private. |
 | **bitwarden** | Read/create/update secrets in Peter's self-hosted Bitwarden vault. | — | All Claude/ChatGPT/DeepSeek lifecycle agents + RAG Tech Lead + Maintainer. *Not bound:* Docs squad. |
 | **chainlayer-docs** | Write, review, publish ChainLayer docs on docs.chainlayer.cloud (Retype). | — | Doc Writer, Doc Reviewer/Publisher (Docs squad). |
 | **chainlayer-knowledge** | Cross-cutting infra facts: chainlink-tools, migrations, Filecoin voter, QuickNode RPCs. | — | Every agent in every squad. |

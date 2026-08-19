@@ -11,6 +11,7 @@
   "max_concurrent_tasks": 6,
   "skills": [
     "bitwarden",
+    "1password",
     "chainlayer-knowledge",
     "chainlink-ops",
     "company-proxmox",
