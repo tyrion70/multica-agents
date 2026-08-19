@@ -215,12 +215,15 @@ When a sibling skill (e.g. `homelab`, `company-k8s`) needs a credential, it shou
 
 That way a future read happens from BW (current, rotated values), not from a stale skill file.
 
-### Known self-rotating item
+### Known dead item — revoked, not rotatable
 
 The group PAT item **"ChainLayer · GitLab — group PAT"** (`company` folder) is a
 **SecureNote** whose token lives in a **hidden custom field named `PAT`** (parse
-the `fields` array — there is no `login.password`). It carries the `self_rotate`
-GitLab scope. An agent that finds the token expired or near-expiry can rotate it
-via GitLab's `POST /personal_access_tokens/self/rotate` endpoint and **write the
-new value back** into this item's `PAT` field + `bw sync`. See the **`git-mr`**
-skill for the full procedure and the proactive-only caveat.
+the `fields` array — there is no `login.password`).
+
+**That token is revoked and must not be used.** It no longer authenticates to
+anything on GitLab — calls with it return `invalid_token` / "Token was revoked".
+The current GitLab credential is the **`peter-agent`** token in 1Password
+(`op://Agent Peter/gitlab/password`); see the **`1password`** skill. The old
+item stays in the vault as a record of the dead credential — treat any value in
+it as unusable, never as a fallback.
