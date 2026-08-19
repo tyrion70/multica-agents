@@ -62,9 +62,9 @@ bites hard and has caught us before, so know it up front:
   HTTPS** fails with `remote: Cannot find valid SSO session. Please login via
   your group's SSO at …` (HTTP 403) **unless there is an active browser SSO
   session** for the account behind the credential. A valid SSH key or a valid
-  group PAT is **not** enough on its own.
+  token is **not** enough on its own.
 - This applies to **every credential available headlessly**: the SSH keys, the
-  vault group PAT (`ChainLayer · GitLab — group PAT`), and even
+  revoked group PAT (`ChainLayer · GitLab — group PAT`), and even
   `multica repo checkout` — they all resolve to the same SSO-gated GitLab
   account. An agent cannot complete the browser SAML flow, so it cannot
   establish the session itself.
@@ -73,17 +73,12 @@ bites hard and has caught us before, so know it up front:
   (`multica repo add`) and then checking it out triggers a fresh fetch → SSO
   403. So "SSH-clone any repo regardless of workspace config" is **false** for
   this group.
-- **What still works headlessly:** the GitLab **REST API** with the group PAT
-  (e.g. `GET /projects/:id/repository/files/<path>/raw`). Use it to *read*
-  source when you only need to inspect a repo you can't clone.
-- **The group PAT has `self_rotate` — keep it alive yourself.** The PAT
-  (`ChainLayer · GitLab — group PAT`, Bitwarden `company` folder) carries the
-  `self_rotate` scope. Rotate it with
-  `POST https://gitlab.com/api/v4/personal_access_tokens/self/rotate` using the
-  current token as `PRIVATE-TOKEN`, then **write the new token back** into
-  Bitwarden (the item is a SecureNote; the token is in its hidden `PAT` field)
-  and `bw sync`. See the **`git-mr`** skill for the full procedure and the
-  important caveat (only works while still valid — rotate proactively).
+- **What still works headlessly:** the GitLab **REST API** with the
+  `peter-agent` token from 1Password, resolved at point of use (e.g.
+  `GITLAB_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$(cat ~/.config/op/service-account-token)" \
+  op read 'op://Agent Peter/gitlab/password')" glab api ...`).
+  Use it to *read* source or act on a repo you can't clone. The `peter-agent`
+  token is the current credential; the old group PAT is revoked.
 - **To actually clone/push** a `chainlayer/*` repo from an agent runtime, a human
   must refresh the group's SSO session for the workspace credential (or the repo
   must be pre-synced). Surface this as a blocker rather than burning time on key

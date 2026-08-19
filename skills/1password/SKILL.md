@@ -42,7 +42,7 @@ skill is fine; install it (see the don'ts).
 | Vault | Holds |
 |---|---|
 | **1Password** (`op`) — vault **`Agent Peter`** | The new GitLab PAT (item `gitlab`, field `password`, a SECURE_NOTE). `op://Agent Peter/gitlab/password`. |
-| **Bitwarden** (`bw`) | Everything else for now: SSH keys, the old `ChainLayer · GitLab — group PAT`, Tailscale OAuth client + pre-auth key, etc. |
+| **Bitwarden** (`bw`) | Everything else for now: SSH keys, the Tailscale OAuth client + pre-auth key, etc. The old `ChainLayer · GitLab — group PAT` is **revoked** — do not use it. |
 
 This list is a snapshot; the migration is one-way (Bitwarden → 1Password).
 When you learn a credential has moved, update this table in the skill and say so
