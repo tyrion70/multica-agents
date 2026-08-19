@@ -108,11 +108,13 @@ EOF
 ```
 
 **The MR author is the token `glab` authenticates with — and that token is
-`peter-agent`, resolved from 1Password at point of use.** Never `glab auth
-login --token`: that writes the PAT into glab's config file, giving the
-credential a second home on disk outside 1Password. `glab` honours the
+`peter-agent`, resolved from 1Password at point of use.** Never run
+`glab auth login --token`: that would write the PAT into glab's config file,
+giving the credential a second home on disk outside 1Password — exactly the
+outcome the point-of-use pattern exists to prevent. `glab` honours the
 `GITLAB_TOKEN` env var, so the inline resolution above is the whole setup —
-there is no stored credential.
+there is no stored credential. If a `glab` auth failure tempts you to reach
+for `glab auth login`, don't — resolve the token at point of use as above.
 
 Verify **who** it authenticates as, not merely that a call succeeds:
 
