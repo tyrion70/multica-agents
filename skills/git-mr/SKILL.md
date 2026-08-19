@@ -40,7 +40,9 @@ git remote get-url origin   # must be gitlab.com/chainlayer/*
 
 ## Step 2 — pre-flight (mandatory, every push)
 
-1. **Git identity**: `git config user.email` must be `peter@chainlayer.io`.
+1. **Git identity**: the commit identity is host-dependent. On an agent
+   runtime `git config user.email` must be `peter+agent@chainlayer.io` and
+   `user.name` `peter-agent`; on Peter's own machines it is `peter@chainlayer.io`.
    Fix repo-locally if wrong — never commit as a hostname email.
 2. **Fetch**: `git fetch origin main`.
 3. **Existing MR state** for the branch:
@@ -68,17 +70,58 @@ git remote get-url origin   # must be gitlab.com/chainlayer/*
 - Conventional commits: `<type>: <description>` (feat, fix, refactor, docs,
   test, chore, perf, ci). Short and to the point — don't over-explain.
 - **No `Co-Authored-By: Claude` lines.** Peter wants only his own name.
-- **Signing**: commits are SSH-signed with `~/.ssh/id_ed25519_signing`
-  (`gpg.format ssh`, `commit.gpgsign true`); auth uses `~/.ssh/id_ed25519_peter`.
-  Keep the roles separate — full setup in the **ssh** skill. If
-  `git log --show-signature` isn't `Good`, fix the signing config there rather
-  than committing unsigned.
+- **Signing**: commits are SSH-signed with whatever `user.signingkey` this host
+  is configured with (`gpg.format ssh`, `commit.gpgsign true`). **The key is
+  host-dependent — do not assume a path.** On an agent runtime the signing key is
+  the agent's own key, so commits are attributed to
+  `peter-agent <peter+agent@chainlayer.io>`; on Peter's machines it is his key.
+  The company rule that commits are signed is unchanged; only the key differs by
+  host. If `git log --show-signature` isn't `Good`, fix the signing config
+  rather than committing unsigned (see "Wiring a host to sign as the agent"
+  below).
 - Terraform repos: `tofu fmt -recursive` before committing.
 - Never commit secrets; machine-consumed tokens live in GCP Secret Manager,
   human-held credentials in the vault (use the **bitwarden** skill — `company`
   folder, or the **1password** skill for the GitLab PAT, which lives at
   `op://Agent Peter/gitlab/password`), local caches only in the gitignored
   `~/.claude/secrets/`.
+
+## Wiring a host to sign as the agent (runbook)
+
+When a new agent runtime is provisioned, it needs the same signing wiring
+`multica-02` has. The private key lives in 1Password — pull it from there, never
+generate a new one and never reproduce key material in any skill, MR, or
+comment. The 1Password item is **"peter-agent SSH commit-signing key
+(multica-02)"** in the `Agent Peter` vault (concealed fields `private key` and
+`public key`).
+
+1. Read the key out of 1Password at point of use and write the private half to
+   `~/.ssh/peter_agent_signing` (mode 0600) and the public half to
+   `~/.ssh/peter_agent_signing.pub`. Do not print the key; write it straight to
+   the file (a tool's own report of its own action is not evidence — check the
+   files afterwards).
+2. Configure git (global on the runtime host):
+   ```bash
+   git config --global user.name "peter-agent"
+   git config --global user.email "peter+agent@chainlayer.io"
+   git config --global user.signingkey "/home/<user>/.ssh/peter_agent_signing.pub"
+   git config --global commit.gpgsign true
+   git config --global gpg.format ssh
+   ```
+3. Register the public half on the GitLab service account **as a signing key
+   only**: `POST /user/keys` with `usage_type: signing` — not
+   `auth_and_signing`, so a leaked copy can sign but never push. Read the key
+   back afterwards to confirm `usage_type` rather than assuming.
+4. Add the public half to `~/.ssh/allowed_signers` keyed by the agent identity:
+   ```
+   peter+agent@chainlayer.io ssh-ed25519 <public half> peter-agent commit signing key
+   ```
+
+**Verifying — local is not enough.** A local `%G?` of `G` only proves the host's
+`allowed_signers` agrees with itself. The real check is against GitLab's
+commit-signature endpoint (`/projects/:id/repository/commits/:sha/signature`)
+reporting `verification_status: verified`, which confirms both the signature and
+that GitLab attributes the commit to `peter-agent`.
 
 ## Step 4 — GitLab MR
 
@@ -124,15 +167,13 @@ GITLAB_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$(cat ~/.config/op/service-account-tok
 # → username: peter-agent  (NOT tyrion70)
 ```
 
-**MR author vs commit identity — they deliberately differ.** The `git push`
-above still goes over **SSH as Peter** (the host rewrites
-`https://gitlab.com/` → `git@gitlab.com:` via `insteadOf`, so pushes use
-Peter's SSH key and never touch the PAT). Consequently commits will say Peter
-while the MR says `peter-agent`. That is fine for the approval gate —
-`merge_requests_author_approval` keys on the MR author — but it will look
-inconsistent to anyone who doesn't know. Commit signing as `peter-agent` is a
-separate job that would need an SSH key registered to the service account;
-not done, and not needed for the gate.
+**MR author vs commit identity.** On an agent runtime these now agree:
+commits are signed with the agent's own key (see "Wiring a host to sign as the
+agent" above) and the MR is created as `peter-agent`, so author, signature,
+pusher and MR author all say `peter-agent`. On Peter's own machines commits
+carry his identity while MRs are still authored by `peter-agent` — fine for the
+approval gate (`merge_requests_author_approval` keys on the MR author), but
+visibly inconsistent unless you know it's deliberate.
 
 **`Closes OPS-XXXX` is for traceability only — do not rely on it to auto-close
 the Linear issue.** The GitLab↔Linear magic-word integration is not reliable.
