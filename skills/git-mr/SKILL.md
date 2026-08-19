@@ -76,7 +76,9 @@ git remote get-url origin   # must be gitlab.com/chainlayer/*
 - Terraform repos: `tofu fmt -recursive` before committing.
 - Never commit secrets; machine-consumed tokens live in GCP Secret Manager,
   human-held credentials in the vault (use the **bitwarden** skill — `company`
-  folder), local caches only in the gitignored `~/.claude/secrets/`.
+  folder, or the **1password** skill for the GitLab PAT, which lives at
+  `op://Agent Peter/gitlab/password`), local caches only in the gitignored
+  `~/.claude/secrets/`.
 
 ## Step 4 — GitLab MR
 
@@ -84,7 +86,9 @@ Two steps, because push options don't support newlines:
 
 ```bash
 git push -u origin <branch>
-glab mr create --fill --title "<type>: <title>" --description "$(cat <<'EOF'
+GITLAB_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$(cat ~/.config/op/service-account-token)" \
+  op read 'op://Agent Peter/gitlab/password')" \
+  glab mr create --fill --title "<type>: <title>" --description "$(cat <<'EOF'
 ## Summary
 <1-2 sentences>
 
@@ -102,6 +106,31 @@ Claude <model>
 EOF
 )"
 ```
+
+**The MR author is the token `glab` authenticates with — and that token is
+`peter-agent`, resolved from 1Password at point of use.** Never `glab auth
+login --token`: that writes the PAT into glab's config file, giving the
+credential a second home on disk outside 1Password. `glab` honours the
+`GITLAB_TOKEN` env var, so the inline resolution above is the whole setup —
+there is no stored credential.
+
+Verify **who** it authenticates as, not merely that a call succeeds:
+
+```bash
+GITLAB_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$(cat ~/.config/op/service-account-token)" \
+  op read 'op://Agent Peter/gitlab/password')" glab api user
+# → username: peter-agent  (NOT tyrion70)
+```
+
+**MR author vs commit identity — they deliberately differ.** The `git push`
+above still goes over **SSH as Peter** (the host rewrites
+`https://gitlab.com/` → `git@gitlab.com:` via `insteadOf`, so pushes use
+Peter's SSH key and never touch the PAT). Consequently commits will say Peter
+while the MR says `peter-agent`. That is fine for the approval gate —
+`merge_requests_author_approval` keys on the MR author — but it will look
+inconsistent to anyone who doesn't know. Commit signing as `peter-agent` is a
+separate job that would need an SSH key registered to the service account;
+not done, and not needed for the gate.
 
 **`Closes OPS-XXXX` is for traceability only — do not rely on it to auto-close
 the Linear issue.** The GitLab↔Linear magic-word integration is not reliable.
@@ -142,51 +171,58 @@ under a verbal "Go, direct". Codified in CHA-779.)
   bump MRs for `latest@sha256:…` pins.
 - After the branch merges: check out main, drop stale stashes.
 
-## GitLab group PAT — self-rotation
+## GitLab PAT — rotation
 
-The group PAT (`ChainLayer · GitLab — group PAT`, stored in Bitwarden `company`
-folder) carries the `self_rotate` scope, so agents can rotate it without human
-involvement — no more dead-token escalations blocking nightly MRs.
+The token that authors MRs is **`peter-agent`**, stored in 1Password at
+`op://Agent Peter/gitlab/password` (a SECURE_NOTE; the token is its concealed
+`password` field). It carries both the `api` scope and `self_rotate`, so the
+agent can rotate it without human involvement — no more dead-token escalations
+blocking MRs.
 
-The item is a **SecureNote** whose token lives in a **hidden custom field named
-`PAT`** (not a Login — there is no `login.password`). Read and write it by
-parsing the `fields` array, per the bitwarden skill's SecureNote pattern.
+**What rotation is — and is not.** A token with `api` scope can rotate itself
+indefinitely, so annual expiry is a guard against *neglect*, not against the
+holder. If you ever want expiry to bind the credential itself, the rotation has
+to be performed by something other than the token's own authority. As it stands,
+rotation is a maintenance act: do it proactively (near-expiry or scheduled), not
+as a post-401 recovery.
 
 **Proactive rotation (while the token is still valid):**
 
 ```bash
-ITEM="ChainLayer · GitLab — group PAT"
-
-# 1. Read current token from the PAT hidden field
-OLD_TOKEN=$(bw get item "$ITEM" \
-  | python3 -c "import json,sys; d=json.load(sys.stdin); print({f['name']:f['value'] for f in d.get('fields',[])}['PAT'])")
+# 1. Read the current token from 1Password at point of use
+OLD_TOKEN=$(OP_SERVICE_ACCOUNT_TOKEN="$(cat ~/.config/op/service-account-token)" \
+  op read 'op://Agent Peter/gitlab/password')
 
 # 2. Rotate — returns a new token, revokes the old one
 NEW_TOKEN=$(curl -s -X POST https://gitlab.com/api/v4/personal_access_tokens/self/rotate \
   -H "PRIVATE-TOKEN: $OLD_TOKEN" | python3 -c "import json,sys; print(json.load(sys.stdin)['token'])")
 
-# 3. Write the new token back into the PAT field + sync
-umask 077                                   # owner-only temp file (default 0022 umask would make it world-readable)
-bw get item "$ITEM" > /tmp/bw-pat.json
-ITEM_ID=$(python3 -c "import json; print(json.load(open('/tmp/bw-pat.json'))['id'])")
+# 3. Write the new token back into the 1Password item's password field.
+#    `op item edit` assignment arguments are visible in argv, so put the
+#    value in a template file instead (same gitignore discipline as the
+#    bitwarden skill's temp files).
+umask 077
+OP_SERVICE_ACCOUNT_TOKEN="$(cat ~/.config/op/service-account-token)" \
+  op item get 'op://Agent Peter/gitlab' --format json > /tmp/op-gitlab-item.json
 python3 -c "
 import json
-d = json.load(open('/tmp/bw-pat.json'))
-for f in d['fields']:
-    if f['name'] == 'PAT':
+d = json.load(open('/tmp/op-gitlab-item.json'))
+for f in d.get('fields', []):
+    if f.get('id') == 'password' or f.get('purpose') == 'PASSWORD':
         f['value'] = '$NEW_TOKEN'
 print(json.dumps(d))
-" | bw encode | xargs -I{} bw edit item "$ITEM_ID" {}
-bw sync
-rm -f /tmp/bw-pat.json
+" > /tmp/op-gitlab-new.json
+OP_SERVICE_ACCOUNT_TOKEN="$(cat ~/.config/op/service-account-token)" \
+  op item edit 'op://Agent Peter/gitlab' --template /tmp/op-gitlab-new.json
+rm -f /tmp/op-gitlab-item.json /tmp/op-gitlab-new.json
 ```
 
 ⚠️ **Caveat — only works while the token is still valid.** A fully-expired
 token returns 401 and cannot rotate itself. Rotate **proactively** (near-expiry
 or scheduled), not as a post-401 recovery. A hard-expired token still needs a
-human to re-issue via the GitLab UI.
+human to re-issue via the GitLab UI, then the new value written to 1Password.
 
-> **Follow-up:** a scheduled Multica autopilot that rotates the PAT before
+> **Follow-up:** a scheduled Multica autopilot that rotates the token before
 > expiry would eliminate the human-in-loop entirely. Not implemented yet —
 > the agent-driven path above is the current approach.
 
