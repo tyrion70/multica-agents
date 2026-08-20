@@ -123,8 +123,11 @@ abandoned** — do NOT treat multica-02 as the live host for anything datafeeds.
   are paused). Each `sweep-cron.sh` run pulls the checkout, so **merge to main
   is the deploy** for the sweep path; the dashboard image is rebuilt separately
   via `dashboard/deploy.sh` on the VM.
-- **VM access**: `ssh root@192.168.18.232` (LAN, `~/.ssh/id_ed25519_peter`).
-  Tailscale SSH to the monitoring node is denied by tailnet policy.
+- **VM access**: request access through **JIT** (`https://jit.java-moth.ts.net/`;
+  agents use `POST /agent/grant`, see the `ssh` skill). The standing
+  `id_ed25519_peter` key still works on the LAN as a fallback while it exists,
+  but JIT is the mechanism that replaces it. Tailscale SSH to the monitoring
+  node is denied by tailnet policy.
 
 ## Co-authored-by commit hook — disabled at the workspace setting
 The Multica daemon installs a git `prepare-commit-msg` hook (in each bare repo's
