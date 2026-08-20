@@ -1,16 +1,79 @@
 ---
 name: ssh
-description: Peter's SSH key setup — which key does what (auth/login vs signing), how to reach private homelab vs company hosts, git auth to GitHub/GitLab, and SSH commit signing. Use whenever SSHing to a machine, cloning/pushing over SSH, configuring git auth or commit signing, or wiring keys onto a new host. Keys live in the vault `shared` folder.
+description: SSH keys and access — JIT first. Reaching a host now means requesting access through JIT (https://jit.java-moth.ts.net/), not using a standing key: humans use the web UI with a YubiKey touch, agents use POST /agent/grant. Also covers the git-auth and commit-signing keys (GitHub auth, SSH-format signing) and wiring keys onto a new host. Use whenever SSHing to a machine, cloning/pushing over SSH, configuring git auth or commit signing, or wiring keys onto a new host.
 ---
 
 # SSH keys & access
+
+The way to reach a machine has changed: **request access through JIT rather
+than logging in with a standing key.** The standing `id_ed25519_peter` key still
+exists on some hosts, but JIT is the mechanism that replaces it and it is being
+removed. This skill leads with the JIT path because that is what works today;
+the standing-key path is documented below for what remains, marked for removal.
+
+## Reaching machines — request access through JIT
+
+JIT (just-in-time) grants temporary SSH access to a target host. There are two
+paths, and **getting the wrong one looks like JIT is broken** — they differ by
+who is calling.
+
+### Humans — the web UI
+
+Open **https://jit.java-moth.ts.net/**, request access to the target host, and
+approve with a **YubiKey touch**. The touch is the identity — a grant is
+attributable to a specific security key, and grants expire on their own.
+
+### Agents — POST /agent/grant
+
+**Agents cannot use the web UI.** `tailscale serve` does not inject identity
+headers for **tagged** devices, so a tagged agent gets **403 on the UI — that is
+expected, not a fault.** An agent reaches a host through the agent path:
+
+```
+POST /agent/grant
+Content-Type: application/json
+
+{"target": "<host>", "reason": "<why>", "seconds": <optional>}
+```
+
+The caller must be a tagged agent device (one of the agent identity tags) and
+must send a real `reason` — the criteria service decides based on it. A missing
+`reason` is refused before any criteria call.
+
+### What is requestable today
+
+`JITSSH_TARGETS` is currently **`monitoring` alone**. A request for any other
+host is refused with "not a JIT-eligible target" — **that refusal is correct
+behaviour, not a broken system.** Don't read it as JIT failing.
+
+### `jit` itself is never requestable
+
+`jit` is the approver and is **deliberately not a target**. It is absent from
+`JITSSH_TARGETS` by design; do not expect to request access to it.
+
+## Legacy standing access (being removed)
+
+The standing key `id_ed25519_peter` still works on hosts where it is installed,
+and is **being removed** — do not treat it as the normal way in. Where it
+remains:
+
+- **Private homelab** (Proxmox VMs): `192.168.16/17/18/19.x`, user `peter` or
+  `root`, **port 22**, key `id_ed25519_peter`. See the `homelab` skill.
+- **Company hosts**: `*.chosts.io`, user `peter`, **port 2822**, key
+  `id_ed25519_peter`. Not reachable from the laptop's plain network the same
+  way — mind the non-standard port.
+
+Plan all host access as JIT requests; use the standing key only for hosts not
+yet covered by a target.
+
+## The keys
 
 Two purpose-built ed25519 keys (plus YubiKey FIDO2 fallbacks). Keep their
 roles separate — auth/login is one key, signing is another.
 
 | Key | Role | Used for |
 |---|---|---|
-| `~/.ssh/id_ed25519_peter` (`peter@chainlayer`) | **auth + login** | SSH login to machines (private homelab + company), and git auth to **GitHub** (tyrion70) |
+| `~/.ssh/id_ed25519_peter` (`peter@chainlayer`) | **auth + login** | Git auth to **GitHub** (tyrion70). Host login via this key is legacy and being removed — reach machines through JIT instead. |
 | `~/.ssh/id_ed25519_signing` (`git-signing`) | **signing** (+ GitLab auth) | SSH-format git commit/tag signing. **Also the key GitLab accepts for auth** (see note below). |
 | `~/.ssh/id_ed25519_sk_yk_*` | fallback | FIDO2 YubiKey keys for other/ad-hoc hosts (PIN-gated) |
 
@@ -21,28 +84,10 @@ Confirmed working (multica-02 runtime, 2026-06-29):
   registered there. Don't assume the auth key works for both forges.
 - `id_ed25519_signing` → produces a Good commit signature.
 
-> **GitLab auth ≠ GitLab repo access for the `chainlayer` group.** Authenticating
-> is necessary but not sufficient — the group enforces SAML SSO on git transport.
-> See "Git over SSO-enforced GitLab groups" below before trying to clone/fetch a
-> `gitlab.com/chainlayer/*` repo.
-
-## Reaching machines
-
-- **Private homelab** (Proxmox VMs): `192.168.16/17/18/19.x`, user `peter` or
-  `root`, **port 22**, key `id_ed25519_peter`. See the `homelab` skill.
-- **Company hosts**: `*.chosts.io`, user `peter`, **port 2822**, key
-  `id_ed25519_peter`. Not reachable from the laptop's plain network the same
-  way — mind the non-standard port.
-
-`~/.ssh/config` should carry these so you don't pass flags by hand:
+`~/.ssh/config` should carry the git-auth mappings so you don't pass flags by
+hand:
 
 ```
-Host *.chosts.io
-    User peter
-    Port 2822
-    IdentityFile ~/.ssh/id_ed25519_peter
-    IdentitiesOnly yes
-
 Host github.com
     IdentityFile ~/.ssh/id_ed25519_peter
     IdentitiesOnly yes
@@ -124,8 +169,9 @@ can use them:
 - `ssh/id_ed25519_signing` → `~/.ssh/id_ed25519_signing` (mode 600)
 
 To wire a fresh host: write each key to its path (`chmod 600`), drop the
-`~/.ssh/config` snippet above, and `chmod 644` the regenerated `.pub`
-(`ssh-keygen -y -f <key> > <key>.pub`).
+`~/.ssh/config` git-auth mappings above, and `chmod 644` the regenerated `.pub`
+(`ssh-keygen -y -f <key> > <key>.pub`). `id_ed25519_peter` remains for git auth
+to GitHub; host access is through JIT, not this key.
 
 ## Don'ts
 
