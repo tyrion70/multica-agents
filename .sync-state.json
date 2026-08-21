@@ -4345,10 +4345,11 @@
           "chainlink-ops",
           "git-mr",
           "git-pr",
+          "linear-company",
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
+        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\", \"linear\"]}",
         "custom_env": [
           "DATAFEEDS_HEALTH_DSN"
         ]
@@ -4370,10 +4371,11 @@
           "chainlink-ops",
           "git-mr",
           "git-pr",
+          "linear-company",
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
+        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\", \"linear\"]}",
         "custom_env": [
           "DATAFEEDS_HEALTH_DSN"
         ]
@@ -4398,10 +4400,11 @@
           "chainlink-ops",
           "git-mr",
           "git-pr",
+          "linear-company",
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
+        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\", \"linear\"]}",
         "custom_env": [
           "DATAFEEDS_HEALTH_DSN"
         ]
@@ -4423,10 +4426,11 @@
           "chainlink-ops",
           "git-mr",
           "git-pr",
+          "linear-company",
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
+        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\", \"linear\"]}",
         "custom_env": [
           "DATAFEEDS_HEALTH_DSN"
         ]
@@ -4451,10 +4455,11 @@
           "chainlink-ops",
           "git-mr",
           "git-pr",
+          "linear-company",
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
+        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\", \"linear\"]}",
         "custom_env": [
           "DATAFEEDS_HEALTH_DSN"
         ]
@@ -4476,10 +4481,11 @@
           "chainlink-ops",
           "git-mr",
           "git-pr",
+          "linear-company",
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
+        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\", \"linear\"]}",
         "custom_env": [
           "DATAFEEDS_HEALTH_DSN"
         ]
@@ -4504,10 +4510,11 @@
           "chainlink-ops",
           "git-mr",
           "git-pr",
+          "linear-company",
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
+        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\", \"linear\"]}",
         "custom_env": [
           "DATAFEEDS_HEALTH_DSN"
         ]
@@ -4529,10 +4536,11 @@
           "chainlink-ops",
           "git-mr",
           "git-pr",
+          "linear-company",
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
+        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\", \"linear\"]}",
         "custom_env": [
           "DATAFEEDS_HEALTH_DSN"
         ]
@@ -4557,10 +4565,11 @@
           "chainlink-ops",
           "git-mr",
           "git-pr",
+          "linear-company",
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
+        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\", \"linear\"]}",
         "custom_env": [
           "DATAFEEDS_HEALTH_DSN"
         ]
@@ -4582,10 +4591,11 @@
           "chainlink-ops",
           "git-mr",
           "git-pr",
+          "linear-company",
           "rag-consumer",
           "ssh"
         ],
-        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\"]}",
+        "mcp_config": "{\"mcpServers\": [\"github\", \"gitlab\", \"linear\"]}",
         "custom_env": [
           "DATAFEEDS_HEALTH_DSN"
         ]
@@ -5694,13 +5704,13 @@
         "repo_state": {
           "name": "rag-consumer",
           "description": "How ChainLayer agents consume the RAG MCP server — the `rag_ask` tool for querying internal knowledge. Bound to agents that have the RAG MCP server in their mcp_config. NOT the rag-ops skill (that's for operating the RAG system itself).",
-          "body": "# rag-consumer — querying the RAG from agent sessions\n\nEvery lifecycle agent (Refiner, Coder, QA, Deployer) across all squads, plus\nTech Leads, Communicators, Maintainers, and domain specialists, has the **RAG\nMCP server** configured as an MCP tool. This means you can call `rag_ask`\ndirectly in your session — the model decides when context is needed.\n\n## The tool: `rag_ask`\n\n```\nrag_ask(query: str) -> str\n```\n\nTakes a natural-language question about ChainLayer infrastructure, operations,\nrunbooks, incidents, deployments, or codebase history. Returns a **grounded\nanswer with numbered source citations** (`[n]`), retrieved from the in-house\nRAG corpus (270+ repos, nightly-refreshed).\n\nUse it whenever you need internal context: before writing code, refining an\nissue, verifying a fix, or deciding a deploy strategy.\n\n## When to use it\n\n- **Refiner:** ask \"What does this system do?\" before scoping a change\n- **Coder:** ask \"How is this configured in production?\" before implementing\n- **QA:** ask \"What are the known failure modes?\" before testing\n- **Deployer:** ask \"What is the rollout order?\" before deploying\n- **Anyone:** ask \"Has this been done before?\" before starting work\n\n## What it returns\n\nA typical response looks like:\n\n```\nThe chainlink-tools platform consists of three apps under a monorepo... [1]\n\nSources:\n  [1] chainlink-ops:README.md\n  [2] linear-ops-cll:OPS-1179.md\n```\n\nIf no relevant context is found, it returns `\"No relevant context found.\"` —\ndo not treat this as a failure; it means your question falls outside the\ningested corpus.\n\n## Architecture\n\n| Property | Value |\n|---|---|\n| Transport | SSE (`GET /sse` + `POST /messages/`) |\n| Endpoint | `http://100.69.200.97:8041/sse` |\n| Auth | None (Tailscale-only binding — any tailnet host can query) |\n| Host | `claude-readonly-01` |\n| Retrieval | Hybrid (dense Qdrant ANN + lexical full-text, RRF fusion) |\n| Model | Qwen3-30B-A3B-Instruct on `gx10-f018` |\n\n## Binding to an agent\n\nTo give an agent the RAG MCP tool, add the following to its `mcp_config` in\n`agent.json`:\n\n```json\n\"rag\": {\n  \"type\": \"sse\",\n  \"url\": \"http://100.69.200.97:8041/sse\"\n}\n```\n\nThen run `scripts/sync.py` in the multica-agents repo to push the config to\nMultica, or wait for the sync autopilot.\n\n## See also\n\n- `rag-ops` skill — operating the RAG system itself (ingestion, secret filter,\n  eval, deploy)\n- `claude-config/chainlayer/mcp/README.md` — general MCP connector management\n",
+          "body": "# rag-consumer — querying the RAG from agent sessions\n\nEvery lifecycle agent (Refiner, Coder, QA, Deployer) across all squads, plus\nTech Leads, Communicators, Maintainers, and domain specialists, has the **RAG\nMCP server** configured as an MCP tool. This means you can call `rag_ask`\ndirectly in your session — the model decides when context is needed.\n\n## The tool: `rag_ask`\n\n```\nrag_ask(query: str) -> str\n```\n\nTakes a natural-language question about ChainLayer infrastructure, operations,\nrunbooks, incidents, deployments, or codebase history. Returns a **grounded\nanswer with numbered source citations** (`[n]`), retrieved from the in-house\nRAG corpus (270+ repos, nightly-refreshed).\n\nUse it whenever you need internal context: before writing code, refining an\nissue, verifying a fix, or deciding a deploy strategy.\n\n## When to use it\n\n- **Refiner:** ask \"What does this system do?\" before scoping a change\n- **Coder:** ask \"How is this configured in production?\" before implementing\n- **QA:** ask \"What are the known failure modes?\" before testing\n- **Deployer:** ask \"What is the rollout order?\" before deploying\n- **Anyone:** ask \"Has this been done before?\" before starting work\n\n## What it returns\n\nA typical response looks like:\n\n```\nThe chainlink-tools platform consists of three apps under a monorepo... [1]\n\nSources:\n  [1] chainlink-ops:README.md\n  [2] linear-ops-cll:OPS-1179.md\n```\n\nIf no relevant context is found, it returns `\"No relevant context found.\"` —\ndo not treat this as a failure; it means your question falls outside the\ningested corpus.\n\n## Architecture\n\n| Property | Value |\n|---|---|\n| Transport | SSE (`GET /sse` + `POST /messages/`) |\n| Endpoint | `http://100.64.220.121:8041/sse` |\n| Auth | None (Tailscale-only binding — any tailnet host can query) |\n| Host | `rag-refresh` |\n| Retrieval | Hybrid (dense Qdrant ANN + lexical full-text, RRF fusion) |\n| Model | Qwen3-30B-A3B-Instruct on `gx10-f018` |\n\n## Binding to an agent\n\nTo give an agent the RAG MCP tool, add the following to its `mcp_config` in\n`agent.json`:\n\n```json\n\"rag\": {\n  \"type\": \"sse\",\n  \"url\": \"http://100.64.220.121:8041/sse\"\n}\n```\n\nThen run `scripts/sync.py` in the multica-agents repo to push the config to\nMultica, or wait for the sync autopilot.\n\n## See also\n\n- `rag-ops` skill — operating the RAG system itself (ingestion, secret filter,\n  eval, deploy)\n- `claude-config/chainlayer/mcp/README.md` — general MCP connector management\n",
           "files": {}
         },
         "multica_state": {
           "name": "rag-consumer",
           "description": "How ChainLayer agents consume the RAG MCP server — the `rag_ask` tool for querying internal knowledge. Bound to agents that have the RAG MCP server in their mcp_config. NOT the rag-ops skill (that's for operating the RAG system itself).",
-          "body": "# rag-consumer — querying the RAG from agent sessions\n\nEvery lifecycle agent (Refiner, Coder, QA, Deployer) across all squads, plus\nTech Leads, Communicators, Maintainers, and domain specialists, has the **RAG\nMCP server** configured as an MCP tool. This means you can call `rag_ask`\ndirectly in your session — the model decides when context is needed.\n\n## The tool: `rag_ask`\n\n```\nrag_ask(query: str) -> str\n```\n\nTakes a natural-language question about ChainLayer infrastructure, operations,\nrunbooks, incidents, deployments, or codebase history. Returns a **grounded\nanswer with numbered source citations** (`[n]`), retrieved from the in-house\nRAG corpus (270+ repos, nightly-refreshed).\n\nUse it whenever you need internal context: before writing code, refining an\nissue, verifying a fix, or deciding a deploy strategy.\n\n## When to use it\n\n- **Refiner:** ask \"What does this system do?\" before scoping a change\n- **Coder:** ask \"How is this configured in production?\" before implementing\n- **QA:** ask \"What are the known failure modes?\" before testing\n- **Deployer:** ask \"What is the rollout order?\" before deploying\n- **Anyone:** ask \"Has this been done before?\" before starting work\n\n## What it returns\n\nA typical response looks like:\n\n```\nThe chainlink-tools platform consists of three apps under a monorepo... [1]\n\nSources:\n  [1] chainlink-ops:README.md\n  [2] linear-ops-cll:OPS-1179.md\n```\n\nIf no relevant context is found, it returns `\"No relevant context found.\"` —\ndo not treat this as a failure; it means your question falls outside the\ningested corpus.\n\n## Architecture\n\n| Property | Value |\n|---|---|\n| Transport | SSE (`GET /sse` + `POST /messages/`) |\n| Endpoint | `http://100.69.200.97:8041/sse` |\n| Auth | None (Tailscale-only binding — any tailnet host can query) |\n| Host | `claude-readonly-01` |\n| Retrieval | Hybrid (dense Qdrant ANN + lexical full-text, RRF fusion) |\n| Model | Qwen3-30B-A3B-Instruct on `gx10-f018` |\n\n## Binding to an agent\n\nTo give an agent the RAG MCP tool, add the following to its `mcp_config` in\n`agent.json`:\n\n```json\n\"rag\": {\n  \"type\": \"sse\",\n  \"url\": \"http://100.69.200.97:8041/sse\"\n}\n```\n\nThen run `scripts/sync.py` in the multica-agents repo to push the config to\nMultica, or wait for the sync autopilot.\n\n## See also\n\n- `rag-ops` skill — operating the RAG system itself (ingestion, secret filter,\n  eval, deploy)\n- `claude-config/chainlayer/mcp/README.md` — general MCP connector management\n",
+          "body": "# rag-consumer — querying the RAG from agent sessions\n\nEvery lifecycle agent (Refiner, Coder, QA, Deployer) across all squads, plus\nTech Leads, Communicators, Maintainers, and domain specialists, has the **RAG\nMCP server** configured as an MCP tool. This means you can call `rag_ask`\ndirectly in your session — the model decides when context is needed.\n\n## The tool: `rag_ask`\n\n```\nrag_ask(query: str) -> str\n```\n\nTakes a natural-language question about ChainLayer infrastructure, operations,\nrunbooks, incidents, deployments, or codebase history. Returns a **grounded\nanswer with numbered source citations** (`[n]`), retrieved from the in-house\nRAG corpus (270+ repos, nightly-refreshed).\n\nUse it whenever you need internal context: before writing code, refining an\nissue, verifying a fix, or deciding a deploy strategy.\n\n## When to use it\n\n- **Refiner:** ask \"What does this system do?\" before scoping a change\n- **Coder:** ask \"How is this configured in production?\" before implementing\n- **QA:** ask \"What are the known failure modes?\" before testing\n- **Deployer:** ask \"What is the rollout order?\" before deploying\n- **Anyone:** ask \"Has this been done before?\" before starting work\n\n## What it returns\n\nA typical response looks like:\n\n```\nThe chainlink-tools platform consists of three apps under a monorepo... [1]\n\nSources:\n  [1] chainlink-ops:README.md\n  [2] linear-ops-cll:OPS-1179.md\n```\n\nIf no relevant context is found, it returns `\"No relevant context found.\"` —\ndo not treat this as a failure; it means your question falls outside the\ningested corpus.\n\n## Architecture\n\n| Property | Value |\n|---|---|\n| Transport | SSE (`GET /sse` + `POST /messages/`) |\n| Endpoint | `http://100.64.220.121:8041/sse` |\n| Auth | None (Tailscale-only binding — any tailnet host can query) |\n| Host | `rag-refresh` |\n| Retrieval | Hybrid (dense Qdrant ANN + lexical full-text, RRF fusion) |\n| Model | Qwen3-30B-A3B-Instruct on `gx10-f018` |\n\n## Binding to an agent\n\nTo give an agent the RAG MCP tool, add the following to its `mcp_config` in\n`agent.json`:\n\n```json\n\"rag\": {\n  \"type\": \"sse\",\n  \"url\": \"http://100.64.220.121:8041/sse\"\n}\n```\n\nThen run `scripts/sync.py` in the multica-agents repo to push the config to\nMultica, or wait for the sync autopilot.\n\n## See also\n\n- `rag-ops` skill — operating the RAG system itself (ingestion, secret filter,\n  eval, deploy)\n- `claude-config/chainlayer/mcp/README.md` — general MCP connector management\n",
           "files": {}
         }
       },
