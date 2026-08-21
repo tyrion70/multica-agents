@@ -304,7 +304,13 @@ class SyncIdentityTest(unittest.TestCase):
             "REALKEY",
         )
 
-        # Second run: secret no longer resolves — must skip, not wipe.
+        # Second run: a repo edit triggers a genuine update, but the secret no
+        # longer resolves — must skip, not wipe. (An unedited agent would now
+        # correctly read as "unchanged" — see test_mcp_agent_unchanged_second_run_no_repush.)
+        self._write_agent("squad-a/coder", {
+            "name": "Test Coder", "runtime_id": "rt-1", "description": "edited",
+            "mcp_config": self._MCP_PLACEHOLDER,
+        })
         with mock.patch.object(sync, "_bw_get_secret", return_value=None):
             code = self._run()
         self.assertEqual(self.backend.updated_calls, 0, "issued an update with an unresolved secret")
@@ -334,6 +340,60 @@ class SyncIdentityTest(unittest.TestCase):
         code = self._run("--force")
         self.assertEqual(code, 0)
         self.assertEqual(self.backend.updated_calls, 1, "--force did not re-push an unchanged agent")
+
+    # --- Change detection normalizes MCP/custom_env like the baseline (CHA-1092) ---
+
+    def test_mcp_agent_unchanged_second_run_no_repush(self):
+        """CHA-1092 regression: _decide_action compared the full mcp_config
+        block (placeholder tokens in the repo, resolved secrets live) against the
+        sanitized server-name set stored in the baseline, so repo_changed was
+        structurally always-true for any MCP-bearing agent. A no-op second run
+        must read as unchanged — no update, no reconcile."""
+        self._write_agent("squad-a/coder", {
+            "name": "Test Coder", "runtime_id": "rt-1", "description": "d",
+            "mcp_config": self._MCP_PLACEHOLDER,
+        })
+        with mock.patch.object(sync, "_bw_get_secret", return_value="REALKEY"):
+            code = self._run("--allow-create")
+        self.assertEqual(code, 0)
+        self.assertEqual(self.backend.created_calls, 1)
+        self.assertEqual(self.backend.updated_calls, 0)
+
+        # Second, non-force run: nothing changed — must be a no-op (no update,
+        # no repo write, no conflict), not a self-reconcile of the MCP diff.
+        with mock.patch.object(sync, "_bw_get_secret", return_value="REALKEY"):
+            code = self._run()
+        self.assertEqual(code, 0)
+        self.assertEqual(self.backend.updated_calls, 0,
+                         "unchanged MCP agent was re-pushed (false change-detection)")
+
+    def test_mcp_agent_single_field_edit_pushes_not_conflicts(self):
+        """CHA-1092 regression: editing one field of an MCP-bearing agent must
+        surface as a repo-side push, never a both-sides conflict (the falsifiable
+        repro from the issue: a single-field edit used to flag a conflict)."""
+        self._write_agent("squad-a/coder", {
+            "name": "Test Coder", "runtime_id": "rt-1", "description": "d",
+            "mcp_config": self._MCP_PLACEHOLDER,
+        })
+        with mock.patch.object(sync, "_bw_get_secret", return_value="REALKEY"):
+            code = self._run("--allow-create")
+        self.assertEqual(code, 0)
+        self.assertEqual(self.backend.created_calls, 1)
+
+        self._write_agent("squad-a/coder", {
+            "name": "Test Coder", "runtime_id": "rt-1", "description": "edited",
+            "mcp_config": self._MCP_PLACEHOLDER,
+        })
+        with mock.patch.object(sync, "_bw_get_secret", return_value="REALKEY"):
+            code = self._run()
+        self.assertEqual(code, 0, "single-field edit must not become a conflict")
+        self.assertEqual(self.backend.updated_calls, 1,
+                         "single-field edit was swallowed instead of pushed")
+        self.assertEqual(
+            self.backend.agents[next(iter(self.backend.agents))]["description"],
+            "edited",
+            "the edited field did not reach Multica",
+        )
 
     def test_max_creates_threshold_aborts(self):
         """With --allow-create, creates beyond the threshold abort the run."""

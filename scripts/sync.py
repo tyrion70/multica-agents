@@ -863,6 +863,32 @@ def _sanitize_custom_env_for_state(custom_env_norm: Any) -> Any:
     return None
 
 
+def _sanitize_agent_for_state(norm: Optional[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
+    """Project a normalized agent/skill state onto the change-detection form
+    that `.sync-state.json` baselines store.
+
+    Secret-bearing fields are reduced to their structure exactly as the baseline
+    write paths do — mcp_config → the sorted MCP server-name set, custom_env →
+    the sorted key list — so a raw repo read (with `#…#` placeholders) and a
+    live Multica read (with resolved secrets) can be diffed against the stored
+    baseline like-for-like. Without this, `_decide_action` compared the full
+    mcp_config block against the sanitized baseline and `repo_changed` was
+    structurally always-true for any MCP-bearing agent (CHA-1092).
+
+    Fields absent from the source are left absent, keeping the projection
+    key-for-key compatible with stored baselines for both agents (all
+    COMPARABLE_FIELDS) and skills ({name, description, body, files}).
+    """
+    if norm is None:
+        return None
+    out = dict(norm)
+    if "mcp_config" in out:
+        out["mcp_config"] = _sanitize_mcp_for_state(out["mcp_config"])
+    if "custom_env" in out:
+        out["custom_env"] = _sanitize_custom_env_for_state(out["custom_env"])
+    return out
+
+
 def _try_reconcile_agent_conflict(
     repo_norm: Dict[str, Any],
     multica_norm: Dict[str, Any],
@@ -974,15 +1000,22 @@ def _decide_action(
     if last is None:
         if multica_norm is None:
             return "push_to_multica"
-        if repo_norm == multica_norm:
+        if _sanitize_agent_for_state(repo_norm) == _sanitize_agent_for_state(multica_norm):
             return "unchanged"
         return "push_to_multica"
 
     last_repo = last.get("repo_state")
     last_multica = last.get("multica_state")
 
-    repo_changed = repo_norm != last_repo
-    multica_changed = multica_norm != last_multica
+    # Baselines store secret-bearing fields sanitized (mcp_config → server-name
+    # set, custom_env → key list); the live reads carry full blocks (placeholders
+    # in the repo, resolved secrets in Multica). Diff like-for-like or any
+    # MCP-bearing agent is structurally always-changed (CHA-1092).
+    repo_snapshot = _sanitize_agent_for_state(repo_norm)
+    multica_snapshot = _sanitize_agent_for_state(multica_norm)
+
+    repo_changed = repo_snapshot != last_repo
+    multica_changed = multica_snapshot != last_multica
 
     if not repo_changed and not multica_changed:
         return "unchanged"
@@ -992,7 +1025,7 @@ def _decide_action(
         if multica_norm is None:
             return "unchanged"
         return "pull_to_repo"
-    if repo_norm == multica_norm:
+    if repo_snapshot == multica_snapshot:
         return "unchanged"
     return "conflict"
 
@@ -1163,20 +1196,12 @@ def sync_agents_workspace(
                 # anchored agent (AC5): we deliberately don't re-mint, so preserve
                 # the last-known multica_state rather than clobbering it with the miss.
                 if multica_norm is not None:
-                    multica_state = {
-                        **multica_norm,
-                        "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config")),
-                        "custom_env": _sanitize_custom_env_for_state(multica_norm.get("custom_env")),
-                    }
+                    multica_state = _sanitize_agent_for_state(multica_norm)
                 else:
                     multica_state = last.get("multica_state") if last else None
                 state_agents[state_key] = {
                     "repo_file": str(rel_path),
-                    "repo_state": {
-                        **repo_norm,
-                        "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config")),
-                        "custom_env": _sanitize_custom_env_for_state(repo_norm.get("custom_env")),
-                    },
+                    "repo_state": _sanitize_agent_for_state(repo_norm),
                     "multica_state": multica_state,
                 }
 
@@ -1268,16 +1293,8 @@ def sync_agents_workspace(
 
                 state_agents[state_key] = {
                     "repo_file": str(rel_path),
-                    "repo_state": {
-                        **repo_norm,
-                        "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config")),
-                        "custom_env": _sanitize_custom_env_for_state(repo_norm.get("custom_env")),
-                    },
-                    "multica_state": {
-                        **repo_norm,
-                        "mcp_config": _sanitize_mcp_for_state(repo_norm.get("mcp_config")),
-                        "custom_env": _sanitize_custom_env_for_state(repo_norm.get("custom_env")),
-                    },
+                    "repo_state": _sanitize_agent_for_state(repo_norm),
+                    "multica_state": _sanitize_agent_for_state(repo_norm),
                 }
 
             elif action == "pull_to_repo":
@@ -1294,16 +1311,8 @@ def sync_agents_workspace(
                     continue
                 state_agents[state_key] = {
                     "repo_file": str(rel_path),
-                    "repo_state": {
-                        **multica_norm,
-                        "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config")),
-                        "custom_env": _sanitize_custom_env_for_state(multica_norm.get("custom_env")),
-                    },
-                    "multica_state": {
-                        **multica_norm,
-                        "mcp_config": _sanitize_mcp_for_state(multica_norm.get("mcp_config")),
-                        "custom_env": _sanitize_custom_env_for_state(multica_norm.get("custom_env")),
-                    },
+                    "repo_state": _sanitize_agent_for_state(multica_norm),
+                    "multica_state": _sanitize_agent_for_state(multica_norm),
                 }
 
             elif action == "conflict":
@@ -1369,16 +1378,8 @@ def sync_agents_workspace(
 
                     state_agents[state_key] = {
                         "repo_file": str(rel_path),
-                        "repo_state": {
-                            **reconciled,
-                            "mcp_config": _sanitize_mcp_for_state(reconciled.get("mcp_config")),
-                            "custom_env": _sanitize_custom_env_for_state(reconciled.get("custom_env")),
-                        },
-                        "multica_state": {
-                            **reconciled,
-                            "mcp_config": _sanitize_mcp_for_state(reconciled.get("mcp_config")),
-                            "custom_env": _sanitize_custom_env_for_state(reconciled.get("custom_env")),
-                        },
+                        "repo_state": _sanitize_agent_for_state(reconciled),
+                        "multica_state": _sanitize_agent_for_state(reconciled),
                     }
                 else:
                     print(f"    ✗ CONFLICT: both sides changed irreconcilably", file=sys.stderr)
@@ -1476,16 +1477,8 @@ def sync_agents_workspace(
             disc_norm = normalize_agent(live_agent)
             state_agents[state_key] = {
                 "repo_file": str(rel_path),
-                "repo_state": {
-                    **disc_norm,
-                    "mcp_config": _sanitize_mcp_for_state(disc_norm.get("mcp_config")),
-                    "custom_env": _sanitize_custom_env_for_state(disc_norm.get("custom_env")),
-                },
-                "multica_state": {
-                    **disc_norm,
-                    "mcp_config": _sanitize_mcp_for_state(disc_norm.get("mcp_config")),
-                    "custom_env": _sanitize_custom_env_for_state(disc_norm.get("custom_env")),
-                },
+                "repo_state": _sanitize_agent_for_state(disc_norm),
+                "multica_state": _sanitize_agent_for_state(disc_norm),
             }
 
         elif action == "conflict":
