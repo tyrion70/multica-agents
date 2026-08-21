@@ -53,9 +53,9 @@ ingested corpus.
 | Property | Value |
 |---|---|
 | Transport | SSE (`GET /sse` + `POST /messages/`) |
-| Endpoint | `http://100.69.200.97:8041/sse` |
+| Endpoint | `http://100.64.220.121:8041/sse` |
 | Auth | None (Tailscale-only binding — any tailnet host can query) |
-| Host | `claude-readonly-01` |
+| Host | `rag-refresh` |
 | Retrieval | Hybrid (dense Qdrant ANN + lexical full-text, RRF fusion) |
 | Model | Qwen3-30B-A3B-Instruct on `gx10-f018` |
 
@@ -67,7 +67,7 @@ To give an agent the RAG MCP tool, add the following to its `mcp_config` in
 ```json
 "rag": {
   "type": "sse",
-  "url": "http://100.69.200.97:8041/sse"
+  "url": "http://100.64.220.121:8041/sse"
 }
 ```
 

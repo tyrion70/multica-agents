@@ -31,7 +31,7 @@
       },
       "rag": {
         "type": "sse",
-        "url": "http://100.69.200.97:8041/sse"
+        "url": "http://100.64.220.121:8041/sse"
       },
       "github": {
         "command": "npx",
