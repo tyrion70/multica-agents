@@ -40,6 +40,32 @@ The caller must be a tagged agent device (one of the agent identity tags) and
 must send a real `reason` — the criteria service decides based on it. A missing
 `reason` is refused before any criteria call.
 
+**Then connect over the tailnet FQDN — not the bare hostname.** The grant
+authorises; it does not connect, and the two failures look identical. On an
+agent runtime `/etc/resolv.conf` reads `search tyrion.eu java-moth.ts.net`, so
+bare `monitoring` resolves to `monitoring.tyrion.eu` (the LAN address), reaches
+the host's **own `sshd`**, and returns `Permission denied (publickey)` even
+though the grant succeeded:
+
+```bash
+tailscale ssh peter@monitoring                # works — cannot pick the wrong address
+ssh peter@monitoring.java-moth.ts.net         # works
+ssh peter@monitoring                          # WRONG HOST: 192.168.18.232, plain sshd
+```
+
+`tailscale ssh` is the form to reach for: only the tailnet address is answered
+by `tailscaled`, and only `tailscaled` enforces the ACL the grant writes.
+**`Permission denied (publickey)` right after a successful grant is a routing
+symptom, not an authorisation one** — check the address in `ssh -v` before
+re-requesting. Do not go hunting for the right key; no key fixes it (this cost
+real time on CHA-1088, where `id_ed25519_peter` is not even present on
+`multica-02`).
+
+**There is no release endpoint.** `POST /agent/release` is a 404, and no route
+releases a tier-1 SSH grant — the panel's "Release now" only covers namespace
+and cluster-admin grants. An agent grant runs for its full window, so **size
+`seconds` to the job** instead of planning to hand it back.
+
 ### What is requestable today
 
 `JITSSH_TARGETS` is currently **`monitoring` alone**. A request for any other
