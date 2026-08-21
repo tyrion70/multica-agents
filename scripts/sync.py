@@ -533,6 +533,14 @@ class BitwardenAuthError(RuntimeError):
     skipping every agent as if all their secrets had vanished (CHA-873)."""
 
 
+class OpAuthError(RuntimeError):
+    """The 1Password service-account token is missing/unusable (or `op` itself
+    failed) — an auth failure that affects every `op://` reference, distinct
+    from a single item being absent. Raised (never swallowed as a None "not
+    found") so the sync aborts loudly instead of skipping every agent as if all
+    their secrets had vanished."""
+
+
 # Per-run memo of resolved Bitwarden lookups. The same handful of vault items
 # (~8: the MCP tokens + the two custom_env secrets) appears across all ~44
 # agents' mcp_config/custom_env, so without this a single full sync fires
@@ -543,21 +551,74 @@ class BitwardenAuthError(RuntimeError):
 # start of each sync run.
 _BW_SECRET_CACHE: Dict[str, Optional[str]] = {}
 
+# Same per-run memo for 1Password references (bodies like "op://Vault/Item/Field").
+_OP_SECRET_CACHE: Dict[str, Optional[str]] = {}
+
 
 def _bw_cache_clear() -> None:
     _BW_SECRET_CACHE.clear()
+    _OP_SECRET_CACHE.clear()
 
 
 def _bw_get_secret(item_name: str) -> Optional[str]:
-    """Resolve a Bitwarden secret, memoised per run (see _BW_SECRET_CACHE).
+    """Resolve a vault secret, memoised per run (see _BW_SECRET_CACHE).
 
-    A BitwardenAuthError from the underlying lookup propagates uncached so a
-    stale session still fails loud on every subsequent placeholder.
+    Routes `op://…` references (1Password) to _op_get_secret; everything else
+    is a Bitwarden lookup. A BitwardenAuthError/OpAuthError from the underlying
+    lookup propagates uncached so a stale session still fails loud on every
+    subsequent placeholder.
     """
+    if item_name.startswith("op://"):
+        return _op_get_secret(item_name)
     if item_name in _BW_SECRET_CACHE:
         return _BW_SECRET_CACHE[item_name]
     val = _bw_get_secret_uncached(item_name)
     _BW_SECRET_CACHE[item_name] = val
+    return val
+
+
+def _op_get_secret(item_uri: str) -> Optional[str]:
+    """Resolve a 1Password reference like #op://Vault/Item/Field#.
+
+    Reads the service-account token at point of use (never exported to the
+    session), runs `op read --no-newline <uri>`, and returns the value.
+
+    Returns None only for a genuine miss (item/field not found); raises
+    OpAuthError when the token is missing/unusable or `op` itself fails, so a
+    vault auth problem aborts loudly instead of skipping every agent.
+    """
+    if item_uri in _OP_SECRET_CACHE:
+        return _OP_SECRET_CACHE[item_uri]
+
+    token_path = pathlib.Path.home() / ".config" / "op" / "service-account-token"
+    if not token_path.is_file():
+        raise OpAuthError(f"missing 1Password service-account token at {token_path}")
+    try:
+        token = token_path.read_text().strip()
+    except OSError as e:
+        raise OpAuthError(f"could not read 1Password service-account token at {token_path}: {e}")
+    if not token:
+        raise OpAuthError(f"1Password service-account token is empty at {token_path}")
+
+    try:
+        result = subprocess.run(
+            ["op", "read", "--no-newline", item_uri],
+            capture_output=True, text=True, timeout=15,
+            env={**os.environ, "OP_SERVICE_ACCOUNT_TOKEN": token},
+        )
+    except Exception as e:
+        raise OpAuthError(f"`op read {item_uri}` failed to run: {e}")
+
+    if result.returncode != 0:
+        stderr = (result.stderr or "").lower()
+        if any(m in stderr for m in ("isn't an item", "could not find", "not found")):
+            _OP_SECRET_CACHE[item_uri] = None
+            return None
+        raise OpAuthError(
+            f"`op read {item_uri}` exited {result.returncode}: {result.stderr.strip()}"
+        )
+    val = result.stdout
+    _OP_SECRET_CACHE[item_uri] = val
     return val
 
 
@@ -665,16 +726,16 @@ def _bw_get_secret_uncached(item_name: str) -> Optional[str]:
 
 class SecretResolutionError(RuntimeError):
     """Raised when an mcp_config/custom_env `#…#` placeholder cannot be resolved
-    to a real secret (BW_SESSION missing/expired, or the Bitwarden item is not
-    found). The sync fails closed on this: the agent's config is skipped and
-    never pushed, so an unresolved placeholder can never be written over a live
-    agent's MCP keys (the CHA-790 key-wipe: the old code logged "leaving
-    placeholder as-is" and pushed it anyway)."""
+    to a real secret (BW_SESSION missing/expired, the 1Password token missing,
+    or the vault item is not found). The sync fails closed on this: the agent's
+    config is skipped and never pushed, so an unresolved placeholder can never
+    be written over a live agent's MCP keys (the CHA-790 key-wipe: the old code
+    logged "leaving placeholder as-is" and pushed it anyway)."""
 
     def __init__(self, unresolved: List[str]):
         self.unresolved = sorted(set(unresolved))
         super().__init__(
-            "could not resolve Bitwarden placeholder(s): "
+            "could not resolve vault placeholder(s): "
             + ", ".join(f"#{name}#" for name in self.unresolved)
         )
 
@@ -1124,10 +1185,11 @@ def sync_agents_workspace(
                 try:
                     mcp_file = _write_mcp_config_tempfile(repo_data)
                     custom_env_file = _write_custom_env_tempfile(repo_data)
-                except BitwardenAuthError:
-                    # A dead/stale session affects every agent — aborting loudly
-                    # is correct (skipping each one hides the real cause). Clean
-                    # the temp file and let it propagate to the top-level abort.
+                except (BitwardenAuthError, OpAuthError):
+                    # A dead/stale vault session affects every agent — aborting
+                    # loudly is correct (skipping each one hides the real cause).
+                    # Clean the temp file and let it propagate to the top-level
+                    # abort.
                     if mcp_file:
                         os.unlink(mcp_file)
                     raise
@@ -1254,8 +1316,8 @@ def sync_agents_workspace(
                     try:
                         mcp_file = _write_mcp_config_tempfile(merged_repo_data)
                         custom_env_file = _write_custom_env_tempfile(merged_repo_data)
-                    except BitwardenAuthError:
-                        # Dead/stale session — abort loudly (see the push path).
+                    except (BitwardenAuthError, OpAuthError):
+                        # Dead/stale vault session — abort loudly (see the push path).
                         if mcp_file:
                             os.unlink(mcp_file)
                         raise
@@ -1881,6 +1943,17 @@ def main() -> None:
             "    The session went stale or locked mid-run. sync.sh now isolates "
             "the session in a private data-dir; if you still hit this, re-run and "
             "check the bw unlock/liveness output above.",
+            file=sys.stderr,
+        )
+    except OpAuthError as e:
+        # A missing/unusable 1Password service-account token fails every op://
+        # reference identically. Abort loudly with the real cause.
+        aborted = f"1Password auth failure — {e}"
+        print(f"\n✗ ABORTED (1Password): {e}", file=sys.stderr)
+        print(
+            "    The service-account token at ~/.config/op/service-account-token "
+            "is missing or unusable, so op:// references cannot be resolved. "
+            "Check the token file and `op read` connectivity, then re-run.",
             file=sys.stderr,
         )
 

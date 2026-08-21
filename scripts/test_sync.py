@@ -514,6 +514,74 @@ class BwSecretResolutionTest(unittest.TestCase):
             with self.assertRaises(sync.BitwardenAuthError):
                 sync._bw_get_secret("Item")
 
+    # --- 1Password op:// resolution ---
+
+    def _op_get(self, uri, *, returncode=0, stdout="", stderr="", token="op-token"):
+        sync._bw_cache_clear()
+        cp = mock.Mock(returncode=returncode, stdout=stdout, stderr=stderr)
+        # Fake $HOME so the resolver's ~/.config/op/service-account-token path
+        # is a mock (its is_file/read_text are patchable, unlike a real PosixPath).
+        token_file = mock.MagicMock()
+        token_file.is_file.return_value = True
+        token_file.read_text.return_value = token
+        fake_home = mock.MagicMock()
+        fake_home.__truediv__.return_value = token_file
+        token_file.__truediv__.return_value = token_file  # chained / stays on the fake
+        with mock.patch.object(pathlib.Path, "home", return_value=fake_home), \
+             mock.patch.object(sync.subprocess, "run", return_value=cp) as run:
+            return sync._op_get_secret(uri), run
+
+    def test_op_placeholder_resolves(self):
+        val, run = self._op_get("op://Agent Peter/gitlab/password", stdout="glpat-value")
+        self.assertEqual(val, "glpat-value")
+        cmd = run.call_args[0][0]
+        self.assertEqual(cmd[0], "op")
+        self.assertIn("--no-newline", cmd)
+        # The service-account token reaches op via env, never argv.
+        self.assertNotIn("OP_SERVICE_ACCOUNT_TOKEN", cmd)
+        self.assertEqual(
+            run.call_args.kwargs["env"]["OP_SERVICE_ACCOUNT_TOKEN"], "op-token",
+        )
+
+    def test_op_genuine_miss_returns_none(self):
+        val, _ = self._op_get(
+            "op://Agent Peter/nope/password",
+            returncode=1,
+            stderr='could not read secret ...: "nope" isn\'t an item in the "Agent Peter" vault.',
+        )
+        self.assertIsNone(val)
+
+    def test_op_missing_token_raises(self):
+        sync._bw_cache_clear()
+        token_file = mock.MagicMock()
+        token_file.is_file.return_value = False
+        fake_home = mock.MagicMock()
+        fake_home.__truediv__.return_value = token_file
+        token_file.__truediv__.return_value = token_file
+        with mock.patch.object(pathlib.Path, "home", return_value=fake_home):
+            with self.assertRaises(sync.OpAuthError):
+                sync._op_get_secret("op://Agent Peter/gitlab/password")
+
+    def test_op_auth_failure_raises(self):
+        with self.assertRaises(sync.OpAuthError):
+            self._op_get("op://Agent Peter/gitlab/password", returncode=1,
+                         stderr="failed to parseToken, format is invalid")
+
+    def test_op_resolution_is_memoised(self):
+        sync._bw_cache_clear()
+        cp = mock.Mock(returncode=0, stdout="glpat-value", stderr="")
+        token_file = mock.MagicMock()
+        token_file.is_file.return_value = True
+        token_file.read_text.return_value = "op-token"
+        fake_home = mock.MagicMock()
+        fake_home.__truediv__.return_value = token_file
+        token_file.__truediv__.return_value = token_file
+        with mock.patch.object(pathlib.Path, "home", return_value=fake_home), \
+             mock.patch.object(sync.subprocess, "run", return_value=cp) as run:
+            self.assertEqual(sync._bw_get_secret("op://Agent Peter/gitlab/password"), "glpat-value")
+            self.assertEqual(sync._bw_get_secret("op://Agent Peter/gitlab/password"), "glpat-value")
+        self.assertEqual(run.call_count, 1, "memoised op lookup re-hit `op read`")
+
 
 class RepoSecretLeakGuardTest(unittest.TestCase):
     """A resolved secret must never be written back into a repo agent.json
