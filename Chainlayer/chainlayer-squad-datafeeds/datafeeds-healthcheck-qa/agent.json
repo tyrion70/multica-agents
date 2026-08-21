@@ -18,6 +18,7 @@
     "chainlink-ops",
     "git-mr",
     "git-pr",
+    "linear-company",
     "rag-consumer",
     "ssh"
   ],
@@ -42,6 +43,13 @@
         "env": {
           "GITLAB_PERSONAL_ACCESS_TOKEN": "#ChainLayer · GitLab — group PAT#"
         }
+      },
+      "linear": {
+        "headers": {
+          "Authorization": "Bearer #ChainLayer · Linear — API key#"
+        },
+        "type": "http",
+        "url": "https://mcp.linear.app/mcp"
       }
     }
   }
