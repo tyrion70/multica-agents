@@ -102,8 +102,13 @@ credential location: **`chainlink-ops` skill**, "Chainlink node API" section.
 The `chainlink-datafeeds-health` app (report, dashboard, DB, sweeps) **moved
 off multica-02** (CHA-1035 migration, cut over 2026-08-13). Current home:
 **monitoring VM** — `192.168.18.232` / `monitoring.252h.org`, VMID 130 on
-proxmox4. The multica-02 containers and its copy of the DB are **stopped and
-abandoned** — do NOT treat multica-02 as the live host for anything datafeeds.
+proxmox4. Everything datafeeds was **deleted from multica-02 on 2026-08-21**
+(CHA-1087) — the DB and its roles, the containers and images, the nightly
+`backup-datafeeds-health` timer and its dumps, the checkout, and the crontab block.
+So multica-02 is not a fallback you can start up: there is nothing there to start,
+and a DSN pointing at `127.0.0.1` from multica-02 (or from a Multica agent
+workspace, which runs on multica-02) now fails instead of silently hitting a frozen
+copy. The repo's `CLAUDE.md` is the short authoritative version of this.
 
 - **Dashboard**: container `datafeeds-health-dashboard` on the monitoring VM,
   port **8080** (`http://monitoring.252h.org:8080`), `--network host`,
