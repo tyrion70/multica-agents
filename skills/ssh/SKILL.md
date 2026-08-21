@@ -48,18 +48,24 @@ the host's **own `sshd`**, and returns `Permission denied (publickey)` even
 though the grant succeeded:
 
 ```bash
-tailscale ssh peter@monitoring                # works — cannot pick the wrong address
-ssh peter@monitoring.java-moth.ts.net         # works
+ssh peter@monitoring.java-moth.ts.net         # USE THIS — works from every client
+tailscale ssh peter@monitoring                # fine where the subcommand exists
 ssh peter@monitoring                          # WRONG HOST: 192.168.18.232, plain sshd
 ```
 
-`tailscale ssh` is the form to reach for: only the tailnet address is answered
-by `tailscaled`, and only `tailscaled` enforces the ACL the grant writes.
-**`Permission denied (publickey)` right after a successful grant is a routing
-symptom, not an authorisation one** — check the address in `ssh -v` before
-re-requesting. Do not go hunting for the right key; no key fixes it (this cost
-real time on CHA-1088, where `id_ed25519_peter` is not even present on
-`multica-02`).
+Only the tailnet address is answered by `tailscaled`, and only `tailscaled`
+enforces the ACL the grant writes. **`Permission denied (publickey)` right after
+a successful grant is a routing symptom, not an authorisation one** — check the
+address in `ssh -v` before re-requesting. Do not go hunting for the right key;
+no key fixes it (this cost real time on CHA-1088, where `id_ed25519_peter` is
+not even present on `multica-02`).
+
+**Give the FQDN, not `tailscale ssh`, when telling a human how to connect.**
+`tailscale ssh` can't misroute, so it is a fine habit on a runtime that has it —
+but the macOS **App Store and TestFlight builds ship without the subcommand**
+(`The 'tailscale ssh' subcommand is not available on macOS builds distributed
+through the App Store or TestFlight`), so a Mac reader following that advice is
+stuck. The FQDN works everywhere; recommend it by default.
 
 **There is no release endpoint.** `POST /agent/release` is a 404, and no route
 releases a tier-1 SSH grant — the panel's "Release now" only covers namespace
