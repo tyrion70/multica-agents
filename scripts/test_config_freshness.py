@@ -135,3 +135,44 @@ def test_the_lag_seconds_are_reported_for_triage(repo, deployed):
     _git(repo, "fetch", "-q", "origin", "main")
     rc, out = _run(repo, deployed)
     assert "baseline_lag_sec=86400" in out, out
+
+
+# --------------------------------------------------------------------------- #
+# sync.sh must actually deploy the profile on a bare run (CHA-1087)
+# --------------------------------------------------------------------------- #
+
+SYNC_SH = pathlib.Path(__file__).resolve().parent / "sync.sh"
+
+
+def test_a_bare_sync_run_still_resolves_a_profile_to_deploy():
+    """The copy used to be gated on `-n "$workspace"`, which is empty unless --workspace
+    is passed. So a plain `sync.sh` — the command the rule file tells you to run after a
+    merge — deployed nothing and still reported success. The host kept serving the old
+    CLAUDE.md while the run looked clean."""
+    sh = SYNC_SH.read_text()
+    assert 'if [ $rc -eq 0 ] && [ -n "$workspace" ]; then' not in sh, (
+        "the copy is gated on --workspace again, so a bare run deploys nothing")
+    assert 'deploy_profile="$workspace"' in sh, "no profile fallback at all"
+    assert "multica-02) deploy_profile=\"Chainlayer\"" in sh
+    assert "multica-01) deploy_profile=\"Private\"" in sh
+    assert 'if [ $rc -eq 0 ] && [ -n "$deploy_profile" ]' in sh
+
+
+def test_the_hostname_fallback_agrees_with_the_freshness_checker():
+    """Two scripts deciding a host's profile differently is how you get a detector that
+    reports FRESH against a file sync never deploys. They must map identically."""
+    sync = SYNC_SH.read_text()
+    check = SCRIPT.read_text()
+    for host, sync_val, check_val in (("multica-01", "Private", "private"),
+                                      ("multica-02", "Chainlayer", "chainlayer")):
+        assert f'{host}) deploy_profile="{sync_val}"' in sync, host
+        assert f'{host}) PROFILE="{check_val}"' in check, host
+
+
+def test_an_explicit_workspace_still_wins():
+    """--workspace must keep overriding the hostname, or a one-off cross-profile sync
+    becomes impossible."""
+    sh = SYNC_SH.read_text()
+    i = sh.index('deploy_profile="$workspace"')
+    j = sh.index('if [ -z "$deploy_profile" ]')
+    assert i < j, "the fallback is applied before the explicit flag is honoured"

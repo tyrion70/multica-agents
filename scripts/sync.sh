@@ -159,8 +159,25 @@ fi
 python3 "$SCRIPT_DIR/sync.py" "$@"
 rc=$?
 
-if [ $rc -eq 0 ] && [ -n "$workspace" ]; then
-    case "$workspace" in
+# Which profile this HOST deploys. `--workspace` selects it when given; otherwise fall
+# back to the hostname, using the same mapping check-config-freshness.sh already uses.
+#
+# This fallback is the fix for a silent no-op (CHA-1087): the copy below used to be gated
+# on `-n "$workspace"`, so a plain `sync.sh` — the exact command the CLAUDE.md
+# "once merged, run sync.sh on each host" instruction tells you to run — skipped the copy
+# entirely and deployed nothing. The rule file stayed at its previous revision while the
+# run reported success. Caught when a merged change to that file did not appear on the
+# host and check-config-freshness.sh reported MISMATCH.
+deploy_profile="$workspace"
+if [ -z "$deploy_profile" ]; then
+  case "$(hostname)" in
+    multica-01) deploy_profile="Private" ;;
+    multica-02) deploy_profile="Chainlayer" ;;
+  esac
+fi
+
+if [ $rc -eq 0 ] && [ -n "$deploy_profile" ]; then
+    case "$deploy_profile" in
       Chainlayer) md="claude-config/chainlayer/CLAUDE.md" ;;
       Private)    md="claude-config/private/CLAUDE.md" ;;
       *)          md="" ;;
