@@ -183,4 +183,22 @@ if [ $rc -eq 0 ] && [ -n "$workspace" ]; then
     fi
 fi
 
+# An uncommitted .sync-state.json is not cosmetic (CHA-1087). It is the record of what
+# was last pushed to each workspace; leave it uncommitted and the baseline falls behind
+# the live workspaces, so the NEXT unrelated change reads as "both sides changed" and a
+# later run exits 2 on a conflict that is not one. That is exactly how the Private/ssh
+# conflict happened. Say so here, at the moment the person who can fix it is watching.
+if [ -n "$(git -C "$REPO_ROOT" status --porcelain -- .sync-state.json 2>/dev/null)" ]; then
+  echo
+  echo "==> ACTION REQUIRED: .sync-state.json is uncommitted."
+  echo "    It records what this run pushed. Uncommitted, the baseline lags the live"
+  echo "    workspaces and a future sync will report a false conflict (CHA-1087)."
+  echo "    Commit it on a branch and open a PR — never straight to main:"
+  echo "      git -C $REPO_ROOT checkout -b chore/sync-state-\$(date -u +%Y%m%d%H%M)"
+  echo "      git -C $REPO_ROOT add .sync-state.json"
+  echo "      git -C $REPO_ROOT commit -m 'chore: sync state'"
+  echo "    check-config-freshness.sh reports this as BASELINE_LAG (exit 4) if it is"
+  echo "    left behind."
+fi
+
 exit $rc

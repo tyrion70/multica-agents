@@ -9,6 +9,16 @@
 # exposed (a stale copy served for six weeks with no signal). This runs from
 # host cron instead.
 #
+# Also detects a lagging sync baseline (CHA-1087). .sync-state.json is the
+# committed record of what was last pushed to each Multica workspace. When a
+# skill or agent merges and nobody commits the refreshed state, the baseline
+# falls behind: the live workspace has moved past it, so the NEXT unrelated
+# change reads as "both sides changed" and sync.sh exits 2 on a conflict that
+# is not one. That is exactly how the Private/ssh conflict happened. Same
+# reasoning as above for living here rather than in sync.sh: a check inside
+# sync can only fire while someone is running sync, and the failure mode is
+# nobody running it.
+#
 # Profile auto-detection (override with --profile):
 #   multica-01 -> private     multica-02 -> chainlayer
 #
@@ -18,6 +28,9 @@
 #   2  STALE (deployed file matches main, but last sync is older than
 #      CONFIG_FRESHNESS_STALE_HOURS)
 #   3  check itself failed (fetch/clone/hash), i.e. could not determine state
+#   4  BASELINE_LAG (CLAUDE.md is fine, but .sync-state.json on origin/main is
+#      older than the newest skills/ or */agent.json commit, so the committed
+#      sync baseline no longer describes what was last pushed to Multica)
 #
 # Notifier: log-only by default (appends to CONFIG_FRESHNESS_LOG). When the
 # 0600 env file ($HOME/.claude/config-freshness.env, sourced at runtime — never
@@ -32,7 +45,7 @@ set -euo pipefail
 
 PROFILE=""
 REPO="${CONFIG_FRESHNESS_REPO:-$HOME/multica-agents}"
-DEPLOYED="$HOME/.claude/CLAUDE.md"
+DEPLOYED="${CONFIG_FRESHNESS_DEPLOYED:-$HOME/.claude/CLAUDE.md}"
 STALE_HOURS="${CONFIG_FRESHNESS_STALE_HOURS:-30}"
 LOG_DIR="${CONFIG_FRESHNESS_LOG_DIR:-$HOME/.claude/logs}"
 LOG_FILE="${CONFIG_FRESHNESS_LOG:-$LOG_DIR/config-freshness.log}"
@@ -75,6 +88,19 @@ if ! git -C "$REPO" fetch origin main >/dev/null 2>&1; then
 fi
 MAIN_HASH="$(git -C "$REPO" show "origin/main:$SRC" | sha256sum | cut -d' ' -f1)"
 
+# --- sync-state baseline lag (CHA-1087) -------------------------------------
+# Commit timestamps, not content: if a skill or agent definition landed AFTER the
+# last .sync-state.json commit, the committed baseline predates it by construction.
+STATE_TS="$(git -C "$REPO" log -1 --format=%ct origin/main -- .sync-state.json 2>/dev/null || true)"
+DEFS_TS="$(git -C "$REPO" log -1 --format=%ct origin/main -- skills '*/agent.json' 2>/dev/null || true)"
+STATE_TS="${STATE_TS:-0}"
+DEFS_TS="${DEFS_TS:-0}"
+if [ "$DEFS_TS" -gt "$STATE_TS" ]; then
+  BASELINE_LAG_SEC=$(( DEFS_TS - STATE_TS ))
+else
+  BASELINE_LAG_SEC=0
+fi
+
 # --- deployed state ----------------------------------------------------------
 if [ -L "$DEPLOYED" ]; then
   # A symlink here is itself a failure: the deploy contract is a regular file
@@ -105,10 +131,15 @@ elif [ "$DEP_HASH" != "$MAIN_HASH" ]; then
   RC=1; STATE="MISMATCH"
 elif [ "$AGE_HOURS" -ge "$STALE_HOURS" ]; then
   RC=2; STATE="STALE"
+elif [ "$BASELINE_LAG_SEC" -gt 0 ]; then
+  # Ranked last: the deployed CLAUDE.md is correct and sync is running, but the
+  # next sync will mis-read a one-sided change as a conflict.
+  RC=4; STATE="BASELINE_LAG"
 fi
 
 LINE="$(date -u +%Y-%m-%dT%H:%M:%SZ) host=$HOST profile=$PROFILE state=$STATE "\
-"deployed=$DEP_HASH main=$MAIN_HASH symlink=$IS_SYMLINK age_hours=$AGE_HOURS"
+"deployed=$DEP_HASH main=$MAIN_HASH symlink=$IS_SYMLINK age_hours=$AGE_HOURS "\
+"baseline_lag_sec=$BASELINE_LAG_SEC"
 mkdir -p "$LOG_DIR"
 echo "$LINE" >> "$LOG_FILE"
 echo "$LINE"
