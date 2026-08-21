@@ -71,6 +71,14 @@ When you need to change an always-on rule or skill wiring:
    autopilot) to redeploy the file — the nightly sync is the backstop, not the
    primary deploy path, so don't treat merge as deploy.
 
+**`.sync-state.json` is not covered by step 2.** It is generated bookkeeping — the
+record of what `sync.sh` last pushed to each workspace — with no reviewable content,
+and it changes on every sync. Commit it **straight to `main`** (`chore: sync state`),
+which is what the Sync autopilot already does. Requiring a PR per sync run is friction
+that gets the commit skipped, and a skipped commit leaves the baseline behind the live
+workspaces, which makes the next unrelated change surface as a false "both sides
+changed" conflict. `check-config-freshness.sh` reports that as `BASELINE_LAG` (exit 4).
+
 (Durable *facts* go in your runtime memory, above — not here. This repo is for
 rules and skills only.)
 
