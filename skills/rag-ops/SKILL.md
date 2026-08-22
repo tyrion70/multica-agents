@@ -1,6 +1,6 @@
 ---
 name: rag-ops
-description: Operate and extend ChainLayer's in-house RAG ops assistant — the on-network Q&A bot over internal docs, runbooks, incidents, and Linear, served from its own chat model + embedder + Qdrant (no third-party inference). Use to add/rescope a corpus source, run or refresh ingestion, reason about the secret filter + its mandatory IaC audit gate, debug retrieval/citations, run the eval, or deploy the CLI/Slack bot. Code is github.com/tyrion70/rag-ops-assistant; it runs on claude-readonly-01 + gx10-f018. NOT the chainlayer-knowledge skill (that's infra facts) — this is the RAG system itself.
+description: Operate and extend ChainLayer's in-house RAG ops assistant — the on-network Q&A bot over internal docs, runbooks, incidents, and Linear, served from its own chat model + embedder + Qdrant (no third-party inference). Use to add/rescope a corpus source, run or refresh ingestion, reason about the secret filter + its mandatory IaC audit gate, debug retrieval/citations, run the eval, or deploy the CLI/Slack bot. Code is github.com/tyrion70/rag-ops-assistant; it runs on rag-refresh + gx10-f018. NOT the chainlayer-knowledge skill (that's infra facts) — this is the RAG system itself.
 ---
 
 # rag-ops — the in-house RAG ops assistant
@@ -14,10 +14,12 @@ into one repo in CHA-106.
 - **Code:** `github.com/tyrion70/rag-ops-assistant` (private). Change it via the
   **git-pr** skill (Multica-issue-first). The repo's own READMEs are the
   authoritative HOW-TO — this skill is the durable map + the safety rules.
-- **Runs on:** `claude-readonly-01` (192.168.16.22, the bot/ingest/Qdrant host)
-  + `gx10-f018` (192.168.19.207, GPU serving the models). Reach both via the
-  **ssh** skill (`claude-readonly-01` has a host alias; f018 is a root hop from
-  it).
+- **Runs on:** `rag-refresh` (192.168.16.130 / tailnet 100.64.220.121 — the
+  bot/MCP/Qdrant/refresh host) + `gx10-f018` (192.168.19.207, GPU serving the
+  models). Reach both via the **ssh** skill (`rag-refresh` resolves on the
+  tailnet as `rag-refresh.java-moth.ts.net`; f018 is a root hop from it).
+  Moved here from `claude-readonly-01` on 2026-08-21 (old host's RAG services
+  decommissioned).
 - **Tracking:** Multica project **RAG**, umbrella `CHA-42`. Follow-ups are
   per-issue (see Roadmap below).
 
@@ -27,9 +29,10 @@ into one repo in CHA-106.
 |---|---|---|---|
 | Chat LLM | gx10-f018 GPU | `:8801/v1` `Qwen3-30B-A3B-Instruct` | `rag-chat.service` (systemd) |
 | Embeddings | gx10-f018 GPU | `:8802/v1` `Qwen3-Embedding-0.6B` (1024-dim) | `rag-embed.service` (systemd) |
-| Vector store | claude-readonly-01 | `127.0.0.1:6333` Qdrant v1.18.2 | docker compose |
-| Ingester / CLI / bot | claude-readonly-01 | — / outbound WS | `venv` + `rag_ops` pkg; `rag-slack.service` |
-| Corpus refresh | claude-readonly-01 | — (systemd timer) | `rag-refresh.service` + `rag-refresh.timer` (CHA-96) |
+| Vector store | rag-refresh | `127.0.0.1:6333` Qdrant v1.18.2 | docker compose (`rag-qdrant`) |
+| Ingester / CLI / bot | rag-refresh | — / outbound WS | `venv` + `rag_ops` pkg; `rag-slack.service` |
+| MCP server (`rag_ask`) | rag-refresh | `100.64.220.121:8041/sse` (Tailscale-only) | `rag-mcp.service` (CHA-161) |
+| Corpus refresh | rag-refresh | — (cron, 03:00 UTC) | `deploy/rag-refresh/rag-refresh-cron.sh` (CHA-1079/1082) |
 
 All endpoints are **internal-LAN only** (Qdrant is localhost-bound; the GPU
 endpoints are LAN-only — public exposure is deliberately absent, CHA-97 tracks
@@ -213,13 +216,19 @@ is a groundedness self-assessment, not a fully independent grade.
 
 ## Refresh mechanism — nightly, incremental (CHA-95/96)
 
-Refresh is **automatic and incremental**. A `rag-refresh.service` unit
-(Type=oneshot, CHA-96) runs nightly via `rag-refresh.timer` (03:00 UTC,
-`Persistent=true` so a missed night catches up at boot), executing from the box
-venv:
+Refresh is **automatic and incremental**. On `rag-refresh`, a **cron job** runs
+nightly at **03:00 UTC** (`0 3 * * *` in Peter's crontab) executing
+`deploy/rag-refresh/rag-refresh-cron.sh` (CHA-1079 step 2 / CHA-1082) from the
+box venv — this replaced the old systemd `rag-refresh.timer` path (CHA-96). The
+cron script retries **once** on a transient Git-over-SSH blip (self-resolves —
+CHA-1062), owns the failure-alert path itself (no systemd `OnFailure=` backstop
+in the daily path), and since CHA-1083 self-reports every run as a **Multica
+issue** in the RAG project (per-source digest issue on success, failure issue
+assigned to the RAG squad on error). Underneath it runs the same incremental
+refresh:
 
 ```bash
-python -m rag_ops.ingestion.refresh      # what the timer runs each night
+python -m rag_ops.ingestion.refresh      # what the cron runs each night
 ```
 
 It wraps `build_corpus` in the incremental re-embed (CHA-95): only added/changed
@@ -228,34 +237,38 @@ chunks. Every in-scope source is refreshed — the `export` sources (incident.io
 Linear OPS/CLL) are materialized by their scripted exporters first, then ingested
 through the same secret filter as everything else. Each run posts a per-source
 **digest of what changed to Slack `#rag-ops`** (on success) or a ⚠️ failure
-alert + non-zero exit (on error), with `OnFailure=rag-refresh-alert.service` as
-the backstop if the runner dies before it can post. `rag-refresh --check-freshness`
-is an explicit staleness probe (non-zero if the recorded heartbeat is too old).
+alert + non-zero exit (on error) — the cron script owns this alert path now.
+`rag-refresh --check-freshness` is an explicit staleness probe (non-zero if the
+recorded heartbeat is too old).
 
-**Manual refresh** (no need to wait for the timer — e.g. right after a meaningful
+**Manual refresh** (no need to wait for the cron — e.g. right after a meaningful
 docs change):
 
 ```bash
-systemctl start rag-refresh.service      # on claude-readonly-01
-rag-refresh                              # or run the command directly from the venv
+bash deploy/rag-refresh/rag-refresh-cron.sh   # on rag-refresh, from the app dir
+rag-refresh                                   # or run the command directly from the venv
 ```
 
-> Note (awareness only, from the CHA-1062 manual run): the first manual
-> `systemctl start rag-refresh.service` hit a **transient GitLab SSH auth blip**
-> on one source's fetch — it self-resolved on retry and is **not systemic**.
+> Note (awareness only, from the CHA-1062 manual run): the first manual refresh
+> hit a **transient GitLab SSH auth blip** on one source's fetch — it
+> self-resolved on retry and is **not systemic** (the cron script now retries
+> once on exactly this).
 
 ## Deploy
 
 Currently a **documented manual deploy** (systemd units already on the boxes; CI
 is a follow-up). Full step-by-step is `deploy/README.md` — summary:
 
-- **claude-readonly-01:** clone to `/home/peter/rag-ops-assistant`, build the
-  venv, write the root-only `.slack.env` from Bitwarden (**company** folder, via
-  the **bitwarden** skill — never commit it; `*.env` is gitignored),
-  `docker compose up -d` (Qdrant), install/repoint `rag-slack.service` **and the
-  nightly refresh units** (`rag-refresh.service` + `rag-refresh.timer` +
-  `rag-refresh-alert.service`, enable the timer), then
-  verify: 0-leak test → a cited `rag-ask` → `rag-eval --judge` → `/ops` in Slack.
+- **rag-refresh:** clone to `/home/peter/rag-ops-assistant`, build the
+  venv, write the root-only `.slack.env` + `.export.env` from Bitwarden
+  (**company** folder, via the **bitwarden** skill — never commit them; `*.env`
+  is gitignored), `docker compose up -d` (Qdrant), install/repoint
+  `rag-slack.service` **and** `rag-mcp.service` (units under
+  `deploy/rag-refresh/`), wire the nightly refresh as the **cron** entrypoint
+  (`deploy/rag-refresh/rag-refresh-cron.sh`, 03:00 UTC — this replaced the old
+  `rag-refresh.service` + `rag-refresh.timer` + `rag-refresh-alert.service`
+  systemd units), then verify: 0-leak test → a cited `rag-ask` → `rag-eval --judge`
+  → `/ops` in Slack → a `rag_ask` round-trip against the MCP server (`:8041`).
 - **gx10-f018:** `deploy/gx10-f018/gx-f018-deploy.sh` brings up chat (`:8801`) +
   embed (`:8802`); `gx-f018-restore-baseline.sh` restores the baseline RAG 30B
   after a benchmark candidate (CHA-117 — supersedes the old `teardown.sh`, which
@@ -282,7 +295,7 @@ is a follow-up). Full step-by-step is `deploy/README.md` — summary:
 | | |
 |---|---|
 | ✅ | Run `rag-ask` / `rag-eval` / dry-run ingests; read Qdrant; edit code behind a PR. |
-| 🔶 | `rag-refresh` / `rag-build-corpus` (touch the live index); restart `rag-slack.service` / `rag-refresh.service`; restart f018 chat/embed (shared, causes a bot blip). |
+| 🔶 | `rag-refresh` / `rag-build-corpus` (touch the live index); restart `rag-slack.service` / `rag-mcp.service`; run `rag-refresh-cron.sh`; restart f018 chat/embed (shared, causes a bot blip). |
 | 🛑 | Enable an `iac` source without the dry-run audit + Peter's approval; commit `corpus/`, `.slack.env`, or any token; expose an endpoint publicly; add a personal repo (`claude-skills`, `multica-agents`) to the corpus. |
 
 ## Provenance & related
@@ -291,7 +304,9 @@ CHA-42 (baseline PoC) → CHA-93 (chain-id allowlist + entropy backstop) → CHA
 (Slack bot) → CHA-100 (self-documentation) → CHA-106 (productionize into the
 repo) → CHA-107 (benchmark) → CHA-117 (f018 restore fix) → CHA-120 (company-repo
 list + IaC gate, k8s-apps pilot) → CHA-95 (incremental re-embed) → CHA-96
-(nightly `rag-refresh` service/timer). Open: CHA-97 (network harden), CHA-98
+(nightly `rag-refresh` service/timer) → CHA-161 (MCP server) → CHA-1079/1082
+(refresh moved to cron) → 2026-08-21 move to `rag-refresh` (claude-readonly-01
+decommissioned). Open: CHA-97 (network harden), CHA-98
 (base64url-in-path backstop), CHA-88 (Drive→docs curation).
 
 Sibling skills: **chainlayer-knowledge** (infra facts the corpus is *about*),
