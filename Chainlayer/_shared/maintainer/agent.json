@@ -63,7 +63,7 @@
           "@modelcontextprotocol/server-gitlab"
         ],
         "env": {
-          "GITLAB_PERSONAL_ACCESS_TOKEN": "#ChainLayer · GitLab — group PAT#"
+          "GITLAB_PERSONAL_ACCESS_TOKEN": "#op://Agent Peter/gitlab/password#"
         }
       }
     }
