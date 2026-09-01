@@ -74,9 +74,44 @@ and cluster-admin grants. An agent grant runs for its full window, so **size
 
 ### What is requestable today
 
-`JITSSH_TARGETS` is currently **`monitoring` alone**. A request for any other
-host is refused with "not a JIT-eligible target" — **that refusal is correct
+The agent allow-list is **not** the discovered host set. Measured live
+2026-09-01 by actually calling `/agent/grant`, the refusal names it in full:
+
+> `'<host>' is not available to agents. Agents are limited to an explicit list
+> (monitoring, claude-workstation-01, claude-readonly-01, multica-02,
+> rag-refresh) while the criteria service still approves every request; humans
+> get the discovered set.`
+
+So agents get those **five** hosts; humans get everything JIT discovers. A
+request for anything else returns **HTTP 400** — **that refusal is correct
 behaviour, not a broken system.** Don't read it as JIT failing.
+
+**Chain-node and other fleet hosts (`*.chosts.io`) are NOT agent-requestable.**
+An agent needing a node's `journalctl` has to ask a human; there is no agent
+path to those boxes today.
+
+**Test, don't infer.** This list changes and this file will go stale — one
+`POST /agent/grant` answers the question in a second, and the refusal message
+names the current list for free. Do not conclude a host is unreachable from
+reading this section; that mistake cost a wrong escalation on CHA-1108, where
+the nodes were healthy all along and the agent reported them dead rather than
+getting the journal.
+
+### The criteria service refuses on its own axes
+
+Being on the allow-list is necessary, not sufficient. A permitted target still
+gets **HTTP 403** if the criteria service is unsatisfied, and its codes are
+terse. Both of these were returned for `monitoring` on 2026-09-01:
+
+| Response | Meaning |
+|---|---|
+| `criteria not met: NOK: NO-TICKET-ID` | the `reason` carried no ticket id the service recognised |
+| `criteria not met: NOK: NO-NETWORK-SCOPE` | reason had a ticket id but no accepted network scope |
+
+A bare prose `reason` is not enough. **HTTP 400 = wrong target; HTTP 403 =
+right target, insufficient reason** — the two look alike in a terminal and mean
+completely different things, so read the status code before rewriting the
+request.
 
 ### `jit` itself is never requestable
 
