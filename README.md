@@ -132,7 +132,10 @@ Do not write:
 
 ```bash
 value="$(git … 2>/dev/null || true)"       # a failed read becomes an empty value
+value="$(git … || :)"                      # …and `|| :` is the same thing, shorter
+value="$(git …)" || echo "oh well"         # …and so is reporting without stopping
 if [ -n "$(git … 2>/dev/null)" ]; then     # "nothing found" and "could not look" are now the same
+value="$(git … 2>&1)"                      # …and stderr in the value is its own trap, below
 ```
 
 Write one of:
@@ -143,11 +146,33 @@ value="$(git …)" || { echo "…" >&2; exit N; }
 # …or ask the question of a status you already captured and checked
 ```
 
+**And do not merge stderr into a captured value.** `git` and the `multica` CLI both
+write warnings to stderr **on success**, so `2>&1` can contaminate a value that
+arrived with rc=0:
+
+```bash
+# origin/main matching both a local branch and a remote-tracking ref:
+ts="$(git log -1 --format=%ct origin/main -- f 2>&1)"
+#   rc=0, ts="warning: refname 'origin/main' is ambiguous.\n1788442689"
+[ "$ts" -gt 0 ]        # "integer expression expected" → else branch → wrong answer
+```
+
+Send diagnostics to their own file, keep the value clean, and assert its shape:
+
+```bash
+err="$(mktemp)"
+if ! ts="$(git … 2>"$err")"; then sed 's/^/  /' "$err" >&2; exit 3; fi
+[[ "$ts" =~ ^[0-9]*$ ]] || { echo "unexpected: $ts" >&2; exit 3; }
+```
+
+This one is worth its own paragraph because the fix for the ninth instance
+introduced it as the tenth, through exactly this door.
+
 **Why.** In September 2026 the nightly sync deleted the bodies of 22 company skills
-and committed them straight to `main` (CHA-1211). Investigating it turned up **nine
+and committed them straight to `main` (CHA-1211). Investigating it turned up **ten
 instances of the same defect** — a failed or changed read reported as a successful
 state — across `sync.py`, `sync.sh`, `commit-sync-state.sh`,
-`check-config-freshness.sh` and the autopilot descriptions:
+`check-config-freshness.sh`, `dump-mcp-configs.sh` and the autopilot descriptions:
 
 | where | what it claimed | what was true |
 |---|---|---|
@@ -161,6 +186,8 @@ state — across `sync.py`, `sync.sh`, `commit-sync-state.sh`,
 | `update-checkout.sh`'s fetch | "HEAD matches the remote" | it matched a cached ref |
 | `sync.sh`'s workspace pre-flight | "the workspace matches" | the check itself failed |
 | `check-config-freshness.sh` | "the baseline is current" | `git log` failed |
+| the fix for the row above | "the baseline is current" | `2>&1` folded a warning into the value |
+| `dump-mcp-configs.sh`'s `find` | "these are the repo's agents" | `find` failed; the list was empty |
 
 Each was individually reproduced and fixed. The point of the rule is that the tenth
 one gets caught by a test instead of by an incident.
@@ -172,8 +199,22 @@ one gets caught by a test instead of by an incident.
 bw logout >/dev/null 2>&1 || true
 ```
 
-The reason is required (three words or more). A waiver in a diff is something a
-reviewer can argue with; a swallowed error is not.
+The reason is required (three words or more) — but be clear about what that does and
+does not buy: **three filler words satisfy it.** The word count only stops a bare
+marker from silencing the rule by accident; it cannot judge whether the reason is any
+good. The actual control is that a waiver appears in a diff and has to be defended in
+review. Don't reach for one to make the lint quiet — if the rule is firing on
+something legitimate, say so in the reason and let a reviewer disagree.
+
+Known limits of the lint, so nobody assumes more than it does:
+
+- It catches **absorbed failure**, not **unchecked success** — a read whose value is
+  used with no test at all still passes. Widening that far would flag most of
+  `dump-mcp-configs.sh` legitimately and the signal would go.
+- It is line-based. Backtick substitution and `[ "$(git …)" = "" ]` are not matched;
+  neither appears in this repo's style.
+- The reader list is a list. A command that reads state and is not on it is invisible
+  to the rule — `find` was, until it wasn't.
 
 **Until the CI wiring lands** (adding `test_shell_guards.py` and
 `test_config_freshness.py` to `.github/workflows/test.yml` needs a token with
