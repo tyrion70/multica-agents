@@ -19,6 +19,7 @@ import pathlib
 import shutil
 import subprocess
 import tempfile
+import time
 import unittest
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -47,6 +48,29 @@ for a in "$@"; do
   fi
 done
 exec {git} "$@"
+"""
+
+
+# A `git` whose `fetch` never returns, to exercise the wall-clock cap.
+GIT_HANG_SHIM = """#!/usr/bin/env bash
+for a in "$@"; do
+  if [ "$a" = "fetch" ]; then
+    sleep 30
+    exit 0
+  fi
+done
+exec {git} "$@"
+"""
+
+# A `multica` stand-in for sync.sh's workspace pre-flight guard. MODE picks the
+# failure being modelled; nothing else in sync.sh calls multica before the guard.
+MULTICA_SHIM = """#!/usr/bin/env bash
+case "{mode}" in
+  fail)      echo "You do not have permission to access this resource." >&2; exit 3 ;;
+  garbage)   echo "not json at all" ;;
+  mismatch)  echo '{{"name": "Private"}}' ;;
+  match)     echo '{{"name": "Chainlayer"}}' ;;
+esac
 """
 
 
@@ -113,6 +137,15 @@ class ShellGuardTestCase(unittest.TestCase):
             cwd=str(cwd or self.work), capture_output=True, text=True, env=env,
         )
 
+    def _shim(self, name, body):
+        """Put a single executable on a PATH prefix and return that PATH."""
+        d = self.tmp / f"shim-{name}"
+        d.mkdir(exist_ok=True)
+        exe = d / name
+        exe.write_text(body, encoding="utf-8")
+        exe.chmod(0o755)
+        return f"{d}:{os.environ['PATH']}"
+
     def run_sync_sh(self, path=None):
         """sync.sh with an argument sync.py rejects, so it exits fast and the
         commit-scope guard still runs — which is the point of `|| rc=$?`."""
@@ -165,6 +198,52 @@ class SyncShScopeGuardTest(ShellGuardTestCase):
         r = self.run_sync_sh(path=self.shim_path)
         self.assertEqual(r.returncode, 5, r.stdout + r.stderr)
         self.assertIn("cannot verify the commit scope", r.stderr)
+
+
+class WorkspacePreflightTest(ShellGuardTestCase):
+    """sync.sh's workspace pre-flight guard — the eighth instance (CHA-1211).
+
+    It fired only when `$active` was non-empty, so a FAILING `multica workspace get`
+    left it empty, short-circuited the test, and the guard passed. It could not tell
+    "matches" from "couldn't check". These four cases are the four outcomes it now
+    distinguishes.
+    """
+
+    def _run_with_multica(self, mode):
+        return self.run_script(
+            "sync.sh", "--workspace", "Chainlayer",
+            path=self._shim("multica", MULTICA_SHIM.format(mode=mode)))
+
+    def test_fails_closed_when_the_check_itself_fails(self):
+        r = self._run_with_multica("fail")
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("cannot", r.stderr)
+        self.assertIn("a guard that cannot check must not pass", r.stderr)
+        # It must stop here, not fall through to sync.py.
+        self.assertNotIn("Loading schema", r.stderr)
+
+    def test_fails_closed_on_output_it_cannot_parse(self):
+        r = self._run_with_multica("garbage")
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("could not parse", r.stderr)
+        self.assertNotIn("Loading schema", r.stderr)
+
+    def test_still_catches_a_real_mismatch(self):
+        r = self._run_with_multica("mismatch")
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("active workspace is 'Private'", r.stderr)
+        self.assertNotIn("Loading schema", r.stderr)
+
+    def test_a_matching_workspace_is_allowed_through(self):
+        """The guard must not become a blanket stop: a match proceeds to sync.py."""
+        r = self._run_with_multica("match")
+        # Reaching sync.py at all is the proof: it prints this before anything else,
+        # and it only runs if the guard let the run through. sync.py then fails on
+        # its own terms in this fixture (no schemas/ dir), which is not the guard's
+        # business — so assert on the guard's silence, not on sync.py's outcome.
+        self.assertIn("Loading schema", r.stderr, r.stdout + r.stderr)
+        self.assertNotIn("--workspace is", r.stderr)
+        self.assertNotIn("cannot be verified", r.stderr)
 
 
 class CommitSyncStateTest(ShellGuardTestCase):
@@ -362,6 +441,53 @@ class UpdateCheckoutTest(ShellGuardTestCase):
         body = (SCRIPTS / "update-checkout.sh").read_text(encoding="utf-8")
         self.assertIn("GIT_TERMINAL_PROMPT=0", body)
         self.assertIn("BatchMode=yes", body)
+
+    def test_an_unreadable_directory_is_not_treated_as_empty(self):
+        """`[ -n "$(ls -A … 2>/dev/null)" ]` read an unreadable dir as an empty one
+        and fell through to the clone, which then failed for the wrong reason."""
+        if os.geteuid() == 0:
+            self.skipTest("running as root: mode 0000 does not deny access")
+        blocked = self.tmp / "blocked"
+        blocked.mkdir()
+        (blocked / "something").write_text("x", encoding="utf-8")
+        blocked.chmod(0o000)
+        try:
+            r = self._update(blocked)
+        finally:
+            blocked.chmod(0o755)
+        self.assertEqual(r.returncode, 6, r.stdout + r.stderr)
+        self.assertIn("cannot be read", r.stderr)
+
+    def test_an_empty_directory_is_still_safe_to_clone_into(self):
+        """The other side of that fix: readable and empty must still clone."""
+        empty = self.tmp / "empty"
+        empty.mkdir()
+        r = self._update(empty)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertTrue((empty / ".git").is_dir())
+
+    def test_a_hung_network_call_is_capped(self):
+        """A wedged connection becomes a failed run, not a job that looks alive.
+
+        GIT_TERMINAL_PROMPT/BatchMode stop git waiting for a human; this is the
+        wall-clock cap that stops it waiting for a host (300s in production).
+        """
+        env_before = os.environ.get("GIT_NET_TIMEOUT")
+        os.environ["GIT_NET_TIMEOUT"] = "1"
+        try:
+            started = time.monotonic()
+            r = self._update(
+                self.work,
+                path=self._shim("git", GIT_HANG_SHIM.format(git=shutil.which("git"))))
+            elapsed = time.monotonic() - started
+        finally:
+            if env_before is None:
+                os.environ.pop("GIT_NET_TIMEOUT", None)
+            else:
+                os.environ["GIT_NET_TIMEOUT"] = env_before
+        self.assertEqual(r.returncode, 6, r.stdout + r.stderr)
+        self.assertLess(elapsed, 20, "the cap did not fire — git ran to completion")
+        self.assertIn("CHECKOUT NOT UPDATED", r.stderr)
 
     def test_a_dirty_tree_is_reported_but_not_fatal(self):
         (self.work / ".sync-state.json").write_text("{}\n", encoding="utf-8")

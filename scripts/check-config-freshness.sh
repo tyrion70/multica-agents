@@ -91,8 +91,24 @@ MAIN_HASH="$(git -C "$REPO" show "origin/main:$SRC" | sha256sum | cut -d' ' -f1)
 # --- sync-state baseline lag (CHA-1087) -------------------------------------
 # Commit timestamps, not content: if a skill or agent definition landed AFTER the
 # last .sync-state.json commit, the committed baseline predates it by construction.
-STATE_TS="$(git -C "$REPO" log -1 --format=%ct origin/main -- .sync-state.json 2>/dev/null || true)"
-DEFS_TS="$(git -C "$REPO" log -1 --format=%ct origin/main -- skills '*/agent.json' 2>/dev/null || true)"
+#
+# Fail closed on the READ, but keep "no such commit yet" as a legitimate answer —
+# `git log -1 -- <path>` exits 0 with empty output when nothing has touched that
+# path, which is different from git failing. Swallowing both as `|| true` meant a
+# broken `git log` reported BASELINE_LAG_SEC=0, i.e. "the baseline is current", from
+# the very script whose job is to notice that it is not (CHA-1211, found by the
+# scripts/*.sh sweep that the fail-open lint test in test_sync.py now automates).
+if ! STATE_TS="$(git -C "$REPO" log -1 --format=%ct origin/main -- .sync-state.json 2>&1)"; then
+  echo "git log failed for .sync-state.json in $REPO:" >&2
+  echo "$STATE_TS" | sed 's/^/  /' >&2
+  exit 3
+fi
+if ! DEFS_TS="$(git -C "$REPO" log -1 --format=%ct origin/main -- skills '*/agent.json' 2>&1)"; then
+  echo "git log failed for the skill/agent definitions in $REPO:" >&2
+  echo "$DEFS_TS" | sed 's/^/  /' >&2
+  exit 3
+fi
+# Empty means "no commit touches that path", which really is timestamp zero.
 STATE_TS="${STATE_TS:-0}"
 DEFS_TS="${DEFS_TS:-0}"
 if [ "$DEFS_TS" -gt "$STATE_TS" ]; then

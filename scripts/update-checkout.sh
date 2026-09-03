@@ -39,6 +39,22 @@ E_STALE=6
 export GIT_TERMINAL_PROMPT=0
 export GIT_SSH_COMMAND="${GIT_SSH_COMMAND:-ssh} -o BatchMode=yes"
 
+# And a wall-clock cap, because the two settings above stop git waiting for a HUMAN
+# and this stops it waiting for a HOST. 300s is far beyond any legitimate need — the
+# whole nightly chain runs in about a second and a fresh clone of this repo is
+# seconds — while still turning a wedged connection into a failed run instead of a
+# job that looks like it is still working. `timeout` exits 124, which the callers
+# below turn into 6 like any other failure. Unlike the rest of this family, a stall
+# produces no commit and no false success, which is why it is a follow-up rather than
+# a gate (CHA-1211 item 27 follow-up).
+GIT_NET_TIMEOUT="${GIT_NET_TIMEOUT:-300}"
+if command -v timeout >/dev/null 2>&1; then
+  git_net() { timeout "$GIT_NET_TIMEOUT" git "$@"; }
+else
+  echo "  ⚠ 'timeout' not found on PATH — network git calls run uncapped" >&2
+  git_net() { git "$@"; }
+fi
+
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo)   REPO="$2"; shift 2 ;;
@@ -56,7 +72,7 @@ fail() {
 
 if [ -d "$REPO/.git" ]; then
   echo "  → updating $REPO"
-  if ! out="$(git -C "$REPO" pull --ff-only 2>&1)"; then
+  if ! out="$(git_net -C "$REPO" pull --ff-only 2>&1)"; then
     echo "$out" | sed 's/^/      /' >&2
     # The two causes seen in practice, named so the issue can say which one:
     #   * Permission denied (publickey) — the `ssh` skill, never fall back to HTTPS.
@@ -67,13 +83,23 @@ if [ -d "$REPO/.git" ]; then
     fail "'git pull --ff-only' failed in $REPO"
   fi
   echo "$out" | sed 's/^/      /'
-elif [ -e "$REPO" ] && [ -n "$(ls -A "$REPO" 2>/dev/null)" ]; then
-  # The case the old one-liner silently mishandled: a directory that exists and is
-  # not a git repo. Cloning into it cannot succeed, so say so instead of trying.
-  fail "$REPO exists, is not a git repository, and is not empty — refusing to clone into it"
 else
+  if [ -e "$REPO" ]; then
+    # The case the old one-liner silently mishandled: a path that exists and is not
+    # a git repo. Cloning into it cannot succeed, so say so instead of trying — but
+    # read it first. `[ -n "$(ls -A … 2>/dev/null)" ]` reported an UNREADABLE
+    # directory as an empty one, fell through to the clone, and produced "clone
+    # failed" instead of the actual cause (CHA-1211).
+    if ! entries="$(ls -A "$REPO" 2>&1)"; then
+      echo "$entries" | sed 's/^/      /' >&2
+      fail "$REPO exists but cannot be read — cannot tell whether cloning into it is safe"
+    fi
+    if [ -n "$entries" ]; then
+      fail "$REPO exists, is not a git repository, and is not empty — refusing to clone into it"
+    fi
+  fi
   echo "  → cloning $REMOTE into $REPO"
-  if ! out="$(git clone "$REMOTE" "$REPO" 2>&1)"; then
+  if ! out="$(git_net clone "$REMOTE" "$REPO" 2>&1)"; then
     echo "$out" | sed 's/^/      /' >&2
     fail "'git clone' failed"
   fi
@@ -88,7 +114,7 @@ head="$(git -C "$REPO" rev-parse HEAD 2>/dev/null)" || fail "cannot read HEAD in
 # `ls-remote --exit-code` returns 2 when no ref matches, so a deleted or renamed
 # default branch (or a repo transfer) is caught here instead of being papered over
 # by a stale `origin/$BRANCH` that survives on disk.
-if ! ls_out="$(git -C "$REPO" ls-remote --exit-code origin "refs/heads/$BRANCH" 2>&1)"; then
+if ! ls_out="$(git_net -C "$REPO" ls-remote --exit-code origin "refs/heads/$BRANCH" 2>&1)"; then
   echo "$ls_out" | sed 's/^/      /' >&2
   fail "origin has no '$BRANCH' branch, or the remote is unreachable — cannot verify $REPO"
 fi
@@ -99,13 +125,16 @@ fi
 # checkout it never verified. That is the same fail-open #129 removed from sync.sh
 # and commit-sync-state.sh two commits earlier, and this is the file everything else
 # now trusts (CHA-1211 H1).
-if ! fetch_out="$(git -C "$REPO" fetch origin "$BRANCH" 2>&1)"; then
+if ! fetch_out="$(git_net -C "$REPO" fetch origin "$BRANCH" 2>&1)"; then
   echo "$fetch_out" | sed 's/^/      /' >&2
   fail "'git fetch origin $BRANCH' failed — HEAD cannot be verified against the remote"
 fi
 
-remote_head="$(git -C "$REPO" rev-parse "origin/$BRANCH" 2>/dev/null || true)"
-if [ -z "$remote_head" ]; then
+# `|| true` here left an empty $remote_head standing in for both "no such ref" and
+# "rev-parse failed"; the emptiness check below caught it either way, but the shape is
+# the one this repo keeps getting wrong, so it checks the status instead (CHA-1211).
+if ! remote_head="$(git -C "$REPO" rev-parse "origin/$BRANCH" 2>&1)"; then
+  echo "$remote_head" | sed 's/^/      /' >&2
   fail "cannot resolve origin/$BRANCH in $REPO"
 fi
 if [ "$head" != "$remote_head" ]; then

@@ -39,11 +39,11 @@ git_status="$(git status --porcelain --untracked-files=all)" || {
   echo "ERROR: 'git status' failed — cannot verify the commit scope, refusing to commit." >&2
   exit 5
 }
-out_of_scope="$(
+dirty_paths="$(
   printf '%s\n' "$git_status" \
-    | sed -e 's/^...//' -e 's/^.* -> //' -e 's/^"\(.*\)"$/\1/' \
-    | grep -v "^${STATE_FILE//./\\.}$" || true
+    | sed -e 's/^...//' -e 's/^.* -> //' -e 's/^"\(.*\)"$/\1/'
 )"
+out_of_scope="$(printf '%s\n' "$dirty_paths" | grep -v "^${STATE_FILE//./\\.}$" || true)"
 if [ -n "$out_of_scope" ]; then
   echo "ERROR: refusing to commit — the tree holds changes outside $STATE_FILE:" >&2
   echo "$out_of_scope" | sed 's/^/         /' >&2
@@ -53,7 +53,10 @@ if [ -n "$out_of_scope" ]; then
   exit 5
 fi
 
-if [ -z "$(git status --porcelain -- "$STATE_FILE")" ]; then
+# Asked of the status already captured above, not of a second `git status` whose
+# failure would have read as "nothing to commit" — the same shape, in the sanctioned
+# commit path (CHA-1211).
+if ! printf '%s\n' "$dirty_paths" | grep -qxF "$STATE_FILE"; then
   echo "  → $STATE_FILE is unchanged; nothing to commit."
   exit 0
 fi
