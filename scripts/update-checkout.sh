@@ -17,7 +17,8 @@
 # (CHA-1211): the fourth instance in this incident of a failed read reported as a
 # successful state.
 #
-# Contract: exit 0 means the checkout is at origin/main and safe to sync from.
+# Contract: exit 0 means the checkout is at origin/main — verified against the remote,
+# not against a cached tracking ref — and safe to sync from.
 # Exit 6 means it is NOT, and the caller must stop and report the run as FAILED —
 # never fall through to a sync.
 #
@@ -28,6 +29,15 @@ REPO="/home/peter/multica-agents"
 REMOTE="git@github.com:tyrion70/multica-agents.git"
 BRANCH="main"
 E_STALE=6
+
+# An unattended nightly job must never wait for a human. Make that this script's
+# property rather than the host's: 18 git fixtures showed no hang, but only because
+# the host's config happened to fail fast, and a job that blocks on a credential
+# prompt looks exactly like a job that is still running (CHA-1211 item 27).
+# BatchMode is appended rather than assigned, so an operator-supplied
+# GIT_SSH_COMMAND (a specific key, say) keeps its flags and still cannot prompt.
+export GIT_TERMINAL_PROMPT=0
+export GIT_SSH_COMMAND="${GIT_SSH_COMMAND:-ssh} -o BatchMode=yes"
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -70,10 +80,30 @@ else
   echo "$out" | sed 's/^/      /'
 fi
 
-# Being on *a* commit is not the same as being current. Assert it, so "the sync ran
-# against a stale checkout" cannot be true after a zero exit.
+# Being on *a* commit is not the same as being current. Assert it against the REMOTE,
+# so "the sync ran against a stale checkout" cannot be true after a zero exit.
 head="$(git -C "$REPO" rev-parse HEAD 2>/dev/null)" || fail "cannot read HEAD in $REPO"
-git -C "$REPO" fetch origin "$BRANCH" --quiet 2>/dev/null || true
+
+# The branch has to exist on the remote, not merely in a local tracking ref.
+# `ls-remote --exit-code` returns 2 when no ref matches, so a deleted or renamed
+# default branch (or a repo transfer) is caught here instead of being papered over
+# by a stale `origin/$BRANCH` that survives on disk.
+if ! ls_out="$(git -C "$REPO" ls-remote --exit-code origin "refs/heads/$BRANCH" 2>&1)"; then
+  echo "$ls_out" | sed 's/^/      /' >&2
+  fail "origin has no '$BRANCH' branch, or the remote is unreachable — cannot verify $REPO"
+fi
+
+# NOT `2>/dev/null || true`. A swallowed fetch error lets the rev-parse below fall
+# back to a stale remote-tracking ref, so the assertion compares HEAD against a
+# CACHED value instead of the remote and the script prints its success line for a
+# checkout it never verified. That is the same fail-open #129 removed from sync.sh
+# and commit-sync-state.sh two commits earlier, and this is the file everything else
+# now trusts (CHA-1211 H1).
+if ! fetch_out="$(git -C "$REPO" fetch origin "$BRANCH" 2>&1)"; then
+  echo "$fetch_out" | sed 's/^/      /' >&2
+  fail "'git fetch origin $BRANCH' failed — HEAD cannot be verified against the remote"
+fi
+
 remote_head="$(git -C "$REPO" rev-parse "origin/$BRANCH" 2>/dev/null || true)"
 if [ -z "$remote_head" ]; then
   fail "cannot resolve origin/$BRANCH in $REPO"
