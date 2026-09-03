@@ -67,16 +67,54 @@ but the macOS **App Store and TestFlight builds ship without the subcommand**
 through the App Store or TestFlight`), so a Mac reader following that advice is
 stuck. The FQDN works everywhere; recommend it by default.
 
-**There is no release endpoint.** `POST /agent/release` is a 404, and no route
-releases a tier-1 SSH grant — the panel's "Release now" only covers namespace
-and cluster-admin grants. An agent grant runs for its full window, so **size
-`seconds` to the job** instead of planning to hand it back.
+**Release the grant when you are done.**
 
-### What is requestable today
+```
+POST /agent/release
+Content-Type: application/json
 
-`JITSSH_TARGETS` is currently **`monitoring` alone**. A request for any other
-host is refused with "not a JIT-eligible target" — **that refusal is correct
-behaviour, not a broken system.** Don't read it as JIT failing.
+{"target": "<host>"}
+```
+
+`target` is **required** — releasing every grant at once is deliberately not
+implicit, so an agent holding several does not lose the rest to an omitted
+field. There is no criteria call on this route: giving up privilege is not
+privileged. The response reports what is `still_open`.
+
+This skill previously said the endpoint was a 404 and that a grant runs for its
+full window. **That was wrong**, and it is why grants sit unreleased. Size
+`seconds` to the job *and* hand it back.
+
+**Re-requesting the same target RESETS the window — it does not add to it.**
+Ask for at least what remains and you extend; ask for less and **you shorten
+your own access**, which is the case you walk into by politely requesting a
+small window on a target you already hold. If you only need a little longer,
+ask for the whole remaining time plus the extra, not the extra.
+
+> **Endpoint behaviour is documented in the approver's own README**, and that is
+> the source: [`jit-ssh/README.md`](https://gitlab.com/chainlayer/infrastructure/jit-ssh/-/blob/main/README.md)
+> — see *Concurrent grants, one per (principal, target)* for the expiry
+> arithmetic and *POST /agent/release* for the contract. Operational guidance
+> lives here; the facts live there. This skill has been wrong about JIT
+> behaviour before precisely because it kept a **copy** of it.
+
+### What is requestable
+
+**Don't expect a fixed list here.** The target set is configuration, and it has
+moved: humans get a discovered set (every tailnet host with `sshEnabled`),
+agents get an explicit list plus tag-based selection, and the two are separate
+knobs on purpose. A number written down in this skill goes stale silently, which
+is the failure this section used to be.
+
+Ask the service instead — the approver's startup line and `GET /version` report
+what it actually loaded, and
+[`jit-ssh/README.md`](https://gitlab.com/chainlayer/infrastructure/jit-ssh/-/blob/main/README.md)
+(*SSH targets: discovery for humans, a list for agents*) explains the split.
+
+What to *do* about a refusal: **"not a JIT-eligible target" is correct behaviour,
+not a broken system.** For an agent, `TARGET-OUT-OF-SCOPE` means the host is
+reachable in principle but not in scope for your ticket — a different answer
+again, and neither is JIT failing.
 
 ### `jit` itself is never requestable
 
@@ -130,49 +168,82 @@ Host gitlab.com
     IdentitiesOnly yes
 ```
 
-## Git over SSO-enforced GitLab groups (chainlayer)
+## Git against `gitlab.com/chainlayer` from an agent runtime
 
-The `gitlab.com/chainlayer` group enforces **SAML SSO on git transport**. This
-bites hard and has caught us before, so know it up front:
+**Clone, fetch and push all work headlessly. Don't plan around SSO.**
 
-- A fresh `git clone`/`git fetch` of any `chainlayer/*` repo over **SSH _or_
-  HTTPS** fails with `remote: Cannot find valid SSO session. Please login via
-  your group's SSO at …` (HTTP 403) **unless there is an active browser SSO
-  session** for the account behind the credential. A valid SSH key or a valid
-  token is **not** enough on its own.
-- This applies to **every credential available headlessly**: the SSH keys, the
-  revoked group PAT (`ChainLayer · GitLab — group PAT`), and even
-  `multica repo checkout` — they all resolve to the same SSO-gated GitLab
-  account. An agent cannot complete the browser SAML flow, so it cannot
-  establish the session itself.
-- `multica repo checkout` only succeeds for repos that were **already synced**
-  into the workspace's bare mirrors while a session was live. Adding a new repo
-  (`multica repo add`) and then checking it out triggers a fresh fetch → SSO
-  403. So "SSH-clone any repo regardless of workspace config" is **false** for
-  this group.
-- **What still works headlessly:** the GitLab **REST API** with the
-  `peter-agent` token from 1Password, resolved at point of use (e.g.
-  `GITLAB_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$(cat ~/.config/op/service-account-token)" \
-  op read 'op://Agent Peter/gitlab/password')" glab api ...`).
-  Use it to *read* source or act on a repo you can't clone. The `peter-agent`
-  token is the current credential; the old group PAT is revoked.
-- **To actually clone/push** a `chainlayer/*` repo from an agent runtime, a human
-  must refresh the group's SSO session for the workspace credential (or the repo
-  must be pre-synced). Surface this as a blocker rather than burning time on key
-  permutations — none of them defeat SSO.
+This section used to say the group enforces SAML SSO on git transport and that
+neither a key nor a token is enough without a browser session — so an agent
+should surface a blocker rather than try. That is **wrong for the path a company
+runtime actually uses**, and it cost real time: work was queued as blocked on
+Peter that the runtime could have done itself.
 
-**Rule (Peter):** IF you encounter `Cannot find valid SSO session`, prompt Peter
-with the precise url so he can login UNLESS you have a different way to
-circumvent the SSO issue.
+**What is true, measured on a Multica company runtime:**
 
-The "precise url" is the `https://gitlab.com/groups/chainlayer/-/saml/sso?token=…`
-link printed in the `remote:` error — surface that exact URL to Peter, don't
-paraphrase it. (A "different way to circumvent" means something that gets the
-work done without his login, e.g. reading the file you need via the REST API
-above — not another SSH-key/PAT permutation, which won't work.)
+- Git transport goes over **HTTPS with the `peter-agent` PAT**, not over SSH.
+  `~/.gitconfig` carries `url.https://gitlab.com/.insteadOf = git@gitlab.com:`,
+  so even a `git@gitlab.com:…` remote is rewritten to HTTPS, and
+  `credential."https://gitlab.com".helper` is
+  `gitlab-agent-credential-helper`, which resolves the PAT from 1Password at
+  point of use. Nothing to configure — clone and push normally.
+- **No browser SSO session is involved** in that path. `git ls-remote` returns
+  refs and pushes land; this has carried eight merge requests.
+- The keys named in the table above (`id_ed25519_peter`,
+  `id_ed25519_signing`) are **not installed on a company runtime** — the
+  signing key here is `~/.ssh/peter_agent_signing`. So don't debug a GitLab git
+  failure by hunting for the right key: the credential is a PAT and the
+  transport is HTTPS.
+- The **REST API** works the same way (`glab` with `GITLAB_TOKEN`, or
+  `PRIVATE-TOKEN`) — see the field trap below, which is the thing that actually
+  goes wrong.
 
-(GitHub `tyrion70/*` repos have no such enforcement — clone/push works with
-`id_ed25519_peter` directly.)
+**If you DO see `Cannot find valid SSO session`** — surface the exact
+`https://gitlab.com/groups/chainlayer/-/saml/sso?token=…` URL from the
+`remote:` output to Peter, verbatim, so he can log in. Don't paraphrase it, and
+don't try key or PAT permutations: none of them defeat SSO. But treat it as an
+**unexpected** condition worth reporting rather than the normal state of
+affairs, because on this runtime it is not.
+
+(GitHub `tyrion70/*` repos have no such enforcement either; git auth there goes
+through `gh auth git-credential`.)
+
+### The GitLab PAT is in the `password` field — and the wrong field fails as a 404
+
+The item is `op://Agent Peter/gitlab`, and it has exactly two fields:
+`notesPlain` and `password`. **The PAT is in `password`.** There is no `token`
+field, however much the name suggests one:
+
+```bash
+export OP_SERVICE_ACCOUNT_TOKEN="$(cat ~/.config/op/service-account-token)"
+GITLAB_TOKEN="$(op read 'op://Agent Peter/gitlab/password')"   # CORRECT
+
+op read 'op://Agent Peter/gitlab/token'                        # errors
+op item get gitlab --vault 'Agent Peter' --fields label=token  # errors:
+#   [ERROR] "token" isn't a field in the "gitlab" item
+```
+
+**The trap is that the error becomes an empty string.** `op` writes it to
+stderr and exits non-zero, so `X="$(op read …/token)"` leaves `X` **empty**
+while the command "succeeded" as far as the next line is concerned — and then:
+
+| what you sent | GitLab answers |
+|---|---|
+| empty `PRIVATE-TOKEN` | **`404 Project Not Found`** |
+| a wrong non-empty token | `401 Unauthorized` |
+
+So the symptom of *sending no credential at all* is a **404 that reads like the
+project doesn't exist or you named it wrong**, and you go looking for a typo in
+the path. **404 means you sent nothing; 401 means you sent something wrong.**
+That distinction cost three MRs' worth of confusion.
+
+Check the length before you use it, so the failure lands where the mistake is:
+
+```bash
+[ -n "$GITLAB_TOKEN" ] || { echo "no PAT — check the FIELD NAME, not the path"; exit 1; }
+```
+
+Never echo the value; check that it is non-empty and that it starts with
+`glpat-`.
 
 ## Git commit signing
 
