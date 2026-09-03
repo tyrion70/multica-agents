@@ -1507,6 +1507,16 @@ def sync_agents_workspace(
 # Skills: parsing, normalization, write-back
 # ---------------------------------------------------------------------------
 
+class SkillContentUnavailable(RuntimeError):
+    """A skill body (or supporting-file body) is missing or empty, so the sync
+    refuses to act on it — a failed or changed READ is not an intentional edit.
+
+    Raised, never swallowed as an empty string. `multica skill get` made bodies
+    opt-in behind --with-content in 2026-09; the sync kept reading
+    `live.get("content", "")`, so every body came back "" and 22 company skills
+    were rewritten as frontmatter-only files in eb50a85 (CHA-1211)."""
+
+
 _FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n?(.*)", re.DOTALL)
 
 
@@ -1580,20 +1590,76 @@ def normalize_skill_repo(skill_name: str) -> Optional[Dict[str, Any]]:
 
 
 def normalize_skill_multica(live: Dict[str, Any]) -> Dict[str, Any]:
-    """Normalize a live Multica skill for state comparison."""
+    """Normalize a live Multica skill for state comparison.
+
+    Fails closed when the response carries no body: an absent `content` key
+    means the read did not deliver the content, not that the workspace copy is
+    empty, and defaulting it to "" is what deleted 22 skill bodies in eb50a85
+    (CHA-1211). Same for a supporting file's `content`.
+
+    An empty-but-present body is kept in the snapshot (so a repo→Multica push
+    can still repair it) — it is the *write* side that refuses it, see
+    `_assert_skill_content_writable`.
+    """
+    name = live.get("name", "")
+    if "content" not in live:
+        raise SkillContentUnavailable(
+            f"'{name}': response carries no 'content' key "
+            f"(content_size={live.get('content_size')!r}) — the body was not "
+            f"served, so it cannot be compared. `multica skill get` needs "
+            f"--with-content."
+        )
     files: Dict[str, str] = {}
     for f in live.get("files") or []:
-        files[f["path"]] = f.get("content", "")
+        path = f.get("path", "<unknown>")
+        if "content" not in f:
+            raise SkillContentUnavailable(
+                f"'{name}': supporting file '{path}' carries no 'content' key "
+                f"(size={f.get('size')!r}) — the body was not served. "
+                f"`multica skill get` needs --with-content."
+            )
+        files[path] = f["content"] or ""
     return {
-        "name": live.get("name", ""),
+        "name": name,
         "description": live.get("description", ""),
-        "body": live.get("content", ""),
+        "body": live.get("content") or "",
         "files": files,
     }
 
 
+def _assert_skill_content_nonempty(
+    skill_name: str,
+    norm: Dict[str, Any],
+    source: str,
+    target: str,
+) -> None:
+    """Refuse to copy an empty body or a 0-byte supporting file over the other side.
+
+    Emptying content is never a legitimate edit — nobody trims a skill down to
+    frontmatter, in the repo or in the workspace UI — so this guards BOTH
+    directions. The repo→Multica direction matters just as much: the 22 gutted
+    files sat on main for hours, and the next push would have written them over
+    the intact live copies, taking the last good version with them (CHA-1211).
+    """
+    if not (norm.get("body") or "").strip():
+        raise SkillContentUnavailable(
+            f"'{skill_name}': {source} body is empty — refusing to write a "
+            f"frontmatter-only skill over {target}."
+        )
+    for rel_path, content in (norm.get("files") or {}).items():
+        if content == "":
+            raise SkillContentUnavailable(
+                f"'{skill_name}': {source} supporting file '{rel_path}' is "
+                f"0 bytes — refusing to empty it in {target}."
+            )
+
+
 def fetch_skill_detail(skill_id: str) -> Dict[str, Any]:
-    return _multica(["skill", "get", skill_id], dry_run=False)
+    # --with-content is REQUIRED. The CLI made bodies opt-in (2026-09): without
+    # the flag the response carries content_hash/content_size and no `content`
+    # key at all, which the sync read as "the workspace copy is now empty"
+    # (CHA-1211). normalize_skill_multica fails closed if it is ever dropped.
+    return _multica(["skill", "get", skill_id, "--with-content"], dry_run=False)
 
 
 # ---------------------------------------------------------------------------
@@ -1644,6 +1710,12 @@ def sync_skills_workspace(
             try:
                 detail = fetch_skill_detail(live_skill["id"])
                 multica_norm = normalize_skill_multica(detail)
+            except SkillContentUnavailable as e:
+                # Incomplete read — comparing against it would read as an edit.
+                print(f"    ✗ LIVE READ INCOMPLETE (fail-closed, nothing written): {e}",
+                      file=sys.stderr)
+                counts["errors"] += 1
+                continue
             except Exception as e:
                 print(f"    ✗ MULTICA FETCH FAILED: {e}", file=sys.stderr)
                 counts["errors"] += 1
@@ -1665,14 +1737,30 @@ def sync_skills_workspace(
             }
 
         elif action == "push_to_multica":
-            _push_skill_to_multica(skill_name, repo_norm, skill_id, live_skill, counts, dry_run)
+            try:
+                _push_skill_to_multica(skill_name, repo_norm, skill_id, live_skill, counts, dry_run)
+            except SkillContentUnavailable as e:
+                # Leave the baseline alone as well as the workspace, so the next
+                # run re-decides instead of calling the emptying "synced".
+                print(f"    ✗ PUSH REFUSED (fail-closed, live copy kept): {e}",
+                      file=sys.stderr)
+                counts["errors"] += 1
+                continue
             state_skills[skill_name] = {
                 "repo_state": repo_norm,
                 "multica_state": repo_norm,
             }
 
         elif action == "pull_to_repo":
-            _pull_skill_to_repo(skill_name, multica_norm, dry_run)
+            try:
+                _pull_skill_to_repo(skill_name, multica_norm, dry_run)
+            except SkillContentUnavailable as e:
+                # Leave the baseline alone as well as the file: re-baselining an
+                # empty body would make the next run call the deletion "synced".
+                print(f"    ✗ PULL REFUSED (fail-closed, repo copy kept): {e}",
+                      file=sys.stderr)
+                counts["errors"] += 1
+                continue
             counts["repo_updated"] += 1
             state_skills[skill_name] = {
                 "repo_state": multica_norm,
@@ -1709,6 +1797,12 @@ def _push_skill_to_multica(
     counts: Dict[str, int],
     dry_run: bool,
 ) -> None:
+    # Same fail-closed rule as the pull side, in the other direction: never
+    # overwrite a live skill with an emptied repo copy (CHA-1211).
+    _assert_skill_content_nonempty(
+        skill_name, repo_norm, source="repo", target="the live workspace copy"
+    )
+
     body = repo_norm["body"]
     description = repo_norm["description"]
     files = repo_norm.get("files", {})
@@ -1785,6 +1879,12 @@ def _pull_skill_to_repo(
 ) -> None:
     skill_dir = SKILLS_DIR / skill_name
     skill_md = skill_dir / "SKILL.md"
+
+    # Before the dry-run branch on purpose: a --dry-run must report the refusal
+    # too, not print "would write" for a write that is never allowed.
+    _assert_skill_content_nonempty(
+        skill_name, multica_norm, source="live", target="the repo copy"
+    )
 
     if dry_run:
         print(f"      [DRY-RUN] would write skills/{skill_name}/SKILL.md", file=sys.stderr)
