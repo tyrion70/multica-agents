@@ -156,8 +156,42 @@ if [ -n "$workspace" ]; then
   fi
 fi
 
-python3 "$SCRIPT_DIR/sync.py" "$@"
-rc=$?
+# `|| rc=$?` rather than a bare call: under `set -e` a failing sync.py aborted the
+# script on this line, so `rc=$?` was dead code and — more to the point — the
+# commit-scope guard below never ran on the runs most likely to have left a bad write
+# in the tree (CHA-1211).
+rc=0
+python3 "$SCRIPT_DIR/sync.py" "$@" || rc=$?
+
+# Commit-scope guard (CHA-1211). The direct-to-main licence in CLAUDE.md is scoped by
+# COMMIT MESSAGE ("chore: sync state"), not by PATH — so when the 2026-09-03 02:38 run
+# rewrote 24 skill files, the autopilot swept them into that same bookkeeping commit and
+# 4,139 deletions reached main with no review. A sync run may leave exactly ONE path
+# dirty: .sync-state.json. Anything else is real repo content and belongs in a PR, so we
+# fail the job here (exit 5) instead of letting it ride on the exemption. This is the
+# check that would have turned 02:38 into a failed run.
+out_of_scope="$(
+  git -C "$REPO_ROOT" status --porcelain --untracked-files=all 2>/dev/null \
+    | sed -e 's/^...//' -e 's/^.* -> //' -e 's/^"\(.*\)"$/\1/' \
+    | grep -v '^\.sync-state\.json$' || true
+)"
+if [ -n "$out_of_scope" ]; then
+  echo
+  echo "==> COMMIT SCOPE VIOLATION: this run changed repo files other than .sync-state.json."
+  echo "$out_of_scope" | sed 's/^/      /'
+  echo
+  echo "    A 'chore: sync state' commit may touch .sync-state.json and nothing else."
+  echo "    These paths are reviewable content — a pull_to_repo write, or something the"
+  echo "    run did not mean to do at all (CHA-1211: a changed CLI contract emptied 22"
+  echo "    skill bodies and they were committed to main as bookkeeping)."
+  echo
+  echo "    Inspect the diff before you keep any of it:"
+  echo "      git -C $REPO_ROOT diff"
+  echo "    Then either open a PR for the ones that are genuine, or 'git checkout --' them."
+  echo "    .sync-state.json is intentionally NOT committed by this failed run: baselining"
+  echo "    an unreviewed write is what makes the damage look synced."
+  exit 5
+fi
 
 # Which profile this HOST deploys. `--workspace` selects it when given; otherwise fall
 # back to the hostname, using the same mapping check-config-freshness.sh already uses.
@@ -214,9 +248,9 @@ if [ -n "$(git -C "$REPO_ROOT" status --porcelain -- .sync-state.json 2>/dev/nul
   echo "    content, and the PR round-trip is friction that gets it skipped (which is"
   echo "    the staleness this warning exists to prevent). The Sync autopilot does the"
   echo "    same. The no-direct-commits rule covers rules and skill wiring, not this."
-  echo "      git -C $REPO_ROOT add .sync-state.json"
-  echo "      git -C $REPO_ROOT commit -m 'chore: sync state'"
-  echo "      git -C $REPO_ROOT push origin main"
+  echo "      $SCRIPT_DIR/commit-sync-state.sh --push"
+  echo "    Use that script rather than a hand-rolled 'git add': it re-checks the scope"
+  echo "    at commit time, so nothing else can ride along on the exemption."
   echo "    check-config-freshness.sh reports this as BASELINE_LAG (exit 4) if it is"
   echo "    left behind."
 fi

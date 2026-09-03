@@ -79,6 +79,16 @@ that gets the commit skipped, and a skipped commit leaves the baseline behind th
 workspaces, which makes the next unrelated change surface as a false "both sides
 changed" conflict. `check-config-freshness.sh` reports that as `BASELINE_LAG` (exit 4).
 
+**The exemption is scoped by PATH, not by commit message.** It covers exactly one
+file — `.sync-state.json` — and nothing may ride along on it. Commit it with
+`scripts/commit-sync-state.sh --push`, which enforces that scope and refuses if
+anything else is dirty; `sync.sh` fails the run (exit 5) rather than leaving a
+mixed tree for you to sweep up. Read as a message-scoped licence, this rule put
+4,139 unreviewed deletions on `main` in one night (CHA-1211): a sync run rewrote 22
+skill bodies and they were committed as "bookkeeping". Any other repo change a sync
+produces — an `agent.json` pulled back, a skill body pulled back — is reviewable
+content and goes through step 2.
+
 (Durable *facts* go in your runtime memory, above — not here. This repo is for
 rules and skills only.)
 

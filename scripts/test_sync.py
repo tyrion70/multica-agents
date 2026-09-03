@@ -713,5 +713,212 @@ class RepoSecretLeakGuardTest(unittest.TestCase):
         )
 
 
+class SkillContentGuardTest(unittest.TestCase):
+    """The 2026-09-03 skill deletion and the guards that make it impossible (CHA-1211).
+
+    `multica skill get` made SKILL.md bodies opt-in behind --with-content. The sync
+    kept reading `live.get("content", "")`, so every body came back "", the change
+    detector called that a workspace edit, and 22 SKILL.md files were rewritten as
+    frontmatter only. Two invariants are asserted here: the read asks for the body,
+    and no read outcome can ever empty a repo file.
+    """
+
+    SKILL = "bitwarden"
+    BODY = "# Bitwarden\n\nReal content, several lines.\n"
+    FILE_REL = "scripts/detect-access.sh"
+    FILE_BODY = "#!/usr/bin/env bash\necho detect\n"
+
+    def setUp(self):
+        self.tmp = pathlib.Path(__import__("tempfile").mkdtemp())
+        self.ws = self.tmp / WS_NAME
+        self.ws.mkdir(parents=True)
+        (self.ws / "skills.json").write_text(json.dumps([self.SKILL]), encoding="utf-8")
+
+        self.skills_dir = self.tmp / "skills"
+        self.skill_md = self.skills_dir / self.SKILL / "SKILL.md"
+        self.support = self.skills_dir / self.SKILL / self.FILE_REL
+        sync.write_skill_md(self.skill_md, self.SKILL, "does bitwarden things", self.BODY)
+        self.support.parent.mkdir(parents=True, exist_ok=True)
+        self.support.write_text(self.FILE_BODY, encoding="utf-8")
+
+        self.state_path = self.tmp / ".sync-state.json"
+        # `content` is a live-shape flag, not a value: False reproduces the post-change
+        # CLI response (content_hash/content_size, no `content` key at all).
+        self.serve_content = True
+        self.live_body = self.BODY
+        self.live_files = {self.FILE_REL: self.FILE_BODY}
+        self.calls = []
+
+        self._patches = [
+            mock.patch.object(sync, "REPO_ROOT", self.tmp),
+            mock.patch.object(sync, "SKILLS_DIR", self.skills_dir),
+            mock.patch.object(sync, "DEFAULT_STATE_PATH", self.state_path),
+            mock.patch.object(sync, "WORKSPACE_IDS", {WS_NAME: WS_ID}),
+            mock.patch.object(sync, "_multica", self._backend),
+        ]
+        for p in self._patches:
+            p.start()
+
+    def tearDown(self):
+        for p in self._patches:
+            p.stop()
+        __import__("shutil").rmtree(self.tmp, ignore_errors=True)
+
+    # -- fake CLI ---------------------------------------------------------
+
+    def _backend(self, args, dry_run=False, mutating=False):
+        self.calls.append(list(args))
+        if args[:2] == ["skill", "list"]:
+            return [{"id": "skill-1", "name": self.SKILL, "description": "does bitwarden things"}]
+        if args[:2] == ["skill", "get"]:
+            return self._skill_detail(with_content="--with-content" in args)
+        if args[:2] == ["skill", "update"] or args[:3] == ["skill", "files", "upsert"]:
+            return {}
+        raise AssertionError(f"unexpected multica call: {args}")
+
+    def _skill_detail(self, with_content):
+        detail = {"id": "skill-1", "name": self.SKILL, "description": "does bitwarden things"}
+        if with_content and self.serve_content:
+            detail["content"] = self.live_body
+            detail["files"] = [
+                {"path": rel, "content": body} for rel, body in self.live_files.items()
+            ]
+        else:
+            detail["content_hash"] = "deadbeef"
+            detail["content_size"] = len(self.live_body)
+            detail["files"] = [
+                {"path": rel, "content_hash": "cafe", "size": len(body)}
+                for rel, body in self.live_files.items()
+            ]
+        return detail
+
+    def _run(self):
+        argv = ["sync.py", "--type", "skills", "--workspace", WS_NAME,
+                "--sync-state", str(self.state_path)]
+        code = 0
+        with mock.patch.object(sys, "argv", argv):
+            try:
+                sync.main()
+            except SystemExit as e:
+                code = e.code or 0
+        return code
+
+    def _baseline(self, body, files=None):
+        """Seed the baseline so both sides read as unchanged for that content."""
+        snapshot = {
+            "name": self.SKILL,
+            "description": "does bitwarden things",
+            "body": body,
+            "files": dict(files if files is not None else {self.FILE_REL: self.FILE_BODY}),
+        }
+        self.state_path.write_text(json.dumps({
+            "version": 1, "agents": {},
+            "skills": {WS_NAME: {self.SKILL: {"repo_state": snapshot,
+                                              "multica_state": dict(snapshot)}}},
+        }), encoding="utf-8")
+
+    # -- the read ---------------------------------------------------------
+
+    def test_skill_get_asks_for_the_body(self):
+        """fetch_skill_detail passes --with-content — without it there is no body."""
+        detail = sync.fetch_skill_detail("skill-1")
+        self.assertIn(["skill", "get", "skill-1", "--with-content"], self.calls)
+        self.assertEqual(detail["content"], self.BODY)
+
+    def test_missing_content_key_is_a_hard_error(self):
+        """The eb50a85 response shape raises instead of normalizing to ""."""
+        with self.assertRaises(sync.SkillContentUnavailable) as cm:
+            sync.normalize_skill_multica(self._skill_detail(with_content=False))
+        self.assertIn("--with-content", str(cm.exception))
+
+    def test_missing_file_content_key_is_a_hard_error(self):
+        """Same defaulting on the files array — the 0-byte-script half of the bug."""
+        detail = self._skill_detail(with_content=True)
+        detail["files"] = [{"path": self.FILE_REL, "content_hash": "cafe", "size": 42}]
+        with self.assertRaises(sync.SkillContentUnavailable) as cm:
+            sync.normalize_skill_multica(detail)
+        self.assertIn(self.FILE_REL, str(cm.exception))
+
+    # -- the write --------------------------------------------------------
+
+    def test_pull_refuses_an_empty_body(self):
+        """A pull that would empty SKILL.md raises and leaves the file alone."""
+        before = self.skill_md.read_text(encoding="utf-8")
+        with self.assertRaises(sync.SkillContentUnavailable):
+            sync._pull_skill_to_repo(self.SKILL, {
+                "name": self.SKILL, "description": "d", "body": "", "files": {},
+            }, dry_run=False)
+        self.assertEqual(self.skill_md.read_text(encoding="utf-8"), before)
+
+    def test_pull_refuses_a_zero_byte_supporting_file(self):
+        before = self.support.read_text(encoding="utf-8")
+        with self.assertRaises(sync.SkillContentUnavailable):
+            sync._pull_skill_to_repo(self.SKILL, {
+                "name": self.SKILL, "description": "d", "body": self.BODY,
+                "files": {self.FILE_REL: ""},
+            }, dry_run=False)
+        self.assertEqual(self.support.read_text(encoding="utf-8"), before)
+
+    def test_dry_run_pull_refuses_too(self):
+        """--dry-run reports the refusal rather than "would write"."""
+        with self.assertRaises(sync.SkillContentUnavailable):
+            sync._pull_skill_to_repo(self.SKILL, {
+                "name": self.SKILL, "description": "d", "body": "", "files": {},
+            }, dry_run=True)
+
+    def test_push_refuses_an_emptied_repo_copy(self):
+        """The other direction: a gutted repo file never overwrites a live skill.
+
+        This is the tail risk the 02:38 commit left on main — the 22 emptied files
+        would have been pushed over the intact workspace copies on the next run.
+        """
+        sync.write_skill_md(self.skill_md, self.SKILL, "does bitwarden things", "")
+        self._baseline(self.BODY)
+
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            code = self._run()
+
+        self.assertEqual(code, 1, "pushing an emptied body must fail the run")
+        self.assertIn("PUSH REFUSED", err.getvalue())
+        self.assertNotIn(["skill", "update", "skill-1"], [c[:3] for c in self.calls])
+        # Baseline untouched: the emptying must not read as synced next run.
+        state = json.loads(self.state_path.read_text())
+        self.assertEqual(state["skills"][WS_NAME][self.SKILL]["repo_state"]["body"], self.BODY)
+
+    # -- end to end -------------------------------------------------------
+
+    def test_bodyless_response_cannot_gut_the_repo(self):
+        """The exact eb50a85 scenario: a body-free read fails the run, changes nothing."""
+        self.serve_content = False  # CLI serves no body even when asked
+        self._baseline(self.BODY)
+        before_md = self.skill_md.read_text(encoding="utf-8")
+        before_sh = self.support.read_text(encoding="utf-8")
+
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            code = self._run()
+
+        self.assertEqual(code, 1, "a body-free read must fail the run")
+        self.assertIn("fail-closed", err.getvalue())
+        self.assertEqual(self.skill_md.read_text(encoding="utf-8"), before_md)
+        self.assertEqual(self.support.read_text(encoding="utf-8"), before_sh)
+        # And the baseline must not record the empty read as synced.
+        state = json.loads(self.state_path.read_text())
+        self.assertEqual(
+            state["skills"][WS_NAME][self.SKILL]["multica_state"]["body"], self.BODY,
+            "baseline was re-written from an incomplete read",
+        )
+
+    def test_a_real_workspace_edit_still_pulls(self):
+        """The guard blocks emptying, not pulling: a genuine edit lands as before."""
+        self._baseline(self.BODY)
+        self.live_body = self.BODY + "\nEdited in the workspace UI.\n"
+
+        with contextlib.redirect_stderr(io.StringIO()):
+            code = self._run()
+
+        self.assertEqual(code, 0)
+        self.assertIn("Edited in the workspace UI.", self.skill_md.read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
