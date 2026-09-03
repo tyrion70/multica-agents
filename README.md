@@ -222,6 +222,58 @@ Known limits of the lint, so nobody assumes more than it does:
 `commit-sync-state.sh` or `update-checkout.sh` must run
 `python3 -m pytest scripts/test_shell_guards.py` by hand.
 
+## Autopilot descriptions get more care than a PR, not less
+
+**Read an autopilot's `status` before writing its description, and never leave a
+description referencing code that is not on `main`.** If a change needs unmerged
+code, the text goes to the reviewer to apply *after* the merge — the description
+and the merge cannot be the same step.
+
+The reason is structural: an autopilot description is the one artefact in this
+system with **no review gate and no CI**. Nobody diffs it, nothing tests it, and
+a broken one is discovered by a job failing hours later. It is simultaneously the
+easiest thing to break and the hardest to notice, which is why it deserves the
+extra check rather than the lighter touch it invites.
+
+Both halves of that rule were learned the same day (CHA-1211):
+
+- The instruction that actually caused the skill deletion lived in a description,
+  not in the repo — no PR could have caught it, which is why `sync.sh`'s guard
+  was not enough on its own.
+- A step-1 rewrite was applied to a live, **active** autopilot while the script
+  it referenced existed only on an unmerged branch. That set the next run up to
+  exit 6. It was caught minutes later only because the change was verified by
+  printing the autopilot back and reading it — which is the check, not luck, and
+  is why `status` is the first thing to look at.
+
+Practically: `multica autopilot get <id>` before and after, confirm the `status`
+you expected, extract any shell block from the **live** text and run `bash -n` on
+it rather than trusting what you typed into a text field.
+
+## If a comment asserts a guarantee, write the test that breaks it
+
+Three times in CHA-1211 a comment claimed an invariant the code beneath it did
+not uphold — and all three were found by *running* the thing, never by reading it:
+
+| Where | The comment claimed | The code did |
+|---|---|---|
+| `update-checkout.sh` | "'the sync ran against a stale checkout' cannot be true after a zero exit" | swallowed the fetch error, so the next line compared HEAD against a cached ref |
+| `_live_custom_env_for_state` | "a resolved value that never enters the snapshot cannot escape" | returned the JSON-string shape verbatim, secret included |
+| `autopilot-step1.sh` | "prefer the copy inside the checkout we just advanced" | fell back to a copy from elsewhere, verifying one tree while the sync read another |
+
+The first two are in git history (`bce49d2`); the third never landed — the fixture
+caught it before the commit, which is the heuristic doing its job at the cheapest
+possible moment.
+
+A comment asserting a guarantee is a claim about behaviour, and the cheapest way
+to find out whether it is true is to try to violate it. So: **when you write one,
+write the test that breaks it.** If the test cannot be written, the comment is
+probably describing an intention rather than a property, and should say so.
+
+It is also a one-line review question — *"where is the test for that sentence?"* —
+and it caught three real bugs here, two of them in the patches that existed to
+remove the same class of bug.
+
 ## Workspaces
 
 Both workspaces live on the same Multica instance (`multica.252h.org`). Passing `--workspace <slug>` to `sync.sh` sets `MULTICA_WORKSPACE_ID` automatically.
