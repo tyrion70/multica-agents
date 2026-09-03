@@ -170,8 +170,19 @@ python3 "$SCRIPT_DIR/sync.py" "$@" || rc=$?
 # dirty: .sync-state.json. Anything else is real repo content and belongs in a PR, so we
 # fail the job here (exit 5) instead of letting it ride on the exemption. This is the
 # check that would have turned 02:38 into a failed run.
+#
+# The `git status` error is NOT swallowed (CHA-1211 F5): with `2>/dev/null` a git
+# failure produced empty output, which read as "nothing out of scope" and passed the
+# guard. Fail-open inside a fail-closed guard is worse than no guard, because it only
+# opens on the runs where something is already wrong.
+git_status="$(git -C "$REPO_ROOT" status --porcelain --untracked-files=all)" || {
+  echo
+  echo "==> ERROR: 'git status' failed in $REPO_ROOT — cannot verify the commit scope." >&2
+  echo "    Refusing to continue: an unverifiable tree is treated as out of scope." >&2
+  exit 5
+}
 out_of_scope="$(
-  git -C "$REPO_ROOT" status --porcelain --untracked-files=all 2>/dev/null \
+  printf '%s\n' "$git_status" \
     | sed -e 's/^...//' -e 's/^.* -> //' -e 's/^"\(.*\)"$/\1/' \
     | grep -v '^\.sync-state\.json$' || true
 )"
