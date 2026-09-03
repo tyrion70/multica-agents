@@ -414,6 +414,7 @@ hosts there is nothing to wire: access is JIT.
 
 - Don't use the signing key as the primary auth identity in config, or the
   auth key for signing — keep the roles split.
-- Don't commit private keys to git; they live in the vault and `~/.ssh` only.
+- Don't commit private keys to git; they live in `~/.ssh`, and in a vault only if
+  one actually holds them — see *The keys are NOT in the vault* above.
 - Don't forget `IdentitiesOnly yes` — without it SSH may offer the YubiKey
   keys first and trigger spurious PIN prompts.
