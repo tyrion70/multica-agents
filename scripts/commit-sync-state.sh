@@ -30,8 +30,17 @@ cd "$REPO_ROOT"
 
 # Everything dirty or staged, other than the state file. Renames report as
 # "R  old -> new"; keep the destination. Paths with odd characters come back quoted.
+#
+# git's own status is captured first and its failure is fatal (CHA-1211 F5): inside the
+# pipeline below the exit code belongs to `grep`/`true`, so a failing `git status` would
+# yield empty output and read as "nothing out of scope" — the guard would open on
+# exactly the runs where the repo is already in a state nobody understands.
+git_status="$(git status --porcelain --untracked-files=all)" || {
+  echo "ERROR: 'git status' failed — cannot verify the commit scope, refusing to commit." >&2
+  exit 5
+}
 out_of_scope="$(
-  git status --porcelain --untracked-files=all \
+  printf '%s\n' "$git_status" \
     | sed -e 's/^...//' -e 's/^.* -> //' -e 's/^"\(.*\)"$/\1/' \
     | grep -v "^${STATE_FILE//./\\.}$" || true
 )"

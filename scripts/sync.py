@@ -799,18 +799,131 @@ def _write_custom_env_tempfile(agent_data: Dict[str, Any]) -> Optional[str]:
     return path
 
 
+class CustomEnvUnreadable(RuntimeError):
+    """`agent env get` could not be read — NOT the same as "the agent has none".
+
+    The endpoint is permission-gated to the agent's owner or a workspace
+    owner/admin, so from a runtime that is neither it returns "You do not have
+    permission to access this resource". Swallowing that as None recorded a
+    denied read as an emptied env, which is the same defect as the skill
+    deletion: a failed read treated as an intentional edit (CHA-1211)."""
+
+
 def _fetch_agent_custom_env(agent_id: str) -> Optional[Dict[str, str]]:
     """Fetch the current custom_env for an agent via 'agent env get'.
 
-    Returns the env dict, or None if not set or the call fails.
+    Returns the env dict, or None when the agent genuinely has none. Raises
+    CustomEnvUnreadable when the call fails — callers must decide what an
+    unreadable env means for them, rather than inheriting a silent None.
     """
     try:
         result = _multica(["agent", "env", "get", agent_id], dry_run=False)
-        if isinstance(result, dict):
-            return result
-        return None
-    except Exception:
-        return None
+    except Exception as e:
+        raise CustomEnvUnreadable(str(e).strip()) from e
+    if isinstance(result, dict):
+        return result
+    return None
+
+
+# Placeholder stored in place of a resolved secret value. Only the KEY SET of a
+# custom_env ever reaches the baseline (see _sanitize_custom_env_for_state), and
+# conflict payloads are printed to stdout and filed into issues, so a resolved
+# value must never enter a normalized snapshot in the first place.
+_REDACTED = "<redacted>"
+
+
+def _live_custom_env_for_state(
+    live_agent: Dict[str, Any],
+    repo_norm: Dict[str, Any],
+    last: Optional[Dict[str, Any]],
+) -> Tuple[Any, Optional[str]]:
+    """Resolve a live agent's custom_env for change detection.
+
+    `agent list` deliberately never returns custom_env — the values are secrets.
+    It returns `has_custom_env` and `custom_env_key_count` instead. But
+    `normalize_agent` does a bare `data.get("custom_env")`, so that absence
+    became None, `_decide_action` read None as "the live env was emptied", and
+    the baseline oscillated: key list → null → key list on alternating nights.
+    That is the +36/−12 / +12/−36 signature on every sync commit from 08-23 to
+    09-02, 12 fields wide — both baseline sides of the six agents that declare a
+    custom_env (CHA-1211 item 12; CHA-1092 aimed at this and missed).
+
+    Returns (value_for_the_snapshot, optional_warning). In order:
+
+    1. `custom_env` present in the response — a real read, use it.
+    2. `has_custom_env` false — the response positively says there is none.
+    3. Present, and the key COUNT matches a key set we already know (the
+       baseline's, or the repo's) — reuse that set. Free, and no audited call.
+    4. Present with a count we cannot account for — something really did change,
+       so read it authoritatively with `agent env get`.
+    5. Even that is unreadable — carry the baseline forward and warn. An absent
+       field is not an empty field, so it contributes nothing to the diff.
+    """
+    if "custom_env" in live_agent:
+        return live_agent["custom_env"], None
+
+    if not live_agent.get("has_custom_env"):
+        return None, None
+
+    count = live_agent.get("custom_env_key_count")
+    # The baseline already stores the sanitized projection (a sorted key list);
+    # the repo side is still a normalized JSON blob and needs projecting.
+    stored = (last or {}).get("multica_state") or {}
+    baseline_keys = stored.get("custom_env")
+    if not isinstance(baseline_keys, list):
+        baseline_keys = _sanitize_custom_env_for_state(baseline_keys)
+    repo_keys = _sanitize_custom_env_for_state(repo_norm.get("custom_env"))
+
+    for keys in (baseline_keys, repo_keys):
+        if isinstance(keys, list) and len(keys) == count:
+            return {k: _REDACTED for k in keys}, None
+
+    agent_id = live_agent.get("id", "")
+    try:
+        env = _fetch_agent_custom_env(agent_id)
+    except CustomEnvUnreadable as e:
+        note = (
+            f"live custom_env holds {count} key(s) this run cannot name, and "
+            f"`agent env get` is not readable from here ({e}) — carrying the "
+            f"baseline forward rather than recording an emptied env"
+        )
+        return ({k: _REDACTED for k in baseline_keys} if baseline_keys else None), note
+    if env is None:
+        return None, None
+    return {k: _REDACTED for k in env}, None
+
+
+def _carry_forward_unread_fields(
+    multica_norm: Dict[str, Any],
+    live_agent: Dict[str, Any],
+    last: Optional[Dict[str, Any]],
+) -> Dict[str, Any]:
+    """Stop a field the live read never carried from reading as "cleared".
+
+    `normalize_agent` projects every COMPARABLE_FIELD with a bare `data.get(f)`,
+    so a field the response simply omits is indistinguishable from one the
+    operator emptied. custom_env is the case that bit us, but the shape is
+    general: a single contract change on this endpoint would land on all 46
+    agent definitions the same way the skill one landed on 22 skills
+    (CHA-1211 F4). Today every other COMPARABLE_FIELD is present in
+    `agent list`, so this is a no-op — which is the point of adding it now.
+
+    Where the baseline knows what the field was, carry that value forward; the
+    field then contributes nothing to the diff instead of a false change.
+    """
+    if last is None:
+        return multica_norm
+    baseline = last.get("multica_state") or {}
+    for field in COMPARABLE_FIELDS:
+        # custom_env is handled by _live_custom_env_for_state, which can see
+        # more than the baseline. Both it and mcp_config are stored in the
+        # baseline as a *projection* rather than the normalized value, so
+        # copying one back into a normalized snapshot would not round-trip.
+        if field in ("custom_env", "mcp_config"):
+            continue
+        if field not in live_agent and field in baseline:
+            multica_norm[field] = baseline[field]
+    return multica_norm
 
 
 def _get_mcp_server_keys(mcp_config: Any) -> Optional[set]:
@@ -1168,7 +1281,16 @@ def sync_agents_workspace(
             state_key = f"{workspace_name}~{agent_name}"
             last = state_agents.get(state_key)
             repo_norm = normalize_agent(repo_data)
-            multica_norm = normalize_agent(live_agent) if live_agent else None
+            multica_norm = None
+            if live_agent:
+                multica_norm = normalize_agent(live_agent)
+                # A field the live read never carried is not a cleared field
+                # (CHA-1211 item 12 / F4).
+                multica_norm = _carry_forward_unread_fields(multica_norm, live_agent, last)
+                env_value, env_note = _live_custom_env_for_state(live_agent, repo_norm, last)
+                multica_norm["custom_env"] = _norm_agent_field("custom_env", env_value)
+                if env_note:
+                    print(f"    ⚠ {env_note}", file=sys.stderr)
 
             action = _decide_action(repo_norm, multica_norm, last)
             agent_id: Optional[str] = live_agent["id"] if live_agent else None
@@ -1415,7 +1537,14 @@ def sync_agents_workspace(
             # Build a dummy repo_norm (doesn't exist in repo files)
             # to detect direction via _decide_action.
             repo_norm = normalize_agent({})
-            multica_norm = normalize_agent(live_agent) if live_agent else None
+            multica_norm = None
+            if live_agent:
+                multica_norm = normalize_agent(live_agent)
+                multica_norm = _carry_forward_unread_fields(multica_norm, live_agent, last)
+                env_value, env_note = _live_custom_env_for_state(live_agent, repo_norm, last)
+                multica_norm["custom_env"] = _norm_agent_field("custom_env", env_value)
+                if env_note:
+                    print(f"    ⚠ {live_name}: {env_note}", file=sys.stderr)
             action = _decide_action(repo_norm, multica_norm, last)
 
         agent_id = live_agent.get("id", "")
@@ -1454,7 +1583,21 @@ def sync_agents_workspace(
             # resolved secrets — we must not write them to the repo (CHA-85). Warn
             # the operator which keys need #Item:Field# placeholders added by hand.
             if agent_id:
-                live_custom_env = _fetch_agent_custom_env(agent_id)
+                try:
+                    live_custom_env = _fetch_agent_custom_env(agent_id)
+                except CustomEnvUnreadable as e:
+                    # Say so rather than printing nothing: a denied read used to
+                    # look identical to "this agent has no custom_env", so the
+                    # operator got no warning at all (CHA-1211).
+                    count = live_agent.get("custom_env_key_count")
+                    live_custom_env = None
+                    if live_agent.get("has_custom_env"):
+                        print(
+                            f"    ⚠ live custom_env present ({count} key(s), names "
+                            f"unreadable from here: {e}); NOT written to repo — add "
+                            f"#Item:Field# placeholder(s) to {rel_path} by hand",
+                            file=sys.stderr,
+                        )
                 if live_custom_env:
                     keys = ", ".join(sorted(live_custom_env.keys()))
                     print(
@@ -1608,6 +1751,16 @@ def normalize_skill_multica(live: Dict[str, Any]) -> Dict[str, Any]:
             f"(content_size={live.get('content_size')!r}) — the body was not "
             f"served, so it cannot be compared. `multica skill get` needs "
             f"--with-content."
+        )
+    if "files" not in live:
+        # The same contract change one level down. An absent `files` key is not
+        # "this skill has no supporting files": it silently records files={} on
+        # both sides of the baseline, which is the setup for exactly the
+        # oscillation this issue is about (CHA-1211 F2).
+        raise SkillContentUnavailable(
+            f"'{name}': response carries no 'files' key — the file list was not "
+            f"served, so an empty one cannot be trusted. A skill with no "
+            f"supporting files returns files=[]."
         )
     files: Dict[str, str] = {}
     for f in live.get("files") or []:
