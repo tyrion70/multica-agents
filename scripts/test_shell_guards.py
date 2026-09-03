@@ -466,6 +466,26 @@ class UpdateCheckoutTest(ShellGuardTestCase):
         self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
         self.assertTrue((empty / ".git").is_dir())
 
+    def test_an_ambiguous_origin_main_does_not_garble_the_verdict(self):
+        """I1's other half: git warns on SUCCESS, and `2>&1` folded the warning into
+        $remote_head, so the comparison failed and a healthy checkout exited 6 with
+        an unreadable message. Fails closed either way — this is the diagnosis half.
+
+        The clone already carries refs/remotes/origin/main, so adding the local
+        branch is what makes `origin/main` ambiguous.
+        """
+        _git("update-ref", "refs/heads/origin/main", "HEAD", cwd=self.work)
+        probe = _git("rev-parse", "origin/main", cwd=self.work, check=False)
+        self.assertIn("ambiguous", probe.stderr,
+                      "fixture invalid: git did not warn, so nothing is being tested")
+
+        r = self._update(self.work)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("✓", r.stdout)
+        # The warning is surfaced rather than discarded — it is a real problem with
+        # the checkout, just not this script's problem.
+        self.assertIn("git warned while resolving", r.stderr)
+
     def test_a_hung_network_call_is_capped(self):
         """A wedged connection becomes a failed run, not a job that looks alive.
 

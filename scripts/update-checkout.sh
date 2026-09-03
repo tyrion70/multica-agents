@@ -133,9 +133,30 @@ fi
 # `|| true` here left an empty $remote_head standing in for both "no such ref" and
 # "rev-parse failed"; the emptiness check below caught it either way, but the shape is
 # the one this repo keeps getting wrong, so it checks the status instead (CHA-1211).
-if ! remote_head="$(git -C "$REPO" rev-parse "origin/$BRANCH" 2>&1)"; then
-  echo "$remote_head" | sed 's/^/      /' >&2
+#
+# Stderr to its own file, not `2>&1` into the value (CHA-1211 I1): git warns on
+# SUCCESS when `origin/$BRANCH` matches both a local branch and a remote-tracking ref
+# ("warning: refname 'origin/main' is ambiguous."), and folded into $remote_head that
+# warning makes the comparison below fail — exit 6 with a garbled message about a
+# checkout that was actually fine. It fails CLOSED here, unlike the same shape in
+# check-config-freshness.sh, so this is a diagnosis bug rather than a wrong answer —
+# but it is the same line, and a diagnosis nobody can read is how an hour goes.
+rp_err="$(mktemp)"
+if ! remote_head="$(git -C "$REPO" rev-parse "origin/$BRANCH" 2>"$rp_err")"; then
+  sed 's/^/      /' "$rp_err" >&2
+  rm -f "$rp_err"
   fail "cannot resolve origin/$BRANCH in $REPO"
+fi
+if [ -s "$rp_err" ]; then
+  # Resolved, but git had something to say. Surface it rather than discarding it:
+  # an ambiguous origin/$BRANCH means the checkout has refs that will confuse the
+  # next person as much as they nearly confused this script.
+  echo "  ⚠ git warned while resolving origin/$BRANCH:" >&2
+  sed 's/^/      /' "$rp_err" >&2
+fi
+rm -f "$rp_err"
+if ! [[ "$remote_head" =~ ^[0-9a-f]{40}$ ]]; then
+  fail "origin/$BRANCH did not resolve to a commit id in $REPO: '$remote_head'"
 fi
 if [ "$head" != "$remote_head" ]; then
   fail "HEAD ($head) is not origin/$BRANCH ($remote_head) — detached, diverged, or on another branch"

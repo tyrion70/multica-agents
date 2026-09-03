@@ -101,14 +101,29 @@ if ! $QUIET; then
   echo "==> Scanning repo for existing agent folders"
 fi
 declare -A REPO_AGENT_FOLDER_MAP
+# The find runs first and its status is checked, rather than `… 2>/dev/null || true`
+# inside the process substitution: there, a failing find fed the loop nothing and the
+# scan carried on having examined zero agent folders — reporting on a repo it never
+# read (CHA-1211 I3, found by the fail-open lint once `find` was added to its reader
+# list). Low stakes here (no autopilot runs this script, and the empty map surfaces
+# downstream as a per-agent ERROR) but it is the same shape.
+find_err="$(mktemp)"
+if ! agent_files="$(find "$REPO_ROOT" -name 'agent.json' -not -path '*/schemas/*' 2>"$find_err")"; then
+  echo "ERROR: could not scan $REPO_ROOT for agent.json files:" >&2
+  sed 's/^/  /' "$find_err" >&2
+  rm -f "$find_err"
+  exit 1
+fi
+rm -f "$find_err"
 while IFS= read -r agent_file; do
+  [ -n "$agent_file" ] || continue
   agent_name="$(jq -r '.name // ""' "$agent_file" 2>/dev/null)"
   if [[ -n "$agent_name" && "$agent_name" != "null" ]]; then
     rel="$(realpath --relative-to="$REPO_ROOT" "$agent_file")"
     agent_dir="$(dirname "$rel")"
     REPO_AGENT_FOLDER_MAP["$agent_name"]="$agent_dir"
   fi
-done < <(find "$REPO_ROOT" -name 'agent.json' -not -path '*/schemas/*' 2>/dev/null || true)
+done <<< "$agent_files"
 
 if ! $QUIET; then
   echo "==> Fetching agents"

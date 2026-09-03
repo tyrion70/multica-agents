@@ -144,6 +144,69 @@ def test_the_lag_seconds_are_reported_for_triage(repo, deployed):
 SYNC_SH = pathlib.Path(__file__).resolve().parent / "sync.sh"
 
 
+def test_an_ambiguous_origin_main_does_not_report_health(repo, deployed):
+    """I1 — the tenth instance, and the one the fix itself introduced (CHA-1211).
+
+    `git` writes warnings to stderr ON SUCCESS. Capturing with `2>&1` folded
+    "warning: refname 'origin/main' is ambiguous." into the timestamp, so the
+    `-gt` comparison errored, the `if` took the else branch, and the watchdog
+    reported `state=FRESH baseline_lag_sec=0` for a repo that really was behind.
+
+    The fixture needs BOTH refs: `origin/main` is only ambiguous when it matches a
+    local branch AND a remote-tracking ref. With just the branch there is no
+    warning at all, and this test would pass on the broken code too — which is the
+    "looks like coverage, tests nothing" trap.
+    """
+    (repo / ".sync-state.json").write_text('{"version": 2}\n')
+    _commit(repo, "chore: sync state", 1000001000)
+    (repo / "skills" / "demo" / "SKILL.md").write_text("v2\n")
+    _commit(repo, "docs(demo): change the skill", 1000002000)
+    _git(repo, "fetch", "-q", "origin", "main")
+
+    head = subprocess.run(["git", "-C", str(repo), "rev-parse", "HEAD"],
+                          capture_output=True, text=True, check=True).stdout.strip()
+    _git(repo, "update-ref", "refs/heads/origin/main", head)
+    _git(repo, "update-ref", "refs/remotes/origin/main", head)
+    # Fixture self-check: without the warning this test proves nothing.
+    probe = subprocess.run(
+        ["git", "-C", str(repo), "log", "-1", "--format=%ct", "origin/main", "--",
+         ".sync-state.json"],
+        capture_output=True, text=True)
+    assert "ambiguous" in probe.stderr, (
+        "fixture invalid: git did not warn, so the contaminated-capture path is "
+        f"not exercised (stderr={probe.stderr!r})")
+
+    rc, out = _run(repo, deployed)
+    assert "state=BASELINE_LAG" in out, out
+    assert "baseline_lag_sec=1000" in out
+    assert rc == 4
+
+
+def test_a_worktree_checkout_says_so(repo, deployed, tmp_path):
+    """I6 — it already refused; now it names the cause instead of 'clone failed'."""
+    wt = tmp_path / "wt"
+    _git(repo, "worktree", "add", "-q", "--detach", str(wt))
+    assert (wt / ".git").is_file(), "fixture invalid: .git should be a file here"
+
+    env = {**os.environ,
+           "CONFIG_FRESHNESS_REPO": str(wt),
+           "CONFIG_FRESHNESS_DEPLOYED": str(deployed),
+           "CONFIG_FRESHNESS_LOG_DIR": str(tmp_path / "logs"),
+           "CONFIG_FRESHNESS_SLACK_TOKEN": "",
+           "CONFIG_FRESHNESS_SLACK_WEBHOOK": ""}
+    p = subprocess.run(["bash", str(SCRIPT), "--profile", "chainlayer", "--repo", str(wt)],
+                       capture_output=True, text=True, env=env)
+    assert p.returncode == 3
+    assert "state=" not in p.stdout, (
+        f"it must report nothing rather than something wrong: {p.stdout}")
+    # The behaviour was already fail-closed; what I6 adds is saying why, so nobody
+    # spends the first minute on the clone that never had a chance of working.
+    assert "worktree" in p.stderr, p.stderr
+    assert "clone failed" not in p.stderr, p.stderr
+    # And it must not have touched the worktree trying.
+    assert (wt / ".git").is_file()
+
+
 def test_a_bare_sync_run_still_resolves_a_profile_to_deploy():
     """The copy used to be gated on `-n "$workspace"`, which is empty unless --workspace
     is passed. So a plain `sync.sh` — the command the rule file tells you to run after a
