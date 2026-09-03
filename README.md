@@ -121,6 +121,66 @@ git clone git@github.com:tyrion70/multica-agents.git multica-agents
 
 When an agent's configuration changes in Multica, the next autopilot run detects the Multica-side change and writes it back automatically (unless the repo also changed, in which case a conflict issue is filed).
 
+## Shell script rules (`scripts/*.sh`)
+
+**A command that reads state must have its failure checked, not absorbed.** This is
+one rule with one reason, and it is enforced by
+`ShellFailOpenLintTest` in `scripts/test_sync.py` — the only test file CI runs today,
+which is why the rule lives there rather than in a linter nobody invokes.
+
+Do not write:
+
+```bash
+value="$(git … 2>/dev/null || true)"       # a failed read becomes an empty value
+if [ -n "$(git … 2>/dev/null)" ]; then     # "nothing found" and "could not look" are now the same
+```
+
+Write one of:
+
+```bash
+if ! value="$(git … 2>&1)"; then echo "$value" >&2; exit N; fi
+value="$(git …)" || { echo "…" >&2; exit N; }
+# …or ask the question of a status you already captured and checked
+```
+
+**Why.** In September 2026 the nightly sync deleted the bodies of 22 company skills
+and committed them straight to `main` (CHA-1211). Investigating it turned up **nine
+instances of the same defect** — a failed or changed read reported as a successful
+state — across `sync.py`, `sync.sh`, `commit-sync-state.sh`,
+`check-config-freshness.sh` and the autopilot descriptions:
+
+| where | what it claimed | what was true |
+|---|---|---|
+| `multica skill get` without `--with-content` | "the workspace copy is empty" | the body was not requested |
+| the same, for `files` | "this skill has no supporting files" | the list was not served |
+| `agent list` with no `custom_env` | "the live env was emptied" | the field is never returned |
+| `agent list` with `mcp_config: null` | "no MCP config" | it lives behind `mcp_config_redacted` |
+| step 1's `git pull --ff-only` | "the checkout is current" | it was three weeks stale |
+| `sync.sh`'s scope guard | "nothing out of scope" | `git status` failed |
+| `commit-sync-state.sh` | "nothing to commit" | `git status` failed |
+| `update-checkout.sh`'s fetch | "HEAD matches the remote" | it matched a cached ref |
+| `sync.sh`'s workspace pre-flight | "the workspace matches" | the check itself failed |
+| `check-config-freshness.sh` | "the baseline is current" | `git log` failed |
+
+Each was individually reproduced and fixed. The point of the rule is that the tenth
+one gets caught by a test instead of by an incident.
+
+**Deliberate exceptions** are declared in the script, on or just above the line:
+
+```bash
+# lint:fail-open-ok best-effort teardown; nothing downstream reads the result
+bw logout >/dev/null 2>&1 || true
+```
+
+The reason is required (three words or more). A waiver in a diff is something a
+reviewer can argue with; a swallowed error is not.
+
+**Until the CI wiring lands** (adding `test_shell_guards.py` and
+`test_config_freshness.py` to `.github/workflows/test.yml` needs a token with
+`workflow` scope, which no agent has), any change to `sync.sh`,
+`commit-sync-state.sh` or `update-checkout.sh` must run
+`python3 -m pytest scripts/test_shell_guards.py` by hand.
+
 ## Workspaces
 
 Both workspaces live on the same Multica instance (`multica.252h.org`). Passing `--workspace <slug>` to `sync.sh` sets `MULTICA_WORKSPACE_ID` automatically.

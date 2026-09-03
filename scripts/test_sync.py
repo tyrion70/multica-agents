@@ -16,6 +16,7 @@ import io
 import json
 import os
 import pathlib
+import re
 import sys
 import unittest
 from unittest import mock
@@ -1322,6 +1323,156 @@ class CustomEnvOscillationTest(unittest.TestCase):
         out = sync._carry_forward_unread_fields(norm, live, last)
         self.assertEqual(out["instructions"], "the real instructions")
         self.assertEqual(out["description"], "live")
+
+
+class ShellFailOpenLintTest(unittest.TestCase):
+    """The mechanical rule for the defect this repo kept re-introducing (CHA-1211).
+
+    Nine instances, each found and fixed individually: the skill bodies, `custom_env`,
+    `mcp_config`, the checkout, `sync.sh`'s scope guard, `commit-sync-state.sh`,
+    `update-checkout.sh`'s fetch, `sync.sh`'s workspace pre-flight, and
+    `check-config-freshness.sh`'s own baseline read. Every one was the same shape: a
+    command that reads state, whose FAILURE is absorbed, feeding a decision that then
+    cannot tell "nothing found" from "could not look".
+
+    It lives in test_sync.py rather than in a linter or a skill because this is the one
+    file CI actually runs — so the rule is enforced tonight, without the `workflow`
+    token scope no agent in this fleet has.
+
+    Deliberate exceptions are declared in the script, on or just above the line, as
+    `# lint:fail-open-ok <reason>`. The waiver is the point as much as the rule: it
+    turns "I meant that" into something a reviewer sees in the diff.
+    """
+
+    SCRIPTS = pathlib.Path(sync.__file__).resolve().parent
+    # Commands that READ state. A swallowed failure here is a swallowed answer.
+    READER = re.compile(r"(?:\b(?:git|multica|bw|jq|sha256sum|stat)\b|python3 -c|\bls -A\b)")
+    ABSORBED = re.compile(r"\|\|\s*true\b")
+    EMPTY_TEST = re.compile(r"\[\s*-[nz]\s+\"\$\(")
+    ARITHMETIC = re.compile(r"\(\(")
+    WAIVER = re.compile(r"#\s*lint:fail-open-ok\s+(\S+(?:\s+\S+){2,})")
+
+    RULE = (
+        "\n"
+        "  RULE (CHA-1211, nine instances of one defect): in scripts/*.sh, a command\n"
+        "  that reads state — git, multica, bw, jq, stat, a python3 -c parse — must\n"
+        "  have its FAILURE checked, not absorbed. Concretely, do not write:\n"
+        "\n"
+        "      value=\"$(git … 2>/dev/null || true)\"      # failure becomes empty\n"
+        "      if [ -n \"$(git … 2>/dev/null)\" ]; then     # empty == failed == 'fine'\n"
+        "\n"
+        "  Write one of:\n"
+        "\n"
+        "      if ! value=\"$(git … 2>&1)\"; then …handle it…; fi\n"
+        "      value=\"$(git …)\" || { echo \"…\" >&2; exit N; }\n"
+        "      # …or ask the question of a status you already captured and checked\n"
+        "\n"
+        "  Why: every instance in this incident let a failed read report a successful\n"
+        "  state. That is how 22 skill bodies were deleted, how the nightly baseline\n"
+        "  oscillated, and how a sync that could not even pull reported a clean run for\n"
+        "  three weeks.\n"
+        "\n"
+        "  If a case really is deliberate — a best-effort teardown, an exit code that\n"
+        "  carries no information — declare it on or above the line:\n"
+        "\n"
+        "      # lint:fail-open-ok <reason, at least three words>\n"
+    )
+
+    @classmethod
+    def _logical_lines(cls, text):
+        """Join backslash continuations, so a multi-line command is judged whole."""
+        out, buf, start = [], "", None
+        for lineno, line in enumerate(text.splitlines(), 1):
+            if start is None:
+                start = lineno
+            buf += line
+            if line.rstrip().endswith("\\"):
+                buf = buf.rstrip()[:-1] + " "
+                continue
+            out.append((start, buf))
+            buf, start = "", None
+        if buf:
+            out.append((start, buf))
+        return out
+
+    def _offenders(self, path):
+        raw = path.read_text(encoding="utf-8").splitlines()
+        found = []
+        for lineno, logical in self._logical_lines(path.read_text(encoding="utf-8")):
+            stripped = logical.strip()
+            if stripped.startswith("#") or not self.READER.search(stripped):
+                continue
+            reasons = []
+            if self.ABSORBED.search(stripped) and not self.ARITHMETIC.search(stripped):
+                reasons.append("failure absorbed by `|| true`")
+            if self.EMPTY_TEST.search(stripped):
+                reasons.append("`[ -n/-z \"$(…)\" ]` cannot tell empty from failed")
+            if not reasons:
+                continue
+            # A waiver on the line itself, or on any comment line directly above it.
+            if self.WAIVER.search(logical):
+                continue
+            above, i = False, lineno - 2
+            while i >= 0 and raw[i].strip().startswith("#"):
+                if self.WAIVER.search(raw[i]):
+                    above = True
+                    break
+                i -= 1
+            if above:
+                continue
+            found.append((lineno, "; ".join(reasons), stripped[:120]))
+        return found
+
+    def test_no_shell_script_swallows_a_state_read(self):
+        scripts = sorted(self.SCRIPTS.glob("*.sh"))
+        self.assertTrue(scripts, f"no shell scripts found under {self.SCRIPTS}")
+        report = []
+        for path in scripts:
+            for lineno, why, text in self._offenders(path):
+                report.append(f"  {path.name}:{lineno}: {why}\n      {text}")
+        if report:
+            self.fail(
+                f"{len(report)} fail-open state read(s) in scripts/*.sh:\n"
+                + "\n".join(report)
+                + self.RULE
+            )
+
+    def test_the_lint_catches_the_shapes_it_claims_to(self):
+        """The lint's own regression test: the nine instances' two shapes, and the
+        forms that replaced them, so a later 'simplification' cannot quietly stop
+        matching. A linter nobody tests is the thing it is warning about."""
+        tmp = pathlib.Path(__import__("tempfile").mkdtemp())
+        try:
+            cases = {
+                # (body, should_be_flagged)
+                "absorbed": ('active="$(multica workspace get --output json || true)"\n', True),
+                "empty_test": ('if [ -n "$(git status --porcelain)" ]; then :; fi\n', True),
+                "continuation": ('x="$(git log \\\n  --oneline || true)"\n', True),
+                "checked_if": ('if ! v="$(git rev-parse HEAD 2>&1)"; then exit 1; fi\n', False),
+                "checked_brace": ('v="$(git status)" || { echo no >&2; exit 5; }\n', False),
+                "arithmetic": ('((COUNT++)) || true\n', False),
+                "comment_only": ('# NOT `2>/dev/null || true`: git errors are fatal here\n', False),
+                "no_reader": ('unset BW_SESSION || true\n', False),
+                "waived_same_line": (
+                    'bw logout >/dev/null 2>&1 || true  # lint:fail-open-ok teardown only, nothing reads it\n',
+                    False),
+                "waived_above": (
+                    "# lint:fail-open-ok deliberate best-effort probe here\n"
+                    'bw logout >/dev/null 2>&1 || true\n', False),
+                "bare_waiver_is_not_enough": (
+                    "# lint:fail-open-ok\n"
+                    'v="$(git status || true)"\n', True),
+            }
+            for name, (body, should_flag) in cases.items():
+                path = tmp / f"{name}.sh"
+                path.write_text("#!/usr/bin/env bash\n" + body, encoding="utf-8")
+                flagged = bool(self._offenders(path))
+                self.assertEqual(
+                    flagged, should_flag,
+                    f"case '{name}': expected flagged={should_flag}, got {flagged}",
+                )
+        finally:
+            __import__("shutil").rmtree(tmp, ignore_errors=True)
 
 
 if __name__ == "__main__":
