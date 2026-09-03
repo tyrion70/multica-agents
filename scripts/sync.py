@@ -883,10 +883,32 @@ def _live_custom_env_for_state(
         # A real read — but keep only the key names. Change detection needs
         # nothing else, and a resolved value that never enters the snapshot
         # cannot escape through a payload that forgot to sanitize (CHA-1211 G2).
+        #
+        # Every shape has to be projected, not just the dict: `_norm_agent_field`
+        # already handles custom_env arriving as a JSON STRING, so that shape is
+        # anticipated elsewhere in this file — and returned unparsed it carried
+        # the resolved value verbatim, which made this guard true of one shape
+        # while its comment claimed both (CHA-1211 H3).
         env = live_agent["custom_env"]
+        if env is None:
+            return None, None
+        if isinstance(env, str):
+            try:
+                env = json.loads(env)
+            except (json.JSONDecodeError, TypeError):
+                return None, (
+                    "live custom_env came back as a string that is not JSON — "
+                    "dropping it rather than recording an unparseable value, and "
+                    "carrying nothing forward from it"
+                )
         if isinstance(env, dict):
             return {k: _REDACTED for k in env}, None
-        return env, None
+        # Some other shape entirely: a changed contract again. Do not pass it on —
+        # an unknown shape is exactly what must not be trusted or repeated.
+        return None, (
+            f"live custom_env came back as {type(env).__name__}, which this run "
+            f"cannot read as a key map — dropping it rather than guessing"
+        )
 
     if not live_agent.get("has_custom_env"):
         return None, None
