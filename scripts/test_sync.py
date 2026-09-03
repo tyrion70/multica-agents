@@ -920,5 +920,193 @@ class SkillContentGuardTest(unittest.TestCase):
         self.assertIn("Edited in the workspace UI.", self.skill_md.read_text(encoding="utf-8"))
 
 
+class CustomEnvOscillationTest(unittest.TestCase):
+    """The nightly `.sync-state.json` flip-flop (CHA-1211 item 12).
+
+    `agent list` never returns `custom_env` — the values are secrets, so it
+    returns `has_custom_env` / `custom_env_key_count` instead. `normalize_agent`
+    turned that absence into None, `_decide_action` read None as "the live env
+    was emptied", and the baseline alternated key-list → null → key-list on
+    consecutive runs. The fake below reproduces the real response shape exactly,
+    so three consecutive runs are enough to catch it.
+    """
+
+    ENV = {"DATAFEEDS_HEALTH_DSN": "#Datafeeds Health DSN:dsn#"}
+
+    class Backend:
+        """`agent list` shaped like the real one: no `custom_env`, ever."""
+
+        def __init__(self):
+            self.agents = {}
+            self.env = {}
+            self._seq = 0
+            self.pulls_forced = 0
+
+        @staticmethod
+        def _flags(tokens):
+            out, i = {}, 0
+            while i < len(tokens):
+                if tokens[i].startswith("--"):
+                    if i + 1 < len(tokens) and not tokens[i + 1].startswith("--"):
+                        out[tokens[i]] = tokens[i + 1]
+                        i += 2
+                        continue
+                    out[tokens[i]] = True
+                i += 1
+            return out
+
+        def _listing(self, aid):
+            a = dict(self.agents[aid])
+            keys = self.env.get(aid) or {}
+            a["has_custom_env"] = bool(keys)
+            a["custom_env_key_count"] = len(keys)
+            a.pop("custom_env", None)  # the contract: never returned by `list`
+            return a
+
+        def __call__(self, args, dry_run=False, mutating=False):
+            if args[:2] == ["agent", "list"]:
+                return [self._listing(aid) for aid in self.agents]
+            if args[:2] == ["skill", "list"]:
+                return []
+            if args[:2] == ["squad", "list"]:
+                return []
+            if args[:2] == ["agent", "create"]:
+                self._seq += 1
+                aid = f"agent-uuid-{self._seq:04d}"
+                f = self._flags(args[2:])
+                if "--custom-env-file" in f:
+                    with open(f["--custom-env-file"]) as fh:
+                        self.env[aid] = json.load(fh)
+                self.agents[aid] = {
+                    "id": aid, "workspace_id": WS_ID,
+                    "name": f.get("--name"), "description": f.get("--description"),
+                    "instructions": f.get("--instructions"),
+                    "runtime_id": f.get("--runtime-id"),
+                    "model": f.get("--model"), "thinking_level": f.get("--thinking-level"),
+                    "visibility": f.get("--visibility"), "custom_args": None,
+                    "runtime_config": None, "max_concurrent_tasks": None,
+                    "skills": [], "mcp_config": None,
+                }
+                return self.agents[aid]
+            if args[:2] == ["agent", "update"]:
+                aid = args[2]
+                f = self._flags(args[3:])
+                for flag, field in (("--name", "name"), ("--description", "description"),
+                                    ("--instructions", "instructions"),
+                                    ("--model", "model"), ("--visibility", "visibility")):
+                    if flag in f:
+                        self.agents[aid][field] = f[flag]
+                return self.agents[aid]
+            if args[:3] == ["agent", "env", "set"]:
+                f = self._flags(args[4:])
+                with open(f["--custom-env-file"]) as fh:
+                    self.env[args[3]] = json.load(fh)
+                return {}
+            if args[:3] == ["agent", "env", "get"]:
+                # Permission-gated in reality, and denied from a runtime that is
+                # neither the agent's owner nor a workspace admin.
+                raise RuntimeError("You do not have permission to access this resource.")
+            if args[:3] == ["agent", "skills", "set"]:
+                return {}
+            raise AssertionError(f"unexpected multica call: {args}")
+
+    def setUp(self):
+        self.tmp = pathlib.Path(__import__("tempfile").mkdtemp())
+        self.ws = self.tmp / WS_NAME
+        self.agent_json = self.ws / "squad-a" / "monitor" / "agent.json"
+        self.agent_json.parent.mkdir(parents=True)
+        self.agent_json.write_text(json.dumps({
+            "name": "Datafeeds Health Monitor",
+            "runtime_id": "rt-1",
+            "description": "watches feeds",
+            "custom_env": dict(self.ENV),
+        }), encoding="utf-8")
+
+        self.state_path = self.tmp / ".sync-state.json"
+        self.backend = self.Backend()
+        self._patches = [
+            mock.patch.object(sync, "REPO_ROOT", self.tmp),
+            mock.patch.object(sync, "DEFAULT_STATE_PATH", self.state_path),
+            mock.patch.object(sync, "WORKSPACE_IDS", {WS_NAME: WS_ID}),
+            mock.patch.object(sync, "_multica", self.backend),
+            mock.patch.object(sync, "_bw_get_secret", return_value="resolved-dsn"),
+        ]
+        for p in self._patches:
+            p.start()
+
+    def tearDown(self):
+        for p in self._patches:
+            p.stop()
+        __import__("shutil").rmtree(self.tmp, ignore_errors=True)
+
+    def _run(self, *extra):
+        argv = ["sync.py", "--type", "agents", "--workspace", WS_NAME,
+                "--sync-state", str(self.state_path)] + list(extra)
+        with mock.patch.object(sys, "argv", argv):
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                try:
+                    sync.main()
+                except SystemExit as e:
+                    return (e.code or 0), err.getvalue()
+        return 0, err.getvalue()
+
+    def _baseline_env(self):
+        state = json.loads(self.state_path.read_text())
+        entry = state["agents"][f"{WS_NAME}~Datafeeds Health Monitor"]
+        return (entry["repo_state"]["custom_env"], entry["multica_state"]["custom_env"])
+
+    def test_baseline_custom_env_is_stable_across_runs(self):
+        """Three consecutive runs: the key list is recorded once and never flips."""
+        self._run("--allow-create")
+        first = self._baseline_env()
+        self.assertEqual(first, (["DATAFEEDS_HEALTH_DSN"], ["DATAFEEDS_HEALTH_DSN"]))
+
+        for run in (2, 3):
+            self._run()
+            self.assertEqual(
+                self._baseline_env(), first,
+                f"run {run} flipped the baseline: {self._baseline_env()} != {first}",
+            )
+
+    def test_second_run_is_unchanged_not_a_pull(self):
+        """The absent field must not read as an edit — no pull, no agent.json rewrite."""
+        self._run("--allow-create")
+        before = self.agent_json.read_text(encoding="utf-8")
+
+        code, err = self._run()
+        self.assertEqual(code, 0)
+        self.assertIn("unchanged", err)
+        self.assertNotIn("writing repo", err)
+        self.assertEqual(self.agent_json.read_text(encoding="utf-8"), before)
+
+    def test_live_env_the_repo_does_not_declare_is_reported_not_guessed(self):
+        """has_custom_env with an unaccountable key count: warn, never fabricate."""
+        self._run("--allow-create")
+        aid = next(iter(self.backend.agents))
+        self.backend.env[aid] = {"DATAFEEDS_HEALTH_DSN": "resolved-dsn", "EXTRA_KEY": "y"}
+
+        code, err = self._run()
+        self.assertIn("cannot name", err)
+        self.assertIn("carrying the baseline forward", err)
+        # Baseline keeps what it knew; the count mismatch is not invented into keys.
+        self.assertEqual(self._baseline_env()[1], ["DATAFEEDS_HEALTH_DSN"])
+
+    def test_env_get_failure_is_not_an_empty_env(self):
+        """_fetch_agent_custom_env raises on a denied read instead of returning None."""
+        with self.assertRaises(sync.CustomEnvUnreadable) as cm:
+            sync._fetch_agent_custom_env("agent-uuid-0001")
+        self.assertIn("permission", str(cm.exception))
+
+    def test_an_unread_comparable_field_is_carried_forward(self):
+        """F4, generalized: any field the response omits keeps its baseline value."""
+        norm = {"instructions": None, "description": "live"}
+        live = {"description": "live"}  # `instructions` absent from the read
+        last = {"multica_state": {"instructions": "the real instructions",
+                                  "description": "live"}}
+        out = sync._carry_forward_unread_fields(norm, live, last)
+        self.assertEqual(out["instructions"], "the real instructions")
+        self.assertEqual(out["description"], "live")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
