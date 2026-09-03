@@ -1,15 +1,38 @@
 ---
 name: ssh
-description: SSH keys and access — JIT first. Reaching a host now means requesting access through JIT (https://jit.java-moth.ts.net/), not using a standing key: humans use the web UI with a YubiKey touch, agents use POST /agent/grant. Also covers the git-auth and commit-signing keys (GitHub auth, SSH-format signing) and wiring keys onto a new host. Use whenever SSHing to a machine, cloning/pushing over SSH, configuring git auth or commit signing, or wiring keys onto a new host.
+description: SSH keys and access — two policies, not one. COMPANY hosts (*.chosts.io, company runtimes, the company tailnet) are reached through JIT + Tailscale with no standing key on disk: humans use the web UI (https://jit.java-moth.ts.net/) with a YubiKey touch, agents use POST /agent/grant, and a 400 (wrong target) is a different answer from a 403 (insufficient reason). PRIVATE/LAN machines of Peter's own are reached with a local key on multica-01, which is supported rather than legacy. Also covers git auth to GitHub and GitLab from a host — where the url.insteadOf rewrite, not the key, decides whether your token is used — SSH-format commit signing, and what to do when a key needs recreating (the keys are NOT in the vault). Use whenever SSHing to a machine, cloning/pushing over SSH, hitting "Permission denied (publickey)", configuring git auth or commit signing, or wiring keys onto a new host.
 ---
 
 # SSH keys & access
 
-The way to reach a machine has changed: **request access through JIT rather
-than logging in with a standing key.** The standing `id_ed25519_peter` key still
-exists on some hosts, but JIT is the mechanism that replaces it and it is being
-removed. This skill leads with the JIT path because that is what works today;
-the standing-key path is documented below for what remains, marked for removal.
+## Read this first: company and private are two different policies
+
+This skill covers both, and they do not have the same answer. Getting the
+boundary wrong sends you looking for a key that should not exist, or hunting for
+a JIT grant on a machine that never had one.
+
+| | **Company hosts** | **Private / LAN — Peter's own machines** |
+|---|---|---|
+| Examples | `*.chosts.io`, company runtimes (multica-02), anything on the company tailnet | homelab Proxmox VMs, `192.168.16/17/18/19.x`, and multica-01 as the client |
+| How you get in | **JIT + Tailscale, every time.** Request a grant, connect over the tailnet FQDN, release when done. | A **local key** is fine — `~/.ssh/id_ed25519_peter` on multica-01. |
+| Standing key on disk | **No.** A key on disk is not the company access path. Its **absence is correct**, not a gap to fill. | **Yes**, deliberately, and expected. |
+
+**Peter's ruling, 2026-09-03**, and it settles a question this skill used to
+answer with one policy for everything: *company → JIT + Tailscale; private →
+a local key on multica-01 for LAN machines.*
+
+Two consequences worth stating, because both have cost time:
+
+- **On a company host, "I can't find the key" is not a problem to solve.**
+  `id_ed25519_peter` is not installed on multica-02 and is not supposed to be.
+  Do not treat its absence as the reason a connection failed (that is what
+  happened on CHA-1088) and do not restore it from anywhere.
+- **On multica-01, the local key is not legacy.** It is the intended path for
+  Peter's own LAN machines, and it is not queued for removal. What is being
+  removed is *standing key access to company hosts*.
+
+Everything below is the detail. The JIT path comes first because it is the
+company path and the one most readers need.
 
 ## Reaching machines — request access through JIT
 
@@ -116,25 +139,73 @@ not a broken system.** For an agent, `TARGET-OUT-OF-SCOPE` means the host is
 reachable in principle but not in scope for your ticket — a different answer
 again, and neither is JIT failing.
 
+**Chain-node and other fleet hosts (`*.chosts.io`) are not agent-requestable.**
+An agent that needs a node's `journalctl` has to ask a human; there is no agent
+path to those boxes. Note what that does *not* mean: the node being unreachable
+**from you** is not evidence about the node.
+
+**Test, don't infer — and never escalate from reading this section.** One
+`POST /agent/grant` answers "can I reach it" in a second, and the refusal names
+the current list for free. Concluding a host is unreachable from a document
+cost a wrong escalation on **CHA-1108**: the nodes were healthy the whole time
+and the agent reported them dead rather than fetching the journal.
+
+### Read the status code: 400 is the wrong target, 403 is an insufficient reason
+
+Being on the agent list is necessary, not sufficient — and the two refusals look
+alike in a terminal while meaning completely different things:
+
+| Status | Meaning | What to change |
+|---|---|---|
+| **400** | wrong target — the host is not agent-requestable | nothing about your reason will help; ask a human, or pick a target that is in scope |
+| **403** | right target, **insufficient reason** — the criteria service declined | rewrite the `reason`; the target is fine |
+
+The criteria codes are terse. Both of these came back for `monitoring` on
+2026-09-01:
+
+| Response | Meaning |
+|---|---|
+| `criteria not met: NOK: NO-TICKET-ID` | the `reason` carried no ticket id the service recognised |
+| `criteria not met: NOK: NO-NETWORK-SCOPE` | the reason had a ticket id but no accepted network scope |
+
+So **a bare prose `reason` is not enough** — give it the ticket and the network
+scope you actually need.
+
+> **The criteria service is being changed as this is written** (CHA-1074: it
+> approved everything up to now, and is gaining real per-agent network scoping).
+> Treat the two codes above as *examples of the shape of a 403*, not a complete
+> list, and read the response body rather than matching on remembered strings.
+> The 400-vs-403 distinction is structural and will hold; the code names are the
+> service's to change, and
+> [`jit-ssh/README.md`](https://gitlab.com/chainlayer/infrastructure/jit-ssh/-/blob/main/README.md)
+> is where they live.
+
 ### `jit` itself is never requestable
 
 `jit` is the approver and is **deliberately not a target**. It is absent from
 `JITSSH_TARGETS` by design; do not expect to request access to it.
 
-## Legacy standing access (being removed)
+## Standing keys — supported on private, going away on company
 
-The standing key `id_ed25519_peter` still works on hosts where it is installed,
-and is **being removed** — do not treat it as the normal way in. Where it
-remains:
+This section used to treat both sides as one dwindling "legacy" path. Per the
+ruling at the top, they are not the same thing.
 
-- **Private homelab** (Proxmox VMs): `192.168.16/17/18/19.x`, user `peter` or
-  `root`, **port 22**, key `id_ed25519_peter`. See the `homelab` skill.
-- **Company hosts**: `*.chosts.io`, user `peter`, **port 2822**, key
-  `id_ed25519_peter`. Not reachable from the laptop's plain network the same
-  way — mind the non-standard port.
+**Private / LAN — supported, not legacy.** Peter's own machines are reached with
+a local key and that is the intended arrangement:
 
-Plan all host access as JIT requests; use the standing key only for hosts not
-yet covered by a target.
+- **Homelab** (Proxmox VMs): `192.168.16/17/18/19.x`, user `peter` or `root`,
+  **port 22**, key `~/.ssh/id_ed25519_peter` on multica-01. See the `homelab`
+  skill. Nothing here is queued for removal.
+
+**Company — being removed; plan every company host as a JIT request.**
+
+- `*.chosts.io`, user `peter`, **port 2822**. Where a standing key is still
+  installed it still works, but it is **not the access path** and must not be
+  planned around, re-installed, or copied to a new host. Mind the non-standard
+  port if you meet one that has not been migrated yet.
+- Agents have no standing-key path to these hosts at all, and no agent JIT
+  target either (see *What is requestable*) — an agent that needs one asks a
+  human.
 
 ## The keys
 
@@ -143,7 +214,7 @@ roles separate — auth/login is one key, signing is another.
 
 | Key | Role | Used for |
 |---|---|---|
-| `~/.ssh/id_ed25519_peter` (`peter@chainlayer`) | **auth + login** | Git auth to **GitHub** (tyrion70). Host login via this key is legacy and being removed — reach machines through JIT instead. |
+| `~/.ssh/id_ed25519_peter` (`peter@chainlayer`) | **auth + login** | Git auth to **GitHub** (tyrion70) — though see the `insteadOf` section: on a host with a `gh` token the transport is HTTPS and this key is not consulted. Host login: **supported for Peter's private/LAN machines** from multica-01; **being removed for company hosts**, which go through JIT. |
 | `~/.ssh/id_ed25519_signing` (`git-signing`) | **signing** (+ GitLab auth) | SSH-format git commit/tag signing. **Also the key GitLab accepts for auth** (see note below). |
 | `~/.ssh/id_ed25519_sk_yk_*` | fallback | FIDO2 YubiKey keys for other/ad-hoc hosts (PIN-gated) |
 
@@ -245,6 +316,48 @@ Check the length before you use it, so the failure lands where the mistake is:
 Never echo the value; check that it is non-empty and that it starts with
 `glpat-`.
 
+## GitHub from a host: one `insteadOf` line decides whether the token is used
+
+**A valid `gh` token is not enough. The remote's URL form decides the transport,
+and the transport decides whether the token is ever consulted.**
+
+This is not theory. On 2026-09-03 `Private Sync` on **multica-01** failed every
+run with `git@github.com: Permission denied (publickey)`, and it looked exactly
+like a missing credential — a PAT was nearly created for it. It wasn't missing:
+
+- multica-01 had `gh` 2.94.0 and a **working OAuth token all along** (`gh auth
+  login` answered *"You were already logged in to this account"*).
+- Its remote was in SSH form (`git@github.com:…`) and the host had **no
+  `url.insteadOf` rewrite**, so git went out over SSH and hit a key that had
+  been deleted — while the perfectly good token sat there unused.
+- **multica-02 had the rewrite.** It therefore used the token over HTTPS and
+  never noticed. That single line of git config was the entire difference
+  between the two hosts.
+
+So, on any host where git talks to GitHub:
+
+```bash
+git config --global url."https://github.com/".insteadOf git@github.com:
+gh auth setup-git          # installs gh as the credential helper
+```
+
+```bash
+# Diagnosing "Permission denied (publickey)" against GitHub — check in this order:
+git config --get-regexp 'url\..*insteadOf'   # is the rewrite there at all?
+gh auth status                                # is there a token, and with what scopes?
+git ls-remote <remote> >/dev/null && echo ok  # what actually happens end to end
+```
+
+**`Permission denied (publickey)` for GitHub on a host with a working `gh`
+login means the rewrite is missing, not the credential.** Reach for
+`git config --get-regexp url` before reaching for the vault, and before asking a
+human to mint a token — the same class of mistake as looking for the missing key
+on multica-02, and it cost most of a day here.
+
+(This is the GitHub twin of the GitLab rewrite documented above:
+`url.https://gitlab.com/.insteadOf = git@gitlab.com:` plus
+`gitlab-agent-credential-helper`. Same mechanism, same failure if it is absent.)
+
 ## Git commit signing
 
 SSH-format signing with the dedicated signing key:
@@ -262,19 +375,40 @@ git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
 peter@chainlayer.io`. Add the signing key to GitHub/GitLab as a **signing**
 key (separate from the auth key) for the green "Verified" badge.
 
-## Keys in the vault
+## The keys are NOT in the vault — corrected 2026-09-03
 
-Both private keys are stored in the Bitwarden **`shared`** folder (see the
-`bitwarden` skill) as file-type items, so any context (private or company)
-can use them:
+**This section used to say both private keys live in the Bitwarden `shared`
+folder as `ssh/id_ed25519_peter` and `ssh/id_ed25519_signing`. They are not
+there.** Checked 2026-09-03: the `shared` folder holds three unrelated items,
+and there are **no SSH key items anywhere in the vault**. Whether they were ever
+there and were later removed is not known — what is established is that the
+path this section gave does not resolve today.
 
-- `ssh/id_ed25519_peter`   → `~/.ssh/id_ed25519_peter` (mode 600)
-- `ssh/id_ed25519_signing` → `~/.ssh/id_ed25519_signing` (mode 600)
+That matters more than a stale path, because it was a **recovery procedure that
+does not work**. Someone rebuilding a host would have followed it, found
+nothing, and had to work out mid-task whether the key was lost or the document
+was wrong. A documented recovery path that fails is worse than none: it is
+believed until it is needed.
 
-To wire a fresh host: write each key to its path (`chmod 600`), drop the
-`~/.ssh/config` git-auth mappings above, and `chmod 644` the regenerated `.pub`
-(`ssh-keygen -y -f <key> > <key>.pub`). `id_ed25519_peter` remains for git auth
-to GitHub; host access is through JIT, not this key.
+**What is actually true:**
+
+- `~/.ssh/id_ed25519_peter` exists **on multica-01 only**, and has **no
+  backup** — not in Bitwarden, not in 1Password. If that host is lost, the key
+  is lost, and the recovery is to generate a new one and re-register the public
+  half (GitHub for git auth, plus any LAN `authorized_keys`).
+- Company runtimes do not have it and do not need it (see the top of this
+  skill), so its absence there is not a recovery problem.
+- The company runtime's signing key is `~/.ssh/peter_agent_signing`, generated
+  per runtime.
+
+**Wiring a fresh host**, then, is not a vault restore. Generate a key, register
+the public half where it is needed, and drop in the `~/.ssh/config` git-auth
+mappings above (`chmod 600` the private key, `644` the `.pub`). For company
+hosts there is nothing to wire: access is JIT.
+
+> If a key ever *is* put in the vault, correct this section in the same change.
+> The failure above was not the key moving — it was the document outliving the
+> arrangement it described.
 
 ## Don'ts
 
