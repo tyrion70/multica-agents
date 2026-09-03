@@ -1223,6 +1223,27 @@ class CustomEnvOscillationTest(unittest.TestCase):
         conflict = json.loads(payload)["conflicts"][0]
         self.assertEqual(conflict["multica_state"]["custom_env"], ["DATAFEEDS_HEALTH_DSN"])
 
+    def test_rung_one_redacts_every_shape_not_just_the_dict(self):
+        """H3: `_norm_agent_field` already anticipates the JSON-string shape, and
+        returned unparsed it carried the resolved value into `multica_norm`."""
+        secret = "postgres://user:sup3rs3cr3t@db.internal/feeds"
+        for shape in ({"DATAFEEDS_HEALTH_DSN": secret},
+                      json.dumps({"DATAFEEDS_HEALTH_DSN": secret})):
+            value, note = sync._live_custom_env_for_state(
+                {"id": "a1", "custom_env": shape}, {}, None)
+            self.assertEqual(value, {"DATAFEEDS_HEALTH_DSN": "<redacted>"},
+                             f"{type(shape).__name__} shape was not projected")
+            self.assertNotIn(secret, json.dumps(value))
+            self.assertIsNone(note)
+
+    def test_rung_one_drops_a_shape_it_cannot_read(self):
+        """An unknown shape is a changed contract: drop it, do not pass it on."""
+        for shape in (["DATAFEEDS_HEALTH_DSN"], "not json at all"):
+            value, note = sync._live_custom_env_for_state(
+                {"id": "a1", "custom_env": shape}, {}, None)
+            self.assertIsNone(value)
+            self.assertIsNotNone(note)
+
     def test_count_is_not_trusted_when_baseline_and_repo_disagree(self):
         """The count rung: 1 == 1 is not identity (CHA-1211 item 17).
 
@@ -1272,6 +1293,12 @@ class CustomEnvOscillationTest(unittest.TestCase):
         last = {"multica_state": {"custom_env": ["OLD_NAME"]}}
 
         value, _ = sync._live_custom_env_for_state(live, repo_norm, last)
+        # The point of the test, said rather than implied: the live agent really
+        # holds RENAMED_LIVE and the resolver does not see it. If someone later
+        # closes the residual, this is the line that explains why it now fails.
+        self.assertNotEqual(sorted(value), ["RENAMED_LIVE"],
+                            "the rename is now visible — the residual is closed, "
+                            "so update this test rather than the resolver")
         self.assertEqual(sorted(value), ["OLD_NAME"])
         self.assertEqual(self.backend.env_get_calls, 0)
 

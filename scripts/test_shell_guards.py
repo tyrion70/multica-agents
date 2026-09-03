@@ -36,6 +36,19 @@ done
 exec {git} "$@"
 """
 
+# A `git` that fails only on `fetch`. Isolates the H1 line: the pull still
+# succeeds, the cached `origin/main` still agrees with HEAD, and the only thing
+# that goes wrong is the verification step itself.
+GIT_FETCH_SHIM = """#!/usr/bin/env bash
+for a in "$@"; do
+  if [ "$a" = "fetch" ]; then
+    echo "fatal: unable to access remote: Could not resolve host" >&2
+    exit 128
+  fi
+done
+exec {git} "$@"
+"""
+
 
 def _git(*args, cwd, check=True):
     return subprocess.run(
@@ -78,6 +91,13 @@ class ShellGuardTestCase(unittest.TestCase):
         shim.write_text(GIT_SHIM.format(git=shutil.which("git")), encoding="utf-8")
         shim.chmod(0o755)
         self.shim_path = f"{shim_dir}:{os.environ['PATH']}"
+
+        fetch_shim_dir = self.tmp / "fetch-shim"
+        fetch_shim_dir.mkdir()
+        fetch_shim = fetch_shim_dir / "git"
+        fetch_shim.write_text(GIT_FETCH_SHIM.format(git=shutil.which("git")), encoding="utf-8")
+        fetch_shim.chmod(0o755)
+        self.fetch_shim_path = f"{fetch_shim_dir}:{os.environ['PATH']}"
 
     def tearDown(self):
         shutil.rmtree(self.tmp, ignore_errors=True)
@@ -227,10 +247,10 @@ class UpdateCheckoutTest(ShellGuardTestCase):
             self.skipTest("scripts/update-checkout.sh not present in this tree")
         super().setUp()
 
-    def _update(self, repo):
+    def _update(self, repo, path=None):
         return self.run_script(
             "update-checkout.sh", "--repo", str(repo), "--remote", str(self.remote),
-            cwd=self.tmp)
+            cwd=self.tmp, path=path)
 
     def test_clones_when_the_directory_is_missing(self):
         target = self.tmp / "fresh"
@@ -278,6 +298,70 @@ class UpdateCheckoutTest(ShellGuardTestCase):
         r = self._update(self.work)
         self.assertEqual(r.returncode, 6, r.stdout + r.stderr)
         self.assertIn("CHECKOUT NOT UPDATED", r.stderr)
+
+    def test_a_deleted_remote_branch_is_not_papered_over_by_a_stale_ref(self):
+        """H1, and the ordinary half of it: deleting or renaming a default branch.
+
+        The local `origin/main` tracking ref survives on disk, so a swallowed
+        fetch error let `rev-parse origin/main` answer from cache and the script
+        printed its success line for a checkout it could not verify.
+        """
+        _git("update-ref", "-d", "refs/heads/main", cwd=self.remote)
+        # The stale tracking ref is still there — that is the whole trap.
+        self.assertTrue(
+            _git("rev-parse", "origin/main", cwd=self.work, check=False).returncode == 0)
+
+        r = self._update(self.work)
+        self.assertEqual(r.returncode, 6, r.stdout + r.stderr)
+        self.assertNotIn("✓", r.stdout)
+        # On this fixture the pull catches it first (the branch tracks the ref
+        # that was deleted), which is fine — the invariant is that no path
+        # reports success. The variant below drives the ls-remote gate itself.
+
+    def test_a_deleted_remote_branch_while_the_pull_still_succeeds(self):
+        """H1's first reproduction, isolated: the pull works, `main` is gone.
+
+        The shape is a repo whose default branch was renamed or removed while the
+        local checkout tracks something else, so nothing in the pull path notices.
+        Pre-fix, the swallowed fetch left a stale `origin/main` that equalled HEAD
+        and the script printed `✓ … at origin/main` for a branch that no longer
+        existed. `ls-remote --exit-code` is what closes this.
+        """
+        # A branch that does exist, for the pull to track and succeed against.
+        _git("push", "-q", "origin", "main:keep", cwd=self.work)
+        _git("config", "branch.main.merge", "refs/heads/keep", cwd=self.work)
+        _git("update-ref", "-d", "refs/heads/main", cwd=self.remote)
+
+        pull = _git("pull", "--ff-only", cwd=self.work, check=False)
+        self.assertEqual(pull.returncode, 0, "fixture invalid: the pull must succeed")
+        self.assertEqual(
+            _git("rev-parse", "origin/main", cwd=self.work).stdout,
+            _git("rev-parse", "HEAD", cwd=self.work).stdout,
+            "fixture invalid: the stale ref must agree with HEAD",
+        )
+
+        r = self._update(self.work)
+        self.assertEqual(r.returncode, 6, r.stdout + r.stderr)
+        self.assertIn("has no 'main' branch", r.stderr)
+        self.assertNotIn("✓", r.stdout)
+
+    def test_a_failing_fetch_is_not_answered_from_cache(self):
+        """H1: the fetch itself fails while the cached ref agrees with HEAD.
+
+        The worst shape, because every other signal looks healthy — the pull
+        succeeds, `origin/main` resolves, and it equals HEAD. Only the fetch
+        failed, which is precisely the read that makes the comparison meaningful.
+        """
+        r = self._update(self.work, path=self.fetch_shim_path)
+        self.assertEqual(r.returncode, 6, r.stdout + r.stderr)
+        self.assertIn("cannot be verified against the remote", r.stderr)
+        self.assertNotIn("✓", r.stdout)
+
+    def test_it_cannot_wait_for_a_human(self):
+        """Item 27: no-prompt is the script's property, not the host's."""
+        body = (SCRIPTS / "update-checkout.sh").read_text(encoding="utf-8")
+        self.assertIn("GIT_TERMINAL_PROMPT=0", body)
+        self.assertIn("BatchMode=yes", body)
 
     def test_a_dirty_tree_is_reported_but_not_fatal(self):
         (self.work / ".sync-state.json").write_text("{}\n", encoding="utf-8")
