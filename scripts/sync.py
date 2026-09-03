@@ -407,7 +407,16 @@ def write_agent_json(
     agent_json_path: pathlib.Path,
     live_agent: Dict[str, Any],
     dry_run: bool,
-) -> None:
+) -> Dict[str, Any]:
+    """Write the repo agent.json from a live read; return what was written.
+
+    The return value is the point: this function deliberately does NOT take
+    custom_env/mcp_config from live (see multica_to_agent_json — those are
+    resolved secrets), so the file on disk is not the live state. A caller that
+    baselines `multica_norm` after calling this records a file that was never
+    written, and the next run sees the repo "change back" (CHA-1211 G1).
+    Baseline the return value instead.
+    """
     existing: Optional[Dict[str, Any]] = None
     if agent_json_path.is_file():
         with open(agent_json_path) as f:
@@ -417,11 +426,12 @@ def write_agent_json(
     _assert_custom_env_placeholders(new_data.get("custom_env"))
     if dry_run:
         print(f"      [DRY-RUN] would write {agent_json_path}", file=sys.stderr)
-        return
+        return new_data
     agent_json_path.parent.mkdir(parents=True, exist_ok=True)
     with open(agent_json_path, "w") as f:
         json.dump(new_data, f, indent=2, ensure_ascii=False)
         f.write("\n")
+    return new_data
 
 
 # ---------------------------------------------------------------------------
@@ -852,15 +862,53 @@ def _live_custom_env_for_state(
 
     1. `custom_env` present in the response — a real read, use it.
     2. `has_custom_env` false — the response positively says there is none.
-    3. Present, and the key COUNT matches a key set we already know (the
-       baseline's, or the repo's) — reuse that set. Free, and no audited call.
-    4. Present with a count we cannot account for — something really did change,
-       so read it authoritatively with `agent env get`.
+    3. Present, and the baseline and the repo AGREE on a key set whose size
+       matches the live count — reuse it. Free, and no audited call.
+    4. Present, but the two sides disagree or cannot account for the count —
+       something really did change, so read it authoritatively with
+       `agent env get`.
     5. Even that is unreadable — carry the baseline forward and warn. An absent
        field is not an empty field, so it contributes nothing to the diff.
+
+    Known residual: a workspace-side key RENAME that keeps the count the same,
+    while baseline and repo still agree with each other, is invisible here — the
+    response carries no signal that anything moved, so rung 3 reuses a set that
+    is no longer live. Nothing short of an unconditional `agent env get` every
+    run can see it, which is the cost rung 3 exists to avoid. Closing it needs a
+    re-read trigger the response CAN supply (the agent's `updated_at` recorded in
+    the baseline); that is a state-format change and is not done here. The error
+    is safe in direction — it reads as `unchanged`, so neither side is written.
     """
     if "custom_env" in live_agent:
-        return live_agent["custom_env"], None
+        # A real read — but keep only the key names. Change detection needs
+        # nothing else, and a resolved value that never enters the snapshot
+        # cannot escape through a payload that forgot to sanitize (CHA-1211 G2).
+        #
+        # Every shape has to be projected, not just the dict: `_norm_agent_field`
+        # already handles custom_env arriving as a JSON STRING, so that shape is
+        # anticipated elsewhere in this file — and returned unparsed it carried
+        # the resolved value verbatim, which made this guard true of one shape
+        # while its comment claimed both (CHA-1211 H3).
+        env = live_agent["custom_env"]
+        if env is None:
+            return None, None
+        if isinstance(env, str):
+            try:
+                env = json.loads(env)
+            except (json.JSONDecodeError, TypeError):
+                return None, (
+                    "live custom_env came back as a string that is not JSON — "
+                    "dropping it rather than recording an unparseable value, and "
+                    "carrying nothing forward from it"
+                )
+        if isinstance(env, dict):
+            return {k: _REDACTED for k in env}, None
+        # Some other shape entirely: a changed contract again. Do not pass it on —
+        # an unknown shape is exactly what must not be trusted or repeated.
+        return None, (
+            f"live custom_env came back as {type(env).__name__}, which this run "
+            f"cannot read as a key map — dropping it rather than guessing"
+        )
 
     if not live_agent.get("has_custom_env"):
         return None, None
@@ -874,9 +922,18 @@ def _live_custom_env_for_state(
         baseline_keys = _sanitize_custom_env_for_state(baseline_keys)
     repo_keys = _sanitize_custom_env_for_state(repo_norm.get("custom_env"))
 
-    for keys in (baseline_keys, repo_keys):
-        if isinstance(keys, list) and len(keys) == count:
-            return {k: _REDACTED for k in keys}, None
+    # Trust the count ONLY when the baseline and the repo agree on the key set.
+    # The count is a weak identity claim — every agent with an env has exactly
+    # one key, so "count == 1" matches any single-key set, live or not. When the
+    # two sides we CAN read agree, reusing their set is safe and free. When they
+    # disagree, one of them is wrong about the live agent and the count cannot
+    # say which, so pay for the authoritative read (CHA-1211 item 17).
+    if (
+        isinstance(baseline_keys, list)
+        and baseline_keys == repo_keys
+        and len(baseline_keys) == count
+    ):
+        return {k: _REDACTED for k in baseline_keys}, None
 
     agent_id = live_agent.get("id", "")
     try:
@@ -910,10 +967,17 @@ def _carry_forward_unread_fields(
 
     Where the baseline knows what the field was, carry that value forward; the
     field then contributes nothing to the diff instead of a false change.
+
+    It says so on stderr when it fires. A no-op today means the only event that
+    can ever trigger it is the next contract change — precisely the event that
+    would otherwise pass unnoticed, which is how this incident started
+    (CHA-1211 item 18). Carrying a field forward silently would make the guard
+    the thing that hides its own trigger.
     """
     if last is None:
         return multica_norm
     baseline = last.get("multica_state") or {}
+    carried: List[str] = []
     for field in COMPARABLE_FIELDS:
         # custom_env is handled by _live_custom_env_for_state, which can see
         # more than the baseline. Both it and mcp_config are stored in the
@@ -923,6 +987,14 @@ def _carry_forward_unread_fields(
             continue
         if field not in live_agent and field in baseline:
             multica_norm[field] = baseline[field]
+            carried.append(field)
+    if carried:
+        print(
+            f"    ⚠ live read omitted {', '.join(carried)} — carrying the baseline "
+            f"forward rather than reading the absence as a cleared field. This is a "
+            f"CHANGED READ CONTRACT: check the CLI/API before trusting this run.",
+            file=sys.stderr,
+        )
     return multica_norm
 
 
@@ -1425,15 +1497,21 @@ def sync_agents_workspace(
                 # the repo must keep its #Item:Field# placeholders (CHA-85).
                 # write_agent_json preserves the existing repo custom_env/mcp_config.
                 try:
-                    write_agent_json(agent_json_path, live_agent, dry_run)
+                    written = write_agent_json(agent_json_path, live_agent, dry_run)
                     counts["repo_updated"] += 1
                 except Exception as e:
                     print(f"    ✗ REPO WRITE FAILED: {e}", file=sys.stderr)
                     counts["errors"] += 1
                     continue
+                # repo_state is the file as WRITTEN, not the live read it came
+                # from. Those differ by exactly custom_env/mcp_config, which the
+                # write preserves from the repo — so baselining multica_norm here
+                # claimed a file that was never written, the next run read the
+                # repo as "changed back", and the entry alternated forever. That
+                # is the seventh agent's flip-flop, one line wide (CHA-1211 G1).
                 state_agents[state_key] = {
                     "repo_file": str(rel_path),
-                    "repo_state": _sanitize_agent_for_state(multica_norm),
+                    "repo_state": _sanitize_agent_for_state(normalize_agent(written)),
                     "multica_state": _sanitize_agent_for_state(multica_norm),
                 }
 
@@ -1505,12 +1583,18 @@ def sync_agents_workspace(
                     }
                 else:
                     print(f"    ✗ CONFLICT: both sides changed irreconcilably", file=sys.stderr)
+                    # Sanitized, like every baseline write path: this payload is
+                    # printed to stdout and step 5 of both sync autopilots parses
+                    # it into an ISSUE BODY. Raw, a live custom_env/mcp_config
+                    # value would be published the moment the API starts
+                    # returning one — and "the API does not return that field"
+                    # is the assumption this whole issue is about (CHA-1211 G2).
                     conflicts.append({
                         "type": "agent",
                         "name": agent_name,
                         "repo_file": str(rel_path),
-                        "repo_state": repo_norm,
-                        "multica_state": multica_norm,
+                        "repo_state": _sanitize_agent_for_state(repo_norm),
+                        "multica_state": _sanitize_agent_for_state(multica_norm),
                         "last_synced_repo": last.get("repo_state") if last else None,
                         "last_synced_multica": last.get("multica_state") if last else None,
                     })
@@ -1606,7 +1690,7 @@ def sync_agents_workspace(
                         file=sys.stderr,
                     )
             try:
-                write_agent_json(agent_json_path, live_agent, dry_run)
+                written = write_agent_json(agent_json_path, live_agent, dry_run)
                 counts["repo_updated"] += 1
             except Exception as e:
                 print(f"    ✗ REPO WRITE FAILED: {e}", file=sys.stderr)
@@ -1617,21 +1701,28 @@ def sync_agents_workspace(
             if agent_id:
                 id_map[agent_key(agent_dir, workspace_dir)] = agent_id
 
-            disc_norm = normalize_agent(live_agent)
+            # Same rule as the pull path above: repo_state is the file as
+            # written, which for a newly discovered agent has no custom_env at
+            # all (CHA-1211 G1).
             state_agents[state_key] = {
                 "repo_file": str(rel_path),
-                "repo_state": _sanitize_agent_for_state(disc_norm),
-                "multica_state": _sanitize_agent_for_state(disc_norm),
+                "repo_state": _sanitize_agent_for_state(normalize_agent(written)),
+                "multica_state": _sanitize_agent_for_state(normalize_agent(live_agent)),
             }
 
         elif action == "conflict":
             print(f"    ✗ CONFLICT: agent '{live_name}' — both sides changed", file=sys.stderr)
+            # Sanitized (CHA-1211 G2 — see the other conflict payload), and built
+            # from the `multica_norm` the decision was actually made on rather
+            # than a fresh normalize_agent(): the fresh one got neither the
+            # redaction nor the carry-forward, so it reported a state that
+            # differed from the one that produced the verdict.
             conflicts.append({
                 "type": "agent",
                 "name": live_name,
                 "repo_file": "(missing — agent only in Multica)",
                 "repo_state": None,
-                "multica_state": normalize_agent(live_agent),
+                "multica_state": _sanitize_agent_for_state(multica_norm),
                 "last_synced_repo": last.get("repo_state") if last else None,
                 "last_synced_multica": last.get("multica_state") if last else None,
             })

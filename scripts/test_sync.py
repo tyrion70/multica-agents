@@ -831,6 +831,47 @@ class SkillContentGuardTest(unittest.TestCase):
             sync.normalize_skill_multica(self._skill_detail(with_content=False))
         self.assertIn("--with-content", str(cm.exception))
 
+    def test_missing_files_key_is_a_hard_error(self):
+        """The same contract change one level down (CHA-1211 F2).
+
+        A skill with no supporting files returns `files: []` — verified against
+        all 32 live skills — so an absent key is always a read failure, and
+        recording it as files={} on both baseline sides is the oscillation setup.
+        """
+        detail = self._skill_detail(with_content=True)
+        del detail["files"]
+        with self.assertRaises(sync.SkillContentUnavailable) as cm:
+            sync.normalize_skill_multica(detail)
+        self.assertIn("'files'", str(cm.exception))
+
+    def test_empty_files_list_is_fine(self):
+        """files=[] is a legitimate answer and must not be confused with absence."""
+        detail = self._skill_detail(with_content=True)
+        detail["files"] = []
+        self.assertEqual(sync.normalize_skill_multica(detail)["files"], {})
+
+    def test_files_free_response_cannot_gut_the_baseline(self):
+        """End to end: a files-free read fails the run and writes no baseline."""
+        self.live_files = {}
+        self._baseline(self.BODY, files={})
+        before = json.loads(self.state_path.read_text())
+
+        original = sync.fetch_skill_detail
+
+        def no_files(skill_id):
+            d = original(skill_id)
+            d.pop("files", None)
+            return d
+
+        with mock.patch.object(sync, "fetch_skill_detail", no_files):
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                code = self._run()
+
+        self.assertEqual(code, 1)
+        self.assertIn("no 'files' key", err.getvalue())
+        self.assertEqual(json.loads(self.state_path.read_text()), before,
+                         "baseline was rewritten from a files-free read")
+
     def test_missing_file_content_key_is_a_hard_error(self):
         """Same defaulting on the files array — the 0-byte-script half of the bug."""
         detail = self._skill_detail(with_content=True)
@@ -941,6 +982,11 @@ class CustomEnvOscillationTest(unittest.TestCase):
             self.env = {}
             self._seq = 0
             self.pulls_forced = 0
+            self.env_readable = False
+            self.env_get_calls = 0
+            # The contract change this issue is about, applied to `agent list`:
+            # the field starts coming back, values and all.
+            self.list_returns_env = False
 
         @staticmethod
         def _flags(tokens):
@@ -960,7 +1006,10 @@ class CustomEnvOscillationTest(unittest.TestCase):
             keys = self.env.get(aid) or {}
             a["has_custom_env"] = bool(keys)
             a["custom_env_key_count"] = len(keys)
-            a.pop("custom_env", None)  # the contract: never returned by `list`
+            if self.list_returns_env:
+                a["custom_env"] = dict(keys)
+            else:
+                a.pop("custom_env", None)  # today's contract: never returned
             return a
 
         def __call__(self, args, dry_run=False, mutating=False):
@@ -1003,8 +1052,11 @@ class CustomEnvOscillationTest(unittest.TestCase):
                     self.env[args[3]] = json.load(fh)
                 return {}
             if args[:3] == ["agent", "env", "get"]:
-                # Permission-gated in reality, and denied from a runtime that is
-                # neither the agent's owner nor a workspace admin.
+                # Permission-gated in reality: readable for the agent's owner or
+                # a workspace owner/admin, denied for anyone else.
+                self.env_get_calls += 1
+                if self.env_readable:
+                    return dict(self.env.get(args[3]) or {})
                 raise RuntimeError("You do not have permission to access this resource.")
             if args[:3] == ["agent", "skills", "set"]:
                 return {}
@@ -1096,6 +1148,170 @@ class CustomEnvOscillationTest(unittest.TestCase):
         with self.assertRaises(sync.CustomEnvUnreadable) as cm:
             sync._fetch_agent_custom_env("agent-uuid-0001")
         self.assertIn("permission", str(cm.exception))
+
+    def _entry(self):
+        state = json.loads(self.state_path.read_text())
+        return state["agents"][f"{WS_NAME}~Datafeeds Health Monitor"]
+
+    def test_pull_baselines_the_file_it_actually_wrote(self):
+        """G1: the seventh agent. `repo_state` must describe the file on disk.
+
+        `write_agent_json` deliberately keeps the repo's custom_env/mcp_config
+        (they are placeholders; live holds resolved secrets), so a baseline taken
+        from the live read claims a file that was never written — and the next
+        run reads the repo as "changed back", forever. Setup is the real drift:
+        a live env the repo does not declare, with `agent env get` readable.
+        """
+        self.agent_json.write_text(json.dumps({
+            "name": "Datafeeds Health Monitor",
+            "runtime_id": "rt-1",
+            "description": "watches feeds",
+        }), encoding="utf-8")  # no custom_env at all — the actual repo state
+        self._run("--allow-create")
+        aid = next(iter(self.backend.agents))
+        self.backend.env[aid] = {"DATAFEEDS_HEALTH_DSN": "resolved-dsn"}
+        self.backend.env_readable = True
+        # A live-side edit, so the run pulls.
+        self.backend.agents[aid]["description"] = "watches feeds, live edit"
+
+        self._run()
+        on_disk = json.loads(self.agent_json.read_text()).get("custom_env")
+        self.assertIsNone(on_disk, "the written file should still declare no custom_env")
+        self.assertIsNone(
+            self._entry()["repo_state"]["custom_env"],
+            "baseline claims a custom_env the written file does not have",
+        )
+
+        # And therefore it settles instead of alternating.
+        for run in (3, 4, 5):
+            code, err = self._run()
+            self.assertEqual(code, 0, err)
+            self.assertIn("unchanged", err, f"run {run} did not settle")
+            self.assertNotIn("writing repo", err)
+
+    def test_conflict_payload_is_sanitized(self):
+        """G2: the payload is printed to stdout and filed into an issue.
+
+        Step 5 of both sync autopilots parses it, so a resolved secret in it is
+        a published secret. Modelled with the contract change this whole issue is
+        about: an `agent list` that starts returning custom_env values.
+        """
+        self._run("--allow-create")
+        aid = next(iter(self.backend.agents))
+        secret = "postgres://user:sup3rs3cr3t@db.internal/feeds"
+        # Both sides move, irreconcilably (description), and the live read now
+        # carries the resolved value.
+        self.backend.agents[aid]["description"] = "live description"
+        self.backend.env[aid] = {"DATAFEEDS_HEALTH_DSN": secret}
+        self.backend.list_returns_env = True
+        data = json.loads(self.agent_json.read_text())
+        data["description"] = "repo description"
+        self.agent_json.write_text(json.dumps(data), encoding="utf-8")
+
+        argv = ["sync.py", "--type", "agents", "--workspace", WS_NAME,
+                "--sync-state", str(self.state_path)]
+        with mock.patch.object(sys, "argv", argv):
+            with contextlib.redirect_stdout(io.StringIO()) as out:
+                with contextlib.redirect_stderr(io.StringIO()):
+                    try:
+                        sync.main()
+                    except SystemExit:
+                        pass
+        payload = out.getvalue()
+        self.assertIn("conflicts", payload, "expected a conflict payload on stdout")
+        self.assertNotIn("sup3rs3cr3t", payload, "resolved secret in the conflict payload")
+        conflict = json.loads(payload)["conflicts"][0]
+        self.assertEqual(conflict["multica_state"]["custom_env"], ["DATAFEEDS_HEALTH_DSN"])
+
+    def test_rung_one_redacts_every_shape_not_just_the_dict(self):
+        """H3: `_norm_agent_field` already anticipates the JSON-string shape, and
+        returned unparsed it carried the resolved value into `multica_norm`."""
+        secret = "postgres://user:sup3rs3cr3t@db.internal/feeds"
+        for shape in ({"DATAFEEDS_HEALTH_DSN": secret},
+                      json.dumps({"DATAFEEDS_HEALTH_DSN": secret})):
+            value, note = sync._live_custom_env_for_state(
+                {"id": "a1", "custom_env": shape}, {}, None)
+            self.assertEqual(value, {"DATAFEEDS_HEALTH_DSN": "<redacted>"},
+                             f"{type(shape).__name__} shape was not projected")
+            self.assertNotIn(secret, json.dumps(value))
+            self.assertIsNone(note)
+
+    def test_rung_one_drops_a_shape_it_cannot_read(self):
+        """An unknown shape is a changed contract: drop it, do not pass it on."""
+        for shape in (["DATAFEEDS_HEALTH_DSN"], "not json at all"):
+            value, note = sync._live_custom_env_for_state(
+                {"id": "a1", "custom_env": shape}, {}, None)
+            self.assertIsNone(value)
+            self.assertIsNotNone(note)
+
+    def test_count_is_not_trusted_when_baseline_and_repo_disagree(self):
+        """The count rung: 1 == 1 is not identity (CHA-1211 item 17).
+
+        Every agent with an env has exactly one key, so a count match proves
+        nothing on its own. When the two readable sides disagree, one of them is
+        wrong about live and the count cannot say which — so pay for the read.
+        """
+        live = {"id": "a1", "has_custom_env": True, "custom_env_key_count": 1}
+        self.backend.env["a1"] = {"LIVE_KEY": "v"}
+        self.backend.env_readable = True
+        repo_norm = {"custom_env": json.dumps({"REPO_KEY": "#x:y#"})}
+        last = {"multica_state": {"custom_env": ["BASELINE_KEY"]}}
+
+        value, note = sync._live_custom_env_for_state(live, repo_norm, last)
+
+        self.assertEqual(sorted(value), ["LIVE_KEY"],
+                         "resolved to a key set that was never live")
+        self.assertIsNone(note)
+        self.assertEqual(self.backend.env_get_calls, 1)
+
+    def test_count_is_trusted_when_both_sides_agree(self):
+        """The steady state stays free — no audited call for the settled case."""
+        live = {"id": "a1", "has_custom_env": True, "custom_env_key_count": 1}
+        self.backend.env_readable = True
+        repo_norm = {"custom_env": json.dumps({"DATAFEEDS_HEALTH_DSN": "#x:y#"})}
+        last = {"multica_state": {"custom_env": ["DATAFEEDS_HEALTH_DSN"]}}
+
+        value, note = sync._live_custom_env_for_state(live, repo_norm, last)
+
+        self.assertEqual(sorted(value), ["DATAFEEDS_HEALTH_DSN"])
+        self.assertIsNone(note)
+        self.assertEqual(self.backend.env_get_calls, 0, "steady state must cost no CLI call")
+
+    def test_known_residual_a_rename_both_sides_missed_is_invisible(self):
+        """Documented limitation, asserted so it cannot be mistaken for a fix.
+
+        If the baseline and the repo agree AND the count is unchanged, the
+        response carries no signal that live moved, so rung 3 reuses a set that
+        is no longer live. Closing this needs a re-read trigger (the agent's
+        `updated_at` in the baseline) — a state-format change, not done here.
+        The direction is safe: it reads as `unchanged`, so nothing is written.
+        """
+        live = {"id": "a1", "has_custom_env": True, "custom_env_key_count": 1}
+        self.backend.env["a1"] = {"RENAMED_LIVE": "v"}
+        self.backend.env_readable = True
+        repo_norm = {"custom_env": json.dumps({"OLD_NAME": "#x:y#"})}
+        last = {"multica_state": {"custom_env": ["OLD_NAME"]}}
+
+        value, _ = sync._live_custom_env_for_state(live, repo_norm, last)
+        # The point of the test, said rather than implied: the live agent really
+        # holds RENAMED_LIVE and the resolver does not see it. If someone later
+        # closes the residual, this is the line that explains why it now fails.
+        self.assertNotEqual(sorted(value), ["RENAMED_LIVE"],
+                            "the rename is now visible — the residual is closed, "
+                            "so update this test rather than the resolver")
+        self.assertEqual(sorted(value), ["OLD_NAME"])
+        self.assertEqual(self.backend.env_get_calls, 0)
+
+    def test_carry_forward_says_so_on_stderr(self):
+        """Item 18: a no-op guard whose only trigger is the next contract change
+        must announce itself, or it hides the very event it exists to catch."""
+        norm = {"instructions": None}
+        live = {}
+        last = {"multica_state": {"instructions": "the real instructions"}}
+        with contextlib.redirect_stderr(io.StringIO()) as err:
+            sync._carry_forward_unread_fields(norm, live, last)
+        self.assertIn("omitted instructions", err.getvalue())
+        self.assertIn("CHANGED READ CONTRACT", err.getvalue())
 
     def test_an_unread_comparable_field_is_carried_forward(self):
         """F4, generalized: any field the response omits keeps its baseline value."""
