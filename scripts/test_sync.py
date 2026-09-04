@@ -1822,5 +1822,74 @@ class CustomEnvWrapperTest(unittest.TestCase):
             sync._fetch_agent_custom_env("25c1c1a0")
 
 
+class SlackWriteToolDisabledTest(unittest.TestCase):
+    """The MCP Slack server must not expose its write tool (CHA-1211).
+
+    Agent Slack posts go out as the dedicated `peter_agent` bot via
+    `chat.postMessage`; the MCP server carries Peter's PERSONAL `xoxp` token, so a
+    post through it is published under his own name. That rule used to be
+    discipline. This makes it structural: with the write tool unregistered, the
+    wrong action is unavailable rather than forbidden.
+
+    The trap this test exists to hold shut: `SLACK_MCP_ADD_MESSAGE_TOOL` is a
+    CHANNEL ALLOWLIST, not a boolean. `"true"` means every channel, a
+    comma-separated list means those channels, `!` negates. So `"false"` is read as
+    a list containing one channel named `false` -- the tool is still REGISTERED and
+    still offered to the model. Measured against slack-mcp-server 1.3.0 by listing
+    the server's tools over stdio:
+
+        unset    -> 15 tools, conversations_add_message absent
+        "true"   -> 16 tools, conversations_add_message PRESENT
+        "false"  -> 16 tools, conversations_add_message PRESENT   <-- the trap
+        ""       -> 15 tools, conversations_add_message absent
+
+    Empty is also the only value that cannot fail unsafe: if any layer of the
+    delivery path drops an empty env var, the result is `unset`, which is likewise
+    disabled. `"false"` degrades the other way.
+    """
+
+    ENABLING = ("true", "1", "yes", "false", "0", "no")
+
+    def _slack_envs(self):
+        for path in sorted((REPO_ROOT / "Chainlayer").rglob("agent.json")):
+            cfg = json.loads(path.read_text(encoding="utf-8")).get("mcp_config")
+            if not isinstance(cfg, dict):
+                continue
+            slack = (cfg.get("mcpServers") or {}).get("slack")
+            if isinstance(slack, dict) and isinstance(slack.get("env"), dict):
+                yield path, slack["env"]
+
+    def test_write_tool_is_unregistered_on_every_agent(self):
+        offenders = [
+            (p.relative_to(REPO_ROOT), env["SLACK_MCP_ADD_MESSAGE_TOOL"])
+            for p, env in self._slack_envs()
+            if env.get("SLACK_MCP_ADD_MESSAGE_TOOL", "") != ""
+        ]
+        self.assertEqual(
+            offenders, [],
+            "SLACK_MCP_ADD_MESSAGE_TOOL must be \"\" (or absent) so the MCP server "
+            "never registers conversations_add_message.\n"
+            "It is a CHANNEL ALLOWLIST, not a boolean: any non-empty value -- "
+            "INCLUDING \"false\" -- registers the write tool, and a post through it "
+            "is published as Peter personally.\n"
+            "Agent posts use SLACK_BOT_TOKEN_PETER_AGENT + chat.postMessage instead; "
+            "see the chainlayer-knowledge skill.\n"
+            f"Offending files: {offenders}",
+        )
+
+    def test_the_personal_token_is_still_present(self):
+        """Disabling the write tool must not cost us the reads. `search.messages`
+        refuses a bot token with `not_allowed_token_type` even holding all five
+        `search:read.*` scopes, so `xoxp` cannot be swapped out -- only narrowed."""
+        envs = list(self._slack_envs())
+        self.assertTrue(envs, "no Chainlayer agent carries a slack MCP block")
+        for path, env in envs:
+            self.assertIn(
+                "SLACK_MCP_XOXP_TOKEN", env,
+                f"{path.relative_to(REPO_ROOT)} lost SLACK_MCP_XOXP_TOKEN -- the MCP "
+                "server's reads depend on it and no bot token can replace them",
+            )
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

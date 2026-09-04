@@ -290,3 +290,33 @@ Company workspace — ChainLayer infrastructure and operations agents.
 ### Private
 
 Personal workspace — homelab, game dev, Eryndal creative projects, and personal tooling agents.
+
+## A config flag is not a boolean until you've watched it behave
+
+`SLACK_MCP_ADD_MESSAGE_TOOL` reads like an on/off switch and is not one. In
+`slack-mcp-server` it is a **channel allowlist**: `true` means every channel, a
+comma-separated list means those channels, `!` negates. So `"false"` is parsed as a
+one-entry list naming a channel called `false` — and the write tool is still
+registered and still offered to the model. Measured against 1.3.0 by listing the
+server's tools over stdio:
+
+```
+unset    -> 15 tools, conversations_add_message absent
+"true"   -> 16 tools, conversations_add_message PRESENT
+"false"  -> 16 tools, conversations_add_message PRESENT   <- the trap
+""       -> 15 tools, conversations_add_message absent
+```
+
+All 35 Chainlayer agents therefore carry `""`, not `"false"`, and
+`SlackWriteToolDisabledTest` in `scripts/test_sync.py` fails on any non-empty value.
+
+Two general rules came out of it:
+
+- **Prefer the value that cannot fail unsafe.** If some layer of the delivery path
+  drops an empty env var, the result is `unset` — still disabled. `"false"` degrades
+  the other way, to enabled. Between two values that both work, pick the one whose
+  failure mode is the safe one.
+- **Read the flag's semantics from the implementation, not from its name.** This is
+  the same defect as the rest of CHA-1211 wearing different clothes: an answer
+  arrived where an answer was expected (`false` where a boolean was expected) and
+  nobody checked it was an answer to the question being asked.

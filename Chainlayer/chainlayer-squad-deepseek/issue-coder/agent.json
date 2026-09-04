@@ -47,7 +47,7 @@
           "-no-cache"
         ],
         "env": {
-          "SLACK_MCP_ADD_MESSAGE_TOOL": "true",
+          "SLACK_MCP_ADD_MESSAGE_TOOL": "",
           "SLACK_MCP_REACTION_TOOL": "true",
           "SLACK_MCP_XOXP_TOKEN": "#ChainLayer · Slack — personal token (xoxp)#"
         }
