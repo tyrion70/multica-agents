@@ -1,6 +1,6 @@
 ---
 name: chainlayer-knowledge
-description: Durable cross-cutting knowledge about ChainLayer's live infra projects — the chainlink-tools platform, the Optimism/Postgres/Proxmox migrations, the Filecoin voter node, and QuickNode RPC URLs. Read this for background/state and key decisions when working any ChainLayer infra issue; it points you at the domain skill for HOW-TO. Keep it updated (PR) when a durable fact or decision changes.
+description: Durable cross-cutting knowledge about ChainLayer's live infra projects — the chainlink-tools platform, the Optimism/Postgres/Proxmox migrations, the Filecoin voter node, and QuickNode RPC URLs. Read this for background/state and key decisions when working any ChainLayer infra issue; it points you at the domain skill for HOW-TO. Keep it updated (PR) when a durable fact or decision changes. ALSO the rule for posting to Slack: agent messages go out as the Albert Indigo bot (xoxb, from Bitwarden at point of use), NEVER through the `slack` MCP server, which carries Peter's personal xoxp token and would make every AI message look like he wrote it — read this before posting anything to Slack.
 ---
 
 # ChainLayer knowledge
@@ -133,6 +133,46 @@ copy. The repo's `CLAUDE.md` is the short authoritative version of this.
   `id_ed25519_peter` key still works on the LAN as a fallback while it exists,
   but JIT is the mechanism that replaces it. Tailscale SSH to the monitoring
   node is denied by tailnet policy.
+
+## Slack: agent messages go out as Albert Indigo, NOT through the `slack` MCP server
+**The MCP `slack` server is configured with the `xoxp` PERSONAL token, which
+authenticates as Peter's own user account** (workspace owner/admin). Posting through
+it makes every AI-authored message appear as though **Peter wrote it personally** —
+in fourteen channels. Don't. This is not a style preference: the reader cannot tell
+an agent's finding from their colleague's opinion.
+
+It is easy to get wrong because the MCP server is right there and looks like the
+obvious path. It was got wrong on 2026-09-04 (CHA-1211): a connectivity test posted
+to `#general` as `UserID UR1T4EEL8 / peter`, and the only copy of this rule was
+inside one autopilot's description, where nothing outside that autopilot's own run
+could find it.
+
+**Instead**, resolve the bot token at point of use via the `bitwarden` skill — item
+**`ChainLayer · Slack — bot token (xoxb)`**, field `SLACK_BOT_TOKEN` — and call the
+Web API directly:
+
+```bash
+curl -s -X POST -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+  -H 'Content-type: application/json; charset=utf-8' \
+  --data '{"channel":"#<channel>","text":"...","unfurl_links":false}' \
+  https://slack.com/api/chat.postMessage
+```
+
+That token is **Albert Indigo** (`ai_bot`, `U0BA9MGR77U`) — the workspace's AI bot
+identity and the correct author for agent messages. It holds `chat:write.public`, so
+it can post to any *existing* public channel **without being invited first**. Never
+echo the token.
+
+Two practical notes:
+
+- **Read the message back** rather than trusting the write's return value. A
+  `chat.postMessage` that returns `ok` still tells you nothing about which identity
+  it posted as — that is exactly how the CHA-1211 slip was caught, and how it would
+  have gone unnoticed otherwise.
+- **`xoxb` is fetched fresh from Bitwarden every time, `xoxp` is not.** The `xoxp`
+  token is baked into 35 agents' `mcp_config`, so rotating it requires a
+  repo→workspace delivery; rotating `xoxb` requires nothing. Worth knowing which one
+  you are being asked about.
 
 ## Co-authored-by commit hook — disabled at the workspace setting
 The Multica daemon installs a git `prepare-commit-msg` hook (in each bare repo's
