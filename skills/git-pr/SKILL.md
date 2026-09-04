@@ -73,22 +73,26 @@ git remote get-url origin   # must be github.com/tyrion70/*
 ```bash
 git push -u origin <branch>
 gh pr create --title "<type>: <title>" --body "$(cat <<'EOF'
-## Summary
-<1-2 sentences>
+## What & why
+<what changes, and why it is needed — 1-3 sentences>
+
+## Linked task
+Tracked in Multica: <issue identifier / URL>
 
 ## Security impact
 <mandatory — never blank, never a bare "N/A".>
 
-Tracked in Multica: <issue identifier / URL>
+## Validation & rollback
+<how this was proven, and how to undo it>
 EOF
 )"
 ```
 
-**`## Security impact` is mandatory here too**, on the same terms as company
-MRs — the checklist and the "None needs its reason" rule are written out in the
-`git-mr` skill under *"`## Security impact` is mandatory on every MR"*; they
-apply unchanged to private PRs. Private does not mean unreviewed: these repos
-still hold credentials, deploy scripts and third-party dependencies.
+**Same four headings as a company MR**, in the same order — see the `git-mr`
+skill under *"These four headings are the reviewer's standard"* for their
+source and for the `## Security impact` and `## Validation & rollback` rules;
+they apply unchanged here. Private does not mean unreviewed: these repos still
+hold credentials, deploy scripts and third-party dependencies.
 
 There is **no Linear closing magic word** for private work — the tracking issue
 lives in Multica, not Linear. A GitHub-side `Closes #NN` may still be used to

@@ -132,26 +132,42 @@ git push -u origin <branch>
 GITLAB_TOKEN="$(OP_SERVICE_ACCOUNT_TOKEN="$(cat ~/.config/op/service-account-token)" \
   op read 'op://Agent Peter/gitlab/password')" \
   glab mr create --fill --title "<type>: <title>" --description "$(cat <<'EOF'
-## Summary
-<1-2 sentences>
+## What & why
+<what changes, and why it is needed — 1-3 sentences>
 
 ## Linked task
 Closes OPS-XXXX
 
-## Changes
-- <bullets>
-
-## Impact
-<scope and risk: what's affected, what's not, required actions>
-
 ## Security impact
 <mandatory — see below. Never blank, never a bare "N/A".>
+
+## Validation & rollback
+<how this was proven, and how to undo it>
 
 ---
 Claude <model>
 EOF
 )"
 ```
+
+### These four headings are the reviewer's standard — do not substitute your own
+
+`## What & why` · `## Linked task` · `## Security impact` ·
+`## Validation & rollback`, in that order. They are **Lazar Davidovic's**
+review standard, stated on `ansible-roles/ansible-role-docker!17`
+(2026-09-04):
+
+> Security impact not considered in this MR, it does not follow our regular
+> practice.
+> `## What & why` `## Linked task` `## Security impact`
+> `## Validation & rollback`
+> Thats how it should look like
+
+Earlier revisions of this skill said `## Summary` / `## Changes` / `## Impact`.
+Those were **our invention**, not his, and an MR using them gets sent back. Use
+his four exactly — not his four plus ours, and not a superset. If you think a
+heading is missing, raise it with him rather than adding it silently: the value
+is that the description matches what the reviewer actually checks.
 
 ### `## Security impact` is mandatory on every MR
 
@@ -184,6 +200,25 @@ section failed.
 Say so plainly when the impact is **negative**: an MR that *reduces* exposure
 is the best kind, and stating it is how the reduction gets credited and
 verified rather than assumed.
+
+### `## Validation & rollback` — two questions, both answered
+
+**How do you know it works, and how does someone undo it at 3am?**
+
+- **Validation** — what you actually ran or measured, not what you intend to.
+  A pipeline being green is not validation of behaviour; name the check and its
+  result. If the proof only arrives after deploy, say that explicitly and state
+  what will be looked at ("`changed` drops from 3 to 2 on the next deploy").
+- **Rollback** — revert the MR, or something more? Say which, and say when a
+  plain revert is *not* enough: data migrated, a snapshot pinned, a credential
+  rotated, an artefact published. **"Revert is sufficient" is a real answer and
+  worth stating** — it tells the person at 3am they can stop reading.
+
+This heading earns its place by making people notice things they otherwise
+wouldn't write down. On `ansible-role-docker!17` it surfaced that a revert needs
+no cleanup pass, because the change alters *which* systemd action applies
+`daemon.json` rather than its contents — true, load-bearing for whoever reverts
+it, and unstated until the heading asked.
 
 **The MR author is the token `glab` authenticates with — and that token is
 `peter-agent`, resolved from 1Password at point of use.** Never run
