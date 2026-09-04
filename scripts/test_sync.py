@@ -11,6 +11,7 @@ twice back-to-back must not mint fresh UUIDs on the second run.
 Run with:  python3 -m pytest scripts/test_sync.py   (or: python3 scripts/test_sync.py)
 """
 
+import collections
 import contextlib
 import io
 import json
@@ -2152,6 +2153,104 @@ class CustomEnvRotationTest(unittest.TestCase):
         })
         with self.assertRaises(Exception):
             sync.validate_agent_json(self.agent_json, schema)
+
+
+class SkillBindingCoverageTest(unittest.TestCase):
+    """A skill bound to an agent must be MANAGED by its workspace's skills.json.
+
+    `skills.json` decides what the sync maintains; an agent's `skills` array decides
+    what it loads. Nothing checked that the two agree, and they had drifted in both
+    directions (CHA-1211):
+
+        bound to Chainlayer agents, absent from Chainlayer/skills.json:
+            git-pr      44 agents      live 4,634 vs repo 5,856
+            cloudflare   4 agents      live 10,763 vs repo 10,187
+
+    An unmanaged skill is not synced, so its live copy silently ages. `git-pr`'s had
+    been missing the never-self-approve rule since 2026-07-16 while 44 agents loaded
+    it. That is the failure this test exists to prevent: not a broken sync, but a
+    skill nobody was watching.
+
+    The reverse direction — managed but bound to no agent (`fortigate`,
+    `new-network`) — is deliberately NOT asserted. The sync maintaining a skill
+    nobody loads is harmless, and a skill is often added before the agent that will
+    use it.
+
+    UNMANAGED_OK is a shrinking backlog, not a config. Each entry needs its live
+    copy read against the repo BEFORE it is managed: with no baseline the first walk
+    applies "repo wins", so adding a name whose live copy holds real workspace-side
+    content arms a deletion. `millionaire` additionally has no repo file at all, so
+    its body has to come back as a PR first.
+    """
+
+    UNMANAGED_OK = {
+        "Private": {
+            # 11 have a repo file and need a live-vs-repo read each before managing.
+            "cancer-game", "cancer-game-artist", "cancer-game-companion",
+            "cancer-game-evidence", "eryndal-artist", "eryndal-audiobook",
+            "eryndal-cardgame", "eryndal-lore", "eryndal-social",
+            "eryndal-universe", "eryndal-writer",
+            # No repo file: bring the body back as a PR before managing.
+            "millionaire",
+        },
+    }
+
+    def _workspaces(self):
+        for wsj in sorted(REPO_ROOT.glob("*/skills.json")):
+            ws = wsj.parent.name
+            managed = set(json.loads(wsj.read_text(encoding="utf-8")))
+            bound = collections.Counter()
+            for ajson in sorted(wsj.parent.rglob("agent.json")):
+                data = json.loads(ajson.read_text(encoding="utf-8"))
+                for name in (data.get("skills") or []):
+                    bound[name] += 1
+            yield ws, managed, bound
+
+    def test_every_bound_skill_is_managed(self):
+        for ws, managed, bound in self._workspaces():
+            allowed = self.UNMANAGED_OK.get(ws, set())
+            unmanaged = {n: c for n, c in bound.items()
+                         if n not in managed and n not in allowed}
+            with self.subTest(workspace=ws):
+                self.assertEqual(
+                    unmanaged, {},
+                    f"{ws}: skill(s) bound to agents but absent from "
+                    f"{ws}/skills.json, so the sync never maintains them and their "
+                    f"live copies age silently while agents load them.\n"
+                    f"Before adding a name here, READ its live copy against the repo: "
+                    f"with no baseline the first walk applies 'repo wins', so a live "
+                    f"copy holding real workspace-side content would be deleted.\n"
+                    f"Offenders (skill -> agents binding it): {unmanaged}",
+                )
+
+    def test_the_backlog_does_not_grow_stale(self):
+        """Every UNMANAGED_OK entry must still be bound and still unmanaged. Once one
+        is managed (or nothing binds it), the exemption is dead and must be deleted —
+        otherwise the list stops being a backlog and becomes a place names hide."""
+        for ws, managed, bound in self._workspaces():
+            for name in sorted(self.UNMANAGED_OK.get(ws, set())):
+                with self.subTest(workspace=ws, skill=name):
+                    self.assertIn(
+                        name, bound,
+                        f"{ws}: '{name}' is exempted but no agent binds it — "
+                        f"remove it from UNMANAGED_OK",
+                    )
+                    self.assertNotIn(
+                        name, managed,
+                        f"{ws}: '{name}' is now managed by {ws}/skills.json — "
+                        f"remove it from UNMANAGED_OK",
+                    )
+
+    def test_every_managed_skill_has_a_repo_file(self):
+        """The sync reads skills/<name>/SKILL.md for every managed name; a missing
+        file is an error the walk only finds at runtime."""
+        for ws, managed, _ in self._workspaces():
+            missing = [n for n in sorted(managed)
+                       if not (REPO_ROOT / "skills" / n / "SKILL.md").is_file()]
+            with self.subTest(workspace=ws):
+                self.assertEqual(missing, [],
+                                 f"{ws}/skills.json names skill(s) with no "
+                                 f"skills/<name>/SKILL.md: {missing}")
 
 
 if __name__ == "__main__":

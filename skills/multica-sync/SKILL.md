@@ -249,6 +249,18 @@ When both sides change independently, the script exits 2 and prints a JSON confl
 3. Add the skill name to `Chainlayer/skills.json` and/or `Private/skills.json`.
 4. Open a PR. Merge triggers the skill sync autopilot.
 
+**`skills.json` and the agents' `skills` arrays are separate, and they drift both
+ways.** A name in `skills.json` is what the sync MAINTAINS; a name in an agent's
+`skills` array is what that agent LOADS. Binding a skill without managing it means
+its live copy ages silently — `git-pr` was loaded by 44 Chainlayer agents while its
+live body sat 1,222 chars behind the repo, missing the never-self-approve rule, from
+2026-07-16 (CHA-1211). The reverse (managed, bound to nothing) is harmless.
+`SkillBindingCoverageTest` in `scripts/test_sync.py` now fails on the first case.
+
+**Before adding an existing skill to `skills.json`, read its live copy against the
+repo.** With no baseline entry the first walk applies *repo wins*, so managing a
+skill whose live body holds real workspace-side content deletes that content.
+
 ## Adding a new agent
 
 1. Create `<workspace>/<squad>/<agent-slug>/agent.json` (see `schemas/agent.json`).
