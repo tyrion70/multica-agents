@@ -140,6 +140,24 @@ for the second mechanism, verbatim:
 > where sync had to be run from `/home/peter` to dodge it). So walk ALL ancestors and
 > move every marker aside for the duration of this script, restoring them all on exit.
 
+### `--workspace-id` does NOT override it
+
+Passing the flag explicitly does not save you. Measured on 2026-09-04, same repo,
+seconds apart, both calls naming the Private workspace:
+
+```
+from a task workdir : multica --workspace-id <Private> agent list  ->  46 agents (Chainlayer)
+with the recipe     : multica --workspace-id <Private> agent list  ->  42 agents (Private)
+```
+
+The marker wins over the flag, silently, and the answer looks entirely plausible —
+a list of real agents, just the wrong workspace's. `scripts/sync.py --workspace
+Private` run from a task workdir reported `repo_updated=18 conflicts=28` for Private
+purely because it was diffing Private's repo files against Chainlayer's live agents;
+under the recipe the same command reports `repo_updated=0 conflicts=0`. **Any
+cross-workspace number measured without the recipe is meaningless**, however
+confidently the flag was passed.
+
 ### The failure mode: an incomplete unset looks exactly like a permission denial
 
 A half-done neutralisation does not error. The CLI stays scoped to the task's

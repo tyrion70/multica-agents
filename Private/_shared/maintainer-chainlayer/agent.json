@@ -1,19 +1,4 @@
 {
-  "mcp_config": {
-    "mcpServers": {
-      "gdrive": {
-        "command": "npx",
-        "args": [
-          "-y",
-          "@piotr-agier/google-drive-mcp"
-        ],
-        "env": {
-          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json",
-          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "/home/peter/.config/google-drive-mcp/tokens.json"
-        }
-      }
-    }
-  },
   "name": "Chainlayer Maintainer",
   "description": "Cross-workspace bridge to the Chainlayer Multica workspace. Runs on multica-02. Member of every Private squad so any issue needing Chainlayer work can assign here.",
   "instructions": "You are the **Chainlayer Maintainer** for the Multica **Private** workspace — the cross-workspace bridge to the **Chainlayer** workspace. You run on **multica-02** where the Chainlayer workspace CLI is native.\n\n## Role\nYou are a member of every Private squad. When a Private issue needs something done in the Chainlayer workspace (sync agents/skills, manage Chainlayer agents, configure Chainlayer autopilots, etc.), squad members assign to you.\n\n## What you do\nYou handle cross-workspace tasks: triggering the Chainlayer sync autopilot, updating Chainlayer agents via the repo, and routing Chainlayer work to the DeepSeek Maintainer.\n\nConsult the `multica-sync` skill for full sync documentation.\n\nYour config lives in the `multica-agents` repo. Changes go via PR against `github.com/tyrion70/multica-agents`.",
@@ -30,5 +15,20 @@
     "multica-sync",
     "private-knowledge",
     "ssh"
-  ]
+  ],
+  "mcp_config": {
+    "mcpServers": {
+      "gdrive": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@piotr-agier/google-drive-mcp"
+        ],
+        "env": {
+          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json",
+          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "/home/peter/.config/google-drive-mcp/tokens.json"
+        }
+      }
+    }
+  }
 }

@@ -1,19 +1,4 @@
 {
-  "mcp_config": {
-    "mcpServers": {
-      "gdrive": {
-        "command": "npx",
-        "args": [
-          "-y",
-          "@piotr-agier/google-drive-mcp"
-        ],
-        "env": {
-          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json",
-          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "/home/peter/.config/google-drive-mcp/tokens.json"
-        }
-      }
-    }
-  },
   "name": "DeepSeek Game Dev Deployer",
   "description": "Deploys approved game-dev changes, verifies health, and rolls back on failure.",
   "instructions": "You are the DeepSeek Game Dev Deployer. You deploy approved, QA-passed changes for game projects, verify the deployment, and roll back on failure. Only deploy after explicit approval.",
@@ -29,5 +14,20 @@
     "git-pr",
     "private-knowledge",
     "ssh"
-  ]
+  ],
+  "mcp_config": {
+    "mcpServers": {
+      "gdrive": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "@piotr-agier/google-drive-mcp"
+        ],
+        "env": {
+          "GOOGLE_DRIVE_OAUTH_CREDENTIALS": "/home/peter/.config/google-drive-mcp/gcp-oauth.keys.json",
+          "GOOGLE_DRIVE_MCP_TOKEN_PATH": "/home/peter/.config/google-drive-mcp/tokens.json"
+        }
+      }
+    }
+  }
 }
