@@ -320,3 +320,43 @@ Two general rules came out of it:
   the same defect as the rest of CHA-1211 wearing different clothes: an answer
   arrived where an answer was expected (`false` where a boolean was expected) and
   nobody checked it was an answer to the question being asked.
+
+## Rotating a secret: `--force` is the delivery path, because no diff can see it
+
+Both secret-bearing fields — `mcp_config` and `custom_env` — enter
+`.sync-state.json` as **projections**: server names for one, key names for the
+other. That is deliberate, and it is what keeps resolved secrets out of a file we
+commit. The consequence is that **a rotation is invisible to change detection**: the
+value changed, the projection did not, so every side reads identical forever.
+
+So `--force` is not an override for a diff that got it wrong. It is the only
+delivery path for a class of change a diff cannot represent:
+
+```
+scripts/sync.py --force --workspace Chainlayer --type agents
+```
+
+Three properties it has to keep:
+
+- **It asks about each field separately.** It used to gate on `mcp_config` alone.
+  Every agent that declares a `custom_env` today happens to declare an `mcp_config`
+  too, so the gate let them through as a side effect and the gap was invisible — the
+  first `custom_env`-only agent would have been unreachable by `--force` forever.
+- **It does not depend on reading the live value.** `agent env get` is audited and
+  restricted to the agent's owner or a workspace owner/admin; in practice it answers
+  only inside the sync autopilot's own run context. A force path that required it
+  would refuse to deliver in exactly the place a rotation has to be delivered from.
+  A rotation you cannot detect still has to be pushable.
+- **It still fails closed.** An unresolvable placeholder is never pushed, and a
+  denied `agent env set` is reported as *denied* — distinct from a generic failure,
+  because "you may not" and "that did not work" call for different responses — with
+  the baseline left untouched so the next run retries instead of recording an
+  undelivered rotation as delivered.
+
+Two hazards in `agent env set` worth knowing before you use it by hand: `{}` means
+**clear all keys**, and a value of `****` means **preserve the existing entry**. The
+first is why an empty `custom_env` is now a schema error and why the writer emits no
+file for one — a blank declaration must not wipe a live agent's secrets. The second
+is why the redaction placeholder in this repo is `<redacted>` and must never become
+`****`: a projection fed back into a write would silently no-op and look like a
+successful push.
