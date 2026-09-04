@@ -1058,10 +1058,13 @@ class CustomEnvOscillationTest(unittest.TestCase):
                 return {}
             if args[:3] == ["agent", "env", "get"]:
                 # Permission-gated in reality: readable for the agent's owner or
-                # a workspace owner/admin, denied for anyone else.
+                # a workspace owner/admin, denied for anyone else. And it answers
+                # with a WRAPPER, not the env map — this fake returned the bare map
+                # until CHA-1220 showed what the endpoint really sends.
                 self.env_get_calls += 1
                 if self.env_readable:
-                    return dict(self.env.get(args[3]) or {})
+                    return {"agent_id": args[3],
+                            "custom_env": dict(self.env.get(args[3]) or {})}
                 raise RuntimeError("You do not have permission to access this resource.")
             if args[:3] == ["agent", "skills", "set"]:
                 return {}
@@ -1739,6 +1742,84 @@ class McpConfigWithheldTest(unittest.TestCase):
         value, _ = sync._live_mcp_config_for_state(live, repo_n, last)
         fixed["mcp_config"] = sync._norm_agent_field("mcp_config", value)
         self.assertEqual(sync._decide_action(repo_n, fixed, last), "unchanged")
+
+
+class CustomEnvWrapperTest(unittest.TestCase):
+    """`agent env get` returns a WRAPPER, not the env map (CHA-1220).
+
+    `{"agent_id": …, "custom_env": {…}}` was returned verbatim, so the wrapper's own
+    keys became the variable names: every agent reported `["agent_id", "custom_env"]`
+    instead of its real keys, and all seven custom_env agents conflicted instead of
+    being delivered.
+
+    Two things make this one different from the other ten instances on this issue.
+    The shape was already written down — `_assert_custom_env_placeholders` names this
+    exact nesting as something to reject — so the repo knew what the wrapper looked
+    like as a thing to GUARD against, never as a thing to PARSE. And it is the one
+    path nobody could test: `agent env get` is permission-gated and was denied from
+    every runtime tried, so this line had never executed until it ran on the sync
+    host. The fake below is built from the shape the host actually returned.
+    """
+
+    def _fetch(self, response):
+        sync._multica = lambda *a, **k: response
+        return sync._fetch_agent_custom_env("25c1c1a0")
+
+    def setUp(self):
+        self._saved = sync._multica
+
+    def tearDown(self):
+        sync._multica = self._saved
+
+    def test_the_wrapper_is_unwrapped(self):
+        env = self._fetch({"agent_id": "25c1c1a0",
+                           "custom_env": {"DATAFEEDS_HEALTH_DSN": "postgres://x"}})
+        self.assertEqual(env, {"DATAFEEDS_HEALTH_DSN": "postgres://x"})
+        # The symptom, stated so the regression is unmistakable:
+        self.assertNotEqual(sorted(env), ["agent_id", "custom_env"])
+
+    def test_the_key_set_is_the_variable_names(self):
+        """What the resolver actually consumes — the projection, not the raw map."""
+        env = self._fetch({"agent_id": "25c1c1a0",
+                           "custom_env": {"NETBOX_API_TOKEN": "secret"}})
+        self.assertEqual(
+            sync._sanitize_custom_env_for_state(
+                sync._norm_agent_field("custom_env", {k: "<redacted>" for k in env})),
+            ["NETBOX_API_TOKEN"])
+
+    def test_an_empty_env_is_empty_not_the_wrapper_keys(self):
+        self.assertEqual(self._fetch({"agent_id": "a", "custom_env": {}}), {})
+
+    def test_a_null_env_is_none(self):
+        self.assertIsNone(self._fetch({"agent_id": "a", "custom_env": None}))
+
+    def test_a_response_without_the_key_is_a_hard_error(self):
+        """Not a fallthrough: reading an unrecognised object's keys as variable
+        names is exactly what this bug was."""
+        with self.assertRaises(sync.CustomEnvContractError) as cm:
+            self._fetch({"agent_id": "a", "env": {"A": "b"}})
+        self.assertIn("agent_id", str(cm.exception))
+
+    def test_a_bare_env_map_is_also_a_hard_error(self):
+        """Deliberate: the endpoint returns the wrapper. Accepting a bare map too
+        would mean guessing which shape arrived, and guessing shapes is the whole
+        defect. If the contract ever changes, this fails loudly rather than
+        silently reading something else's keys."""
+        with self.assertRaises(sync.CustomEnvContractError):
+            self._fetch({"DATAFEEDS_HEALTH_DSN": "postgres://x"})
+
+    def test_a_non_object_is_a_hard_error(self):
+        with self.assertRaises(sync.CustomEnvContractError):
+            self._fetch(["a", "b"])
+
+    def test_a_failed_call_is_still_unreadable_not_a_contract_error(self):
+        """The two failure modes stay distinct: denied is CustomEnvUnreadable (the
+        caller carries the baseline forward), malformed is a contract error."""
+        def boom(*a, **k):
+            raise RuntimeError("You do not have permission to access this resource.")
+        sync._multica = boom
+        with self.assertRaises(sync.CustomEnvUnreadable):
+            sync._fetch_agent_custom_env("25c1c1a0")
 
 
 if __name__ == "__main__":
