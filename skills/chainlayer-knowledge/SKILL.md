@@ -1,6 +1,6 @@
 ---
 name: chainlayer-knowledge
-description: Durable cross-cutting knowledge about ChainLayer's live infra projects — the chainlink-tools platform, the Optimism/Postgres/Proxmox migrations, the Filecoin voter node, and QuickNode RPC URLs. Read this for background/state and key decisions when working any ChainLayer infra issue; it points you at the domain skill for HOW-TO. Keep it updated (PR) when a durable fact or decision changes. ALSO the rule for posting to Slack: agent messages go out as the Albert Indigo bot (xoxb, from Bitwarden at point of use), NEVER through the `slack` MCP server, which carries Peter's personal xoxp token and would make every AI message look like he wrote it — read this before posting anything to Slack.
+description: Durable cross-cutting knowledge about ChainLayer's live infra projects — the chainlink-tools platform, the Optimism/Postgres/Proxmox migrations, the Filecoin voter node, and QuickNode RPC URLs. Read this for background/state and key decisions when working any ChainLayer infra issue; it points you at the domain skill for HOW-TO. Keep it updated (PR) when a durable fact or decision changes. ALSO the rule for posting to Slack: agent messages go out as the dedicated `peter_agent` bot (field SLACK_BOT_TOKEN_PETER_AGENT, xoxb, from Bitwarden at point of use), NEVER through the `slack` MCP server, which carries Peter's personal xoxp token and would make every AI message look like he wrote it — read this before posting anything to Slack.
 ---
 
 # ChainLayer knowledge
@@ -134,7 +134,7 @@ copy. The repo's `CLAUDE.md` is the short authoritative version of this.
   but JIT is the mechanism that replaces it. Tailscale SSH to the monitoring
   node is denied by tailnet policy.
 
-## Slack: agent messages go out as Albert Indigo, NOT through the `slack` MCP server
+## Slack: agent messages go out as an agent bot (`xoxb`), NOT through the `slack` MCP server
 **The MCP `slack` server is configured with the `xoxp` PERSONAL token, which
 authenticates as Peter's own user account** (workspace owner/admin). Posting through
 it makes every AI-authored message appear as though **Peter wrote it personally** —
@@ -148,31 +148,52 @@ inside one autopilot's description, where nothing outside that autopilot's own r
 could find it.
 
 **Instead**, resolve the bot token at point of use via the `bitwarden` skill — item
-**`ChainLayer · Slack — bot token (xoxb)`**, field `SLACK_BOT_TOKEN` — and call the
-Web API directly:
+**`ChainLayer · Slack — bot token (xoxb)`**, field **`SLACK_BOT_TOKEN_PETER_AGENT`** —
+and call the Web API directly:
 
 ```bash
-curl -s -X POST -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
+curl -s -X POST -H "Authorization: Bearer $SLACK_BOT_TOKEN_PETER_AGENT" \
   -H 'Content-type: application/json; charset=utf-8' \
   --data '{"channel":"#<channel>","text":"...","unfurl_links":false}' \
   https://slack.com/api/chat.postMessage
 ```
 
-That token is **Albert Indigo** (`ai_bot`, `U0BA9MGR77U`) — the workspace's AI bot
-identity and the correct author for agent messages. It holds `chat:write.public`, so
-it can post to any *existing* public channel **without being invited first**. Never
-echo the token.
+That field is **`peter_agent`** (`U0BV2JXRW04`, app `B0BUSMY10KD`) — a bot identity
+created specifically for agent posts (2026-09-04), so an AI-authored message is
+distinguishable from **both** Peter and Albert Indigo. It holds `chat:write.public`,
+so it can post to any *existing* public channel **without being invited first**.
+Never echo the token.
 
-Two practical notes:
+**Pick the field by name, not by shape.** The same Bitwarden item holds three fields,
+and the two bot tokens are indistinguishable by eye — both `xoxb`, both 57 characters:
 
+| field | identity | use it for |
+|---|---|---|
+| `SLACK_BOT_TOKEN_PETER_AGENT` | `peter_agent` / `U0BV2JXRW04` | **agent posts — this one** |
+| `SLACK_BOT_TOKEN` | `ai_bot` "Albert Indigo" / `U0BA9MGR77U` | the workspace's older AI bot; not for agent posts |
+| `SLACK_APP_TOKEN` | `xapp` app-level token | Socket Mode, not the Web API |
+
+Three practical notes:
+
+- **`bw sync` before an ad-hoc lookup.** The local Bitwarden cache does not notice a
+  field added on another machine, so a fresh field reads as absent — which looks
+  exactly like "the field doesn't exist" and sends you to the wrong one.
+  `SLACK_BOT_TOKEN_PETER_AGENT` was invisible for that reason within minutes of being
+  created (CHA-1211). `sync.sh` already runs `bw sync` before resolving placeholders;
+  an interactive or one-off lookup has to do it itself.
 - **Read the message back** rather than trusting the write's return value. A
   `chat.postMessage` that returns `ok` still tells you nothing about which identity
   it posted as — that is exactly how the CHA-1211 slip was caught, and how it would
-  have gone unnoticed otherwise.
+  have gone unnoticed otherwise. `auth.test` answers the same question before you
+  post, and is the only thing that tells the two `xoxb` tokens apart.
 - **`xoxb` is fetched fresh from Bitwarden every time, `xoxp` is not.** The `xoxp`
   token is baked into 35 agents' `mcp_config`, so rotating it requires a
-  repo→workspace delivery; rotating `xoxb` requires nothing. Worth knowing which one
-  you are being asked about.
+  repo→workspace delivery; rotating `xoxb` requires nothing. And the `xoxp` server
+  cannot simply be retired in favour of a bot token: `search.messages` rejects a bot
+  token with `not_allowed_token_type` even when the app has been granted the whole
+  `search:read.*` set (checked 2026-09-04 on `peter_agent`, which has it). Reading
+  the scope list says yes; reading the API's answer says no. Search stays user-token
+  work; **posting** does not.
 
 ## Co-authored-by commit hook — disabled at the workspace setting
 The Multica daemon installs a git `prepare-commit-msg` hook (in each bare repo's
