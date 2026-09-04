@@ -1756,9 +1756,9 @@ class CustomEnvWrapperTest(unittest.TestCase):
     The shape was already written down — `_assert_custom_env_placeholders` names this
     exact nesting as something to reject — so the repo knew what the wrapper looked
     like as a thing to GUARD against, never as a thing to PARSE. And it is the one
-    path nobody could test: `agent env get` is permission-gated and was denied from
-    every runtime tried, so this line had never executed until it ran on the sync
-    host. The fake below is built from the shape the host actually returned.
+    path nobody could test at the time: `agent env get` was denied from every
+    runtime tried -- for CLI-scoping reasons later understood, not privilege ones
+    -- so this line had never executed until it ran on the sync host. The fake below is built from the shape the host actually returned.
     """
 
     def _fetch(self, response):
@@ -1889,6 +1889,269 @@ class SlackWriteToolDisabledTest(unittest.TestCase):
                 f"{path.relative_to(REPO_ROOT)} lost SLACK_MCP_XOXP_TOKEN -- the MCP "
                 "server's reads depend on it and no bot token can replace them",
             )
+
+class MulticaDryRunWriteTest(unittest.TestCase):
+    """--dry-run must not perform the one write that carries secrets (CHA-1211).
+
+    `_multica`'s legacy mutation detection matched `args[1] in {create, update,
+    skills}`. For `agent env set` args[1] is "env", so it never matched, and both
+    call sites passed only `dry_run=`. A dry run therefore REPLACED a live
+    agent's custom_env for real — and for a repo file declaring `custom_env: {}`
+    it would have cleared it, since `agent env set` reads `{}` as "clear all
+    keys".
+
+    `agent env get` must keep running under --dry-run: it feeds change
+    detection, and skipping it would make the dry run report a different answer
+    than the real run — a preview that lies in the other direction.
+    """
+
+    def test_env_set_does_not_reach_the_cli_under_dry_run(self):
+        with mock.patch("subprocess.run") as sp:
+            out = sync._multica(
+                ["agent", "env", "set", "a1", "--custom-env-file", "/tmp/x.json"],
+                dry_run=True,
+            )
+        sp.assert_not_called()
+        self.assertIsNone(out)
+
+    def test_env_get_still_reaches_the_cli_under_dry_run(self):
+        with mock.patch("subprocess.run") as sp:
+            sp.return_value = mock.Mock(
+                returncode=0, stdout=json.dumps({"agent_id": "a1", "custom_env": {}}), stderr=""
+            )
+            out = sync._multica(["agent", "env", "get", "a1"], dry_run=True)
+        sp.assert_called_once()
+        self.assertEqual(out, {"agent_id": "a1", "custom_env": {}})
+
+    def test_the_other_agent_writes_are_still_recognised(self):
+        for verb in ("create", "update", "skills"):
+            with self.subTest(verb=verb), mock.patch("subprocess.run") as sp:
+                sync._multica(["agent", verb, "a1"], dry_run=True)
+                sp.assert_not_called()
+
+
+class CustomEnvRotationTest(unittest.TestCase):
+    """`--force` is the delivery path for a rotated custom_env (CHA-1211).
+
+    A rotation is undetectable by design, not by oversight: both secret-bearing
+    fields enter the baseline as PROJECTIONS -- key names for custom_env, server
+    names for mcp_config -- specifically so no resolved value is ever written to
+    a committed file. A rotation changes only the value, so every side reads
+    identical forever. `--force` exists because no diff can see this class of
+    change.
+
+    Two causes had to close together:
+
+    1. The force gate asked only about `mcp_config`. Every agent declaring a
+       custom_env today happens to declare an mcp_config too, so the gate passed
+       them through as a side effect and the hole was invisible -- the first
+       custom_env-only agent would have been unreachable by --force forever. The
+       fixture here is exactly that agent: custom_env, no mcp_config.
+    2. The push was coupled to the live env read. An unreadable env must never
+       block a delivery, whatever the reason it could not be read, so
+       `env_readable = False` is the default in these tests rather than the
+       exception.
+
+       The original justification -- that the read is permission-gated outside
+       the sync autopilot's own run context -- was withdrawn: it came from a
+       reproduction that unset MULTICA_* but left a
+       `.multica/daemon_task_context.json` on an ancestor path, which keeps the
+       CLI task-scoped and makes it answer "You do not have permission". Under
+       the full recipe the read succeeds from an ordinary runtime. The tests
+       below are unchanged by that, which is the point: they assert the property
+       (an unreadable env does not stop the push) and never the reason.
+    """
+
+    Backend = CustomEnvOscillationTest.Backend
+
+    class DenyingBackend(CustomEnvOscillationTest.Backend):
+        """Records how `env set` was called, and can refuse it the way the real
+        endpoint does for a context that is neither owner nor admin."""
+
+        def __init__(self):
+            super().__init__()
+            self.env_set_calls = []       # (agent_id, payload, mutating_kwarg)
+            self.deny_env_set = False
+
+        def __call__(self, args, dry_run=False, mutating=False):
+            if args[:3] == ["agent", "env", "set"]:
+                if self.deny_env_set:
+                    raise RuntimeError(
+                        "You do not have permission to access this resource."
+                    )
+                path = args[args.index("--custom-env-file") + 1]
+                with open(path) as fh:
+                    payload = json.load(fh)
+                self.env_set_calls.append((args[3], payload, mutating))
+                self.env[args[3]] = payload
+                return {}
+            return super().__call__(args, dry_run=dry_run, mutating=mutating)
+
+    ENV = {"DATAFEEDS_HEALTH_DSN": "#Datafeeds Health DSN:dsn#"}
+
+    def setUp(self):
+        self.tmp = pathlib.Path(__import__("tempfile").mkdtemp())
+        self.ws = self.tmp / WS_NAME
+        self.agent_json = self.ws / "squad-a" / "monitor" / "agent.json"
+        self.agent_json.parent.mkdir(parents=True)
+        # custom_env and NO mcp_config: the shape the old gate could not reach.
+        self._write_repo({
+            "name": "Datafeeds Health Monitor",
+            "runtime_id": "rt-1",
+            "description": "watches feeds",
+            "custom_env": dict(self.ENV),
+        })
+        self.state_path = self.tmp / ".sync-state.json"
+        self.backend = self.DenyingBackend()
+        self.secret = "dsn-v1"
+        self._patches = [
+            mock.patch.object(sync, "REPO_ROOT", self.tmp),
+            mock.patch.object(sync, "DEFAULT_STATE_PATH", self.state_path),
+            mock.patch.object(sync, "WORKSPACE_IDS", {WS_NAME: WS_ID}),
+            mock.patch.object(sync, "_multica", self.backend),
+            mock.patch.object(sync, "_bw_get_secret", side_effect=lambda *a, **k: self.secret),
+        ]
+        for p in self._patches:
+            p.start()
+
+    def tearDown(self):
+        for p in self._patches:
+            p.stop()
+        __import__("shutil").rmtree(self.tmp, ignore_errors=True)
+
+    def _write_repo(self, data):
+        self.agent_json.write_text(json.dumps(data), encoding="utf-8")
+
+    def _run(self, *extra):
+        argv = ["sync.py", "--type", "agents", "--workspace", WS_NAME,
+                "--sync-state", str(self.state_path), "--allow-create"] + list(extra)
+        with mock.patch.object(sys, "argv", argv):
+            with contextlib.redirect_stderr(io.StringIO()) as err:
+                try:
+                    sync.main()
+                except SystemExit as e:
+                    return (e.code or 0), err.getvalue()
+        return 0, err.getvalue()
+
+    def _state(self):
+        return json.loads(self.state_path.read_text(encoding="utf-8"))
+
+    def _settle(self):
+        """Create the agent and reach a steady 'unchanged' state."""
+        self._run()
+        self._run()
+        self.backend.env_set_calls.clear()
+
+    # -- the gate -----------------------------------------------------------
+
+    def test_force_reaches_an_agent_that_declares_custom_env_and_no_mcp_config(self):
+        self._settle()
+        self.secret = "dsn-v2-rotated"
+        _, err = self._run("--force")
+        self.assertTrue(
+            self.backend.env_set_calls,
+            "--force did not re-push custom_env for an agent with no mcp_config "
+            "block. The gate must ask about EACH secret-bearing field; asking "
+            "only about mcp_config leaves custom_env with no push-all path, and "
+            "the current overlap between the two hides that.\n" + err,
+        )
+        aid, payload, _ = self.backend.env_set_calls[-1]
+        self.assertEqual(payload, {"DATAFEEDS_HEALTH_DSN": "dsn-v2-rotated"},
+                         "the rotated value did not reach the live agent")
+        self.assertIn("custom_env", err)
+
+    def test_a_plain_run_cannot_see_the_rotation(self):
+        """Not a wart -- the reason --force has to exist. The baseline holds key
+        NAMES so no secret is committed, so a changed VALUE is invisible."""
+        self._settle()
+        self.secret = "dsn-v2-rotated"
+        _, err = self._run()
+        self.assertEqual(self.backend.env_set_calls, [])
+        self.assertIn("unchanged", err)
+
+    # -- cause 2: the force path must not need the gated read ---------------
+
+    def test_force_pushes_even_though_the_live_env_read_is_denied(self):
+        self.backend.env_readable = False
+        self._settle()
+        self.secret = "dsn-v2-rotated"
+        _, err = self._run("--force")
+        self.assertTrue(
+            self.backend.env_set_calls,
+            "--force must not depend on `agent env get`. Whatever makes that "
+            "read fail -- privilege, CLI scoping, a changed contract -- it is a "
+            "diagnostic, and a diagnostic must not decide whether a rotation can "
+            "be delivered.\n" + err,
+        )
+
+    def test_a_denied_read_is_never_recorded_as_an_emptied_env(self):
+        self.backend.env_readable = False
+        self._settle()
+        st = self._state()["agents"][f"{WS_NAME}~Datafeeds Health Monitor"]
+        self.assertEqual(st["multica_state"]["custom_env"], ["DATAFEEDS_HEALTH_DSN"],
+                         "a denied read must carry the baseline forward, not blank it")
+
+    # -- fail-closed --------------------------------------------------------
+
+    def test_a_forced_push_never_emits_an_unresolved_placeholder(self):
+        self._settle()
+        with mock.patch.object(sync, "_bw_get_secret",
+                               side_effect=sync.SecretResolutionError("vault locked")):
+            _, err = self._run("--force")
+        self.assertEqual(self.backend.env_set_calls, [],
+                         "fail-closed: an unresolvable placeholder must not be pushed")
+        self.assertIn("SKIPPING push (fail-closed)", err)
+
+    def test_a_denied_env_set_is_reported_as_denied_and_not_recorded_as_done(self):
+        self._settle()
+        before = self._state()["agents"][f"{WS_NAME}~Datafeeds Health Monitor"]
+        self.backend.deny_env_set = True
+        self.secret = "dsn-v2-rotated"
+        code, err = self._run("--force")
+        self.assertIn("CUSTOM_ENV SET DENIED", err,
+                      "a denial is not a generic failure -- it must say so")
+        self.assertIn("daemon_task_context.json", err,
+                      "the message must point at the likeliest cause. A task-scoped "
+                      "CLI answers with this same denial, so a message that reads as "
+                      "a privilege verdict sends the operator to the wrong fix -- "
+                      "which is exactly how the retracted claim on CHA-1211 survived")
+        self.assertNotEqual(code, 0, "a denied write must make the run fail")
+        after = self._state()["agents"][f"{WS_NAME}~Datafeeds Health Monitor"]
+        self.assertEqual(before, after,
+                         "the baseline must not advance on a half-applied push, or the "
+                         "next run reads the undelivered rotation as already delivered")
+
+    def test_the_env_set_call_declares_itself_mutating(self):
+        """The call site's half of the dry-run fix: `_multica` can only skip a
+        write under --dry-run if the caller says it is one."""
+        self._settle()
+        self.secret = "dsn-v2"
+        self._run("--force")
+        self.assertTrue(self.backend.env_set_calls)
+        for aid, payload, mutating in self.backend.env_set_calls:
+            self.assertTrue(mutating, "env set must be called with mutating=True")
+
+    # -- the clear-all-keys hazard ------------------------------------------
+
+    def test_an_empty_custom_env_never_becomes_a_clear_all_keys_write(self):
+        self._settle()
+        # Bypass schema validation deliberately: minProperties now rejects this
+        # at authoring time, and this asserts the second line of defence for any
+        # path that reaches the writer without validating.
+        self.assertIsNone(
+            sync._write_custom_env_tempfile({"name": "x", "custom_env": {}}),
+            "`{}` means 'clear all keys' to `agent env set` -- an empty "
+            "declaration must produce no write at all, not an env wipe",
+        )
+
+    def test_the_schema_rejects_an_empty_custom_env(self):
+        schema = json.loads((REPO_ROOT / "schemas" / "agent.json").read_text(encoding="utf-8"))
+        self._write_repo({
+            "name": "Datafeeds Health Monitor", "runtime_id": "rt-1",
+            "description": "watches feeds", "custom_env": {},
+        })
+        with self.assertRaises(Exception):
+            sync.validate_agent_json(self.agent_json, schema)
 
 
 if __name__ == "__main__":

@@ -119,6 +119,81 @@ always target that workspace, never the host default. A run still **refuses** to
 sync agents for a directory whose name isn't a known workspace. The two production
 autopilots each pass `--workspace <slug>` explicitly anyway (one per workspace).
 
+## Running a CLI command against a workspace from a host
+
+Inside an agent task run the `multica` CLI is scoped to **that task's** workspace, so
+a command you expect to hit the host default hits the task's workspace instead. Two
+mechanisms do it, and unsetting only the first is the trap:
+
+1. the `MULTICA_*` environment variables (`MULTICA_WORKSPACE_ID`, `MULTICA_TOKEN`,
+   `MULTICA_TASK_ID`, …), and
+2. `.multica/daemon_task_context.json` — the on-disk twin, which the CLI discovers by
+   walking **up** from the CWD.
+
+`scripts/sync.sh` is the implementation; read it rather than copying it. Its reasoning
+for the second mechanism, verbatim:
+
+> The CLI stops at the **FIRST** marker it finds, but a nested task workdir can carry
+> MORE than one on its ancestor path — e.g. the task's own marker plus a stale one
+> higher up under `.../multica_workspaces/`. Neutralising only the nearest leaves the
+> higher one still re-scoping the CLI (**CHA-874**, surfaced during CHA-873's deploy
+> where sync had to be run from `/home/peter` to dodge it). So walk ALL ancestors and
+> move every marker aside for the duration of this script, restoring them all on exit.
+
+### The failure mode: an incomplete unset looks exactly like a permission denial
+
+A half-done neutralisation does not error. The CLI stays scoped to the task's
+workspace and answers `You do not have permission to access this resource` — which
+reads as a permission boundary and is nothing of the kind.
+
+That is not hypothetical. On 2026-09-04 `multica agent env get` was reported as
+permission-gated everywhere except the sync autopilot's own run context, and a
+rotation path was designed around that supposed fact. The reproduction had unset the
+env vars but left the daemon markers in place. Under the full recipe the same call
+returns normally from an ordinary task runtime (CHA-1211). **Before concluding
+anything about permissions, look at the markers:**
+
+```bash
+d="$PWD"; while [ -n "$d" ]; do
+  [ -f "$d/.multica/daemon_task_context.json" ] && echo "MARKER: $d"
+  [ "$d" = "/" ] && break; d="$(dirname "$d")"
+done
+```
+
+### Two ways to do it
+
+**Prefer this one — run from a directory with no marker on its ancestor path.** Then
+there is nothing to move and nothing to restore, so a run that dies mid-way cannot
+leave the CLI broken:
+
+```bash
+cd /home/peter        # clean today; verify with the loop above
+env -u MULTICA_TOKEN -u MULTICA_WORKSPACE_ID -u MULTICA_TASK_ID -u MULTICA_AGENT_ID \
+    -u MULTICA_AGENT_NAME -u MULTICA_SERVER_URL -u MULTICA_DAEMON_PORT \
+    -u MULTICA_TASK_SLOT -u MULTICA_TASK_CONFIG_ROOT -u MULTICA_TASK_WORKSPACES_ROOT \
+    multica agent list          # ← substitute your own command
+```
+
+The CLI then falls back to host login, which means the **host default** workspace
+above — on `multica-01` that is Private, on `multica-02` Chainlayer. Pass
+`--workspace <slug>` when you want the other one.
+
+**Only if you must run from inside a task workdir** (the sync scripts do, because they
+run out of the repo checkout): move every marker aside and restore them in an `EXIT`
+trap, as `sync.sh` does. Do not attempt this ad hoc without the trap — losing CLI
+access mid-run is worse than not knowing the answer.
+
+### `agent env get` returns resolved secrets
+
+The response is a wrapper, `{"agent_id": …, "custom_env": {…}}`, and the values are
+the **real** ones, not placeholders. When using it to diagnose, project to key names
+before printing — a bare `--output json` puts live credentials in your run log:
+
+```bash
+multica agent env get "$AGENT_ID" --output json | python3 -c \
+  "import json,sys; print(sorted(json.load(sys.stdin)['custom_env']))"
+```
+
 ## Autopilots
 
 The sync autopilots run on schedule and on merges to `main`. Each:

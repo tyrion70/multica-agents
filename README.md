@@ -320,3 +320,79 @@ Two general rules came out of it:
   the same defect as the rest of CHA-1211 wearing different clothes: an answer
   arrived where an answer was expected (`false` where a boolean was expected) and
   nobody checked it was an answer to the question being asked.
+
+## A break-on-purpose run is worth nothing if what you restored isn't what executes
+
+This repo checks a guard by breaking it on purpose and watching the named test
+fail. That check has its own failure mode: **clear `__pycache__` between the revert
+and the restore.**
+
+Reverting the denied-`env set` message meant swapping `DENIED` for `FAILED`. Both are
+six characters, so the file size never changed, and `cp` put the mtime back in the
+same second. Python validates a `.pyc` on source mtime **and size** — both matched,
+so the restored file was never recompiled and the *reverted* bytecode kept running.
+A test that should have passed failed, and the first read of that was "ordering
+dependence in the new tests".
+
+The restore was correct. The execution wasn't. Nothing in the source, the diff or
+`git status` could show it, because none of them is what ran:
+
+```bash
+find . -name __pycache__ -type d -not -path './.git/*' -exec rm -rf {} +
+rm -rf .pytest_cache
+```
+
+Same shape as everything else on CHA-1211 — the artifact you inspected was not the
+artifact that answered — with the twist that here the artifact was the *test
+harness*. A same-length edit is the dangerous case, so assume it whenever a
+break-on-purpose result surprises you.
+
+## Rotating a secret: `--force` is the delivery path, because no diff can see it
+
+Both secret-bearing fields — `mcp_config` and `custom_env` — enter
+`.sync-state.json` as **projections**: server names for one, key names for the
+other. That is deliberate, and it is what keeps resolved secrets out of a file we
+commit. The consequence is that **a rotation is invisible to change detection**: the
+value changed, the projection did not, so every side reads identical forever.
+
+So `--force` is not an override for a diff that got it wrong. It is the only
+delivery path for a class of change a diff cannot represent:
+
+```
+scripts/sync.py --force --workspace Chainlayer --type agents
+```
+
+Three properties it has to keep:
+
+- **It asks about each field separately.** It used to gate on `mcp_config` alone.
+  Every agent that declares a `custom_env` today happens to declare an `mcp_config`
+  too, so the gate let them through as a side effect and the gap was invisible — the
+  first `custom_env`-only agent would have been unreachable by `--force` forever.
+- **It does not depend on reading the live value.** An unreadable env must never
+  block a delivery, whatever the reason it could not be read — a rotation you cannot
+  detect still has to be pushable, and coupling a push to a diagnostic read makes
+  delivery fail for reasons that have nothing to do with the payload.
+
+  This was first justified by a stronger claim — that `agent env get` answers only
+  inside the sync autopilot's own run context — and that claim was wrong. It came
+  from a reproduction that unset `MULTICA_*` but left a
+  `.multica/daemon_task_context.json` in place on an ancestor path, which keeps the
+  CLI task-scoped and makes it reply *"You do not have permission to access this
+  resource."* **An incomplete neutralisation is indistinguishable from a denial.**
+  Under the full recipe the read succeeds from an ordinary runtime; the recipe is in
+  the `multica-sync` skill and the implementation is in `scripts/sync.sh`. The
+  decoupling was right for a reason that survives its own premise being false, which
+  is the only kind of reason worth writing down.
+- **It still fails closed.** An unresolvable placeholder is never pushed, and a
+  denied `agent env set` is reported as *denied* — distinct from a generic failure,
+  because "you may not" and "that did not work" call for different responses — with
+  the baseline left untouched so the next run retries instead of recording an
+  undelivered rotation as delivered.
+
+Two hazards in `agent env set` worth knowing before you use it by hand: `{}` means
+**clear all keys**, and a value of `****` means **preserve the existing entry**. The
+first is why an empty `custom_env` is now a schema error and why the writer emits no
+file for one — a blank declaration must not wipe a live agent's secrets. The second
+is why the redaction placeholder in this repo is `<redacted>` and must never become
+`****`: a projection fed back into a write would silently no-op and look like a
+successful push.

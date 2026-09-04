@@ -28,7 +28,7 @@ Usage:
   scripts/sync.py --workspace Chainlayer       # one workspace; passes --workspace-id to every CLI call
   scripts/sync.py --workspace Private          # Private workspace (9627be94-...)
   scripts/sync.py --dry-run                    # print what would happen, no writes
-  scripts/sync.py --force                      # re-resolve + re-push every agent's mcp_config (full restore)
+  scripts/sync.py --force                      # re-resolve + re-push every agent's mcp_config AND custom_env (rotation / full restore)
   scripts/sync.py --sync-state /tmp/state.json # alternate state file
 
 Workspace IDs (same Multica instance, multica.252h.org):
@@ -130,11 +130,26 @@ def _multica(args: List[str], dry_run: bool = False, mutating: bool = False) -> 
         print(f"      [DRY-RUN] would run: {_dry_run_cmd()}", file=sys.stderr)
         return None
 
-    # Legacy agent mutation detection for backwards compatibility
+    # Legacy agent mutation detection for backwards compatibility.
+    #
+    # `agent env set` was missing from this set. It is a WRITE, but args[1] is
+    # "env" rather than "set", so the membership test never matched it — and both
+    # call sites passed only dry_run=, never mutating=True. A --dry-run therefore
+    # REPLACED a live agent's custom_env for real: the flag whose entire purpose
+    # is to promise "no writes" performed the one write that carries resolved
+    # secrets, and would have cleared the env outright for a repo file declaring
+    # `custom_env: {}` (CHA-1211).
+    #
+    # Matched on the two-token verb, not on args[1] == "env", because `agent env
+    # get` is a READ that a dry-run still needs for change detection. Skipping
+    # that too would make the dry-run report a different answer than the real run.
     agent_mutating = (
         args[0] == "agent"
         and len(args) >= 2
-        and args[1] in {"create", "update", "skills"}
+        and (
+            args[1] in {"create", "update", "skills"}
+            or args[1:3] == ["env", "set"]
+        )
     )
     if dry_run and agent_mutating:
         print(f"      [DRY-RUN] would run: {_dry_run_cmd()}", file=sys.stderr)
@@ -838,6 +853,21 @@ def _write_custom_env_tempfile(agent_data: Dict[str, Any]) -> Optional[str]:
     custom_env = agent_data.get("custom_env")
     if custom_env is None:
         return None
+    if not custom_env:
+        # `agent env set` documents `{}` as "clear all keys". A repo file
+        # declaring an empty custom_env is schema-valid (was: no minProperties)
+        # and almost certainly means "this agent declares none" — so pushing it
+        # verbatim would WIPE a live agent's secrets to satisfy a file that says
+        # nothing. Refuse to speak: emit no file, so `env set` is never called.
+        # Clearing an env for real stays a deliberate act performed with the CLI,
+        # not something a blank field does on your behalf (CHA-790 / CHA-1211).
+        print(
+            "    ⚠ custom_env is declared but empty — NOT pushing it. `{}` means "
+            "'clear all keys' to `agent env set`; remove the field instead, or "
+            "clear it deliberately with the CLI.",
+            file=sys.stderr,
+        )
+        return None
     resolved = _resolve_mcp_secrets(custom_env)
     fd, path = tempfile.mkstemp(suffix=".json", prefix="custom-env-")
     with os.fdopen(fd, "w") as f:
@@ -845,14 +875,37 @@ def _write_custom_env_tempfile(agent_data: Dict[str, Any]) -> Optional[str]:
     return path
 
 
+def _is_permission_denied(exc: Exception) -> bool:
+    """True when a multica call failed because this context may not perform it.
+
+    Kept distinct from every other failure for the same reason the read side
+    separates CustomEnvUnreadable from CustomEnvContractError: "you may not" and
+    "that did not work" call for different responses, and collapsing them is how
+    a denial gets retried forever or recorded as an empty value (CHA-1211).
+
+    The agent env endpoints are audited and restricted to the agent's owner or a
+    workspace owner/admin, so a denial here is a fact about the CONTEXT, not
+    about the agent or the payload.
+    """
+    return "do not have permission" in str(exc).lower()
+
+
 class CustomEnvUnreadable(RuntimeError):
     """`agent env get` could not be read — NOT the same as "the agent has none".
 
-    The endpoint is permission-gated to the agent's owner or a workspace
-    owner/admin, so from a runtime that is neither it returns "You do not have
-    permission to access this resource". Swallowing that as None recorded a
-    denied read as an emptied env, which is the same defect as the skill
-    deletion: a failed read treated as an intentional edit (CHA-1211)."""
+    The endpoint is restricted to the agent's owner or a workspace owner/admin
+    and returns "You do not have permission to access this resource" when the
+    caller is neither. Swallowing that as None recorded a denied read as an
+    emptied env, which is the same defect as the skill deletion: a failed read
+    treated as an intentional edit (CHA-1211).
+
+    Do not read that message as a privilege verdict. The commonest cause is
+    SCOPING: a `.multica/daemon_task_context.json` left in place on an ancestor
+    of the CWD keeps the CLI pointed at a task's workspace, and it answers with
+    this exact string. An incomplete neutralisation is indistinguishable from a
+    denial — which is how "the read only works inside the sync autopilot" became
+    a believed fact on CHA-1211 before the full recipe disproved it. The recipe
+    is in the `multica-sync` skill; the implementation is in sync.sh."""
 
 
 class CustomEnvContractError(RuntimeError):
@@ -879,9 +932,10 @@ def _fetch_agent_custom_env(agent_id: str) -> Optional[Dict[str, str]]:
     against, never as a thing to parse. A guard that recognises a bad shape is not
     the same as a reader that knows the good one.
 
-    And it is the one path nobody could test: `agent env get` is permission-gated,
-    denied from every runtime tried, so this line had never actually executed until
-    it ran on the sync host. Everything else on this issue was verified offline
+    And it is the one path nobody could test at the time: `agent env get` was
+    denied from every runtime tried — for scoping reasons later understood, not
+    privilege ones — so this line had never actually executed until it ran on the
+    sync host. Everything else on this issue was verified offline
     against fakes built from shapes we could observe; this shape could not be
     observed, so the fake was built from an assumption.
 
@@ -1553,20 +1607,58 @@ def sync_agents_workspace(
             action = _decide_action(repo_norm, multica_norm, last)
             agent_id: Optional[str] = live_agent["id"] if live_agent else None
 
-            # --force: re-resolve and re-push mcp_config for every agent that has
-            # a block and a live counterpart, bypassing change detection. The
-            # diff compares against a redacted live read, so an agent already
-            # holding placeholders (or whose secret was wiped) reads as
-            # "unchanged" and is skipped forever; --force is the reliable
-            # full-restore path. Fail-closed still applies inside the push, so a
-            # forced run can never push an unresolved placeholder either.
+            # --force: re-resolve and re-push every secret-bearing field for an
+            # agent with a live counterpart, bypassing change detection.
+            #
+            # Change detection CANNOT see a rotated secret, and not by accident:
+            # both fields enter the baseline as projections — key names for
+            # custom_env, server names for mcp_config — precisely so no resolved
+            # value is ever written to a file we commit. A rotation changes only
+            # the VALUE, so both sides read identical forever. That is what
+            # --force is for; it is the delivery path for a class of change no
+            # diff can detect, rather than an override of a diff that got it
+            # wrong.
+            #
+            # It used to gate on mcp_config alone, which left custom_env with no
+            # push-all path at all (CHA-1211). Today every agent declaring a
+            # custom_env happens to declare an mcp_config too, so the gate let
+            # them through as a side effect and the hole was invisible — the
+            # first custom_env-only agent would have been unreachable by --force
+            # forever. Ask about each field instead of relying on the overlap.
+            #
+            # Deliberately NOT conditional on the live custom_env read. An
+            # unreadable env must never block a delivery, whatever the reason it
+            # could not be read: a rotation you cannot detect still has to be
+            # pushable, and coupling a push to a diagnostic read makes delivery
+            # fail for reasons that have nothing to do with the payload.
+            #
+            # This was first justified by a report that the read is
+            # permission-gated outside the sync autopilot's own run context. That
+            # was a reproduction artifact, not a boundary: unsetting MULTICA_*
+            # while leaving a .multica/daemon_task_context.json in place on an
+            # ancestor path leaves the CLI task-scoped, and it then answers "You
+            # do not have permission to access this resource". Under the full
+            # recipe the read succeeds from an ordinary runtime (CHA-1211 —
+            # procedure in the `multica-sync` skill, implementation in sync.sh).
+            # The decoupling stands on its own merits; the premise it arrived
+            # with did not.
+            #
+            # Fail-closed still applies inside the push, so a forced run can
+            # never emit an unresolved placeholder either.
+            forced_fields = [
+                f for f in ("mcp_config", "custom_env") if repo_data.get(f) is not None
+            ]
             if (
                 force
                 and live_agent is not None
-                and repo_data.get("mcp_config") is not None
+                and forced_fields
                 and action != "push_to_multica"
             ):
-                print(f"    ⟳ --force: re-pushing mcp_config (bypassing diff, was '{action}')", file=sys.stderr)
+                print(
+                    f"    ⟳ --force: re-pushing {', '.join(forced_fields)} "
+                    f"(bypassing diff, was '{action}')",
+                    file=sys.stderr,
+                )
                 action = "push_to_multica"
 
             if action == "unchanged":
@@ -1652,9 +1744,31 @@ def sync_agents_workspace(
                     # Set custom_env separately via env set (not supported on agent update)
                     if custom_env_file and live_agent is not None:
                         try:
-                            _multica(["agent", "env", "set", agent_id, "--custom-env-file", custom_env_file], dry_run=dry_run)
+                            _multica(["agent", "env", "set", agent_id, "--custom-env-file", custom_env_file],
+                                      dry_run=dry_run, mutating=True)
                         except Exception as e:
-                            print(f"    ✗ CUSTOM_ENV SET FAILED: {e}", file=sys.stderr)
+                            if _is_permission_denied(e):
+                                # A fact about this run's context, not about the
+                                # agent or the payload — so say which, and where
+                                # it CAN be done. The read side already keeps
+                                # "denied" distinct from "none"; the write side
+                                # has the same two answers to tell apart.
+                                print(
+                                    f"    ✗ CUSTOM_ENV SET DENIED: this context may not write agent "
+                                    f"env (owner/admin only, audited).", file=sys.stderr)
+                                print(
+                                    f"      The rest of the push landed; the custom_env half did NOT — "
+                                    f"the baseline is unchanged, so the next run retries.", file=sys.stderr)
+                                print(
+                                    f"      Before treating this as a privilege problem, look for a "
+                                    f".multica/daemon_task_context.json on an ANCESTOR of the CWD: a "
+                                    f"task-scoped CLI answers with exactly this message. Recipe in the "
+                                    f"`multica-sync` skill.", file=sys.stderr)
+                            else:
+                                print(f"    ✗ CUSTOM_ENV SET FAILED: {e}", file=sys.stderr)
+                            # No baseline write: `continue` skips it, so the agent
+                            # is retried next run instead of being recorded as
+                            # delivered. A half-applied push must not look done.
                             counts["errors"] += 1
                             continue
                 finally:
@@ -1734,7 +1848,8 @@ def sync_agents_workspace(
 
                         # Set custom_env after update (env set, not supported on agent update)
                         if custom_env_file:
-                            _multica(["agent", "env", "set", agent_id, "--custom-env-file", custom_env_file], dry_run=dry_run)
+                            _multica(["agent", "env", "set", agent_id, "--custom-env-file", custom_env_file],
+                                      dry_run=dry_run, mutating=True)
                     except Exception as e:
                         print(f"    ✗ MULTICA UPDATE FAILED: {e}", file=sys.stderr)
                         counts["errors"] += 1
@@ -2360,12 +2475,15 @@ def main() -> None:
     parser.add_argument(
         "--force",
         action="store_true",
-        help="Re-resolve and re-push mcp_config for every agent that has a block, "
-             "bypassing change detection. The diff compares against a redacted "
-             "live read, so an agent already holding placeholders reads as "
-             "'unchanged' and is never re-pushed; --force is the reliable "
-             "full-restore path. Fail-closed still applies (never pushes an "
-             "unresolved placeholder).",
+        help="Re-resolve and re-push BOTH secret-bearing fields — mcp_config and "
+             "custom_env — for every agent that declares one. Change detection "
+             "cannot see a rotated secret by design: both fields enter the "
+             "baseline as projections (key names, server names) so no resolved "
+             "value is ever committed, and a rotation changes only the value. So "
+             "this is the delivery path for rotations and full restores, not an "
+             "override of a diff that got it wrong. It does not depend on "
+             "reading the live env at all. Fail-closed still applies (never "
+             "pushes an unresolved placeholder).",
     )
     parser.add_argument(
         "--allow-create",
