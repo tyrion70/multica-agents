@@ -144,11 +144,46 @@ Closes OPS-XXXX
 ## Impact
 <scope and risk: what's affected, what's not, required actions>
 
+## Security impact
+<mandatory — see below. Never blank, never a bare "N/A".>
+
 ---
 Claude <model>
 EOF
 )"
 ```
+
+### `## Security impact` is mandatory on every MR
+
+**Every MR carries this section, including chores and dependency bumps** — a
+version bump *is* a supply-chain change, and "it's only a config file" is how
+an exposed admin namespace or a `curl | sh` on every deploy gets shipped
+without anyone weighing it.
+
+Answer against these, and only the ones that apply:
+
+- **Attack surface** — new or removed listeners, ports, routes, RPC namespaces,
+  published container ports, anything reachable that was not before.
+- **Privileges** — anything running as root, new `sudo`/capabilities, broadened
+  IAM or RBAC, a service account gaining scope.
+- **Secrets and credentials** — new secrets, a credential moving or gaining a
+  second home on disk, tokens in argv or logs, rotation implications.
+- **Data exposure** — logs or artefacts that could carry sensitive values,
+  paths or internal topology committed to a repo.
+- **Supply chain** — new or bumped third-party code, unpinned versions, remote
+  scripts executed during deploy, registry or mirror changes.
+- **Auth and network paths** — authentication or authorisation logic, firewall
+  or ACL rules, tailnet/VPN reachability.
+
+**"None" is a valid answer, but only with its reason.** An unreasoned "None"
+is worth exactly as much as leaving the section out, so write
+*"None — config-only; no new network paths, credentials or privileges"*, not
+*"None"*. If a reviewer still has to ask "what's the security impact?", the
+section failed.
+
+Say so plainly when the impact is **negative**: an MR that *reduces* exposure
+is the best kind, and stating it is how the reduction gets credited and
+verified rather than assumed.
 
 **The MR author is the token `glab` authenticates with — and that token is
 `peter-agent`, resolved from 1Password at point of use.** Never run

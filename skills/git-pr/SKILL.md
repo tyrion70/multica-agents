@@ -76,10 +76,19 @@ gh pr create --title "<type>: <title>" --body "$(cat <<'EOF'
 ## Summary
 <1-2 sentences>
 
+## Security impact
+<mandatory — never blank, never a bare "N/A".>
+
 Tracked in Multica: <issue identifier / URL>
 EOF
 )"
 ```
+
+**`## Security impact` is mandatory here too**, on the same terms as company
+MRs — the checklist and the "None needs its reason" rule are written out in the
+`git-mr` skill under *"`## Security impact` is mandatory on every MR"*; they
+apply unchanged to private PRs. Private does not mean unreviewed: these repos
+still hold credentials, deploy scripts and third-party dependencies.
 
 There is **no Linear closing magic word** for private work — the tracking issue
 lives in Multica, not Linear. A GitHub-side `Closes #NN` may still be used to
