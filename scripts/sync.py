@@ -350,7 +350,32 @@ def multica_to_agent_json(
             result["skills"] = _norm_agent_field("skills", live.get("skills"))
         elif field in ("model", "thinking_level"):
             val = live.get(field)
-            result[field] = val if val != "" else None
+            # `""` and `null` BOTH mean "runtime default" — schemas/agent.json says
+            # so in as many words for both fields — so rewriting one into the other
+            # changes the file without changing its meaning. This coerced every `""`
+            # to `null`, which invented a value neither side held: live had `""`, the
+            # repo had `""`, and the pull wrote `null`.
+            #
+            # It is worse than cosmetic. The commit-scope guard refuses the resulting
+            # dirty file, so the change can never land; the next run fast-forwards
+            # main back to `""`, rewrites it to `null`, and is refused again — every
+            # night, indefinitely (CHA-1216).
+            #
+            # Note what the fix is NOT: "a `""` read stays `""`" on its own would
+            # rewrite `thinking_level: null` to `""` in 45 files that currently agree
+            # with the writer, trading one spurious diff for forty-five. The rule that
+            # holds in both directions is: when the two forms are equivalent, keep
+            # whichever one the repo already uses, and never write a change the reader
+            # cannot see.
+            if (
+                existing
+                and field in existing
+                and val in ("", None)
+                and existing[field] in ("", None)
+            ):
+                result[field] = existing[field]
+            else:
+                result[field] = val
         elif field in ("mcp_config", "custom_env"):
             pass  # preserved from the existing repo file above; never from live
         else:
