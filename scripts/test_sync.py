@@ -1562,5 +1562,59 @@ class ShellFailOpenLintTest(unittest.TestCase):
             __import__("shutil").rmtree(tmp, ignore_errors=True)
 
 
+class RuntimeDefaultSerialisationTest(unittest.TestCase):
+    """`model`/`thinking_level`: `""` and `null` both mean "runtime default", so a
+    write must not swap one for the other (CHA-1211 / CHA-1216).
+
+    The old `val if val != "" else None` invented a value neither side held — live
+    `""`, repo `""`, written `null` — and because the commit-scope guard refuses the
+    resulting dirty file, it could never land: the next run fast-forwarded main back
+    to `""` and rewrote it again. A nightly, permanent red run from one coercion.
+    """
+
+    def _written(self, live_val, existing, field="model"):
+        live = {"name": "A", "runtime_id": "rt-1", field: live_val}
+        return sync.multica_to_agent_json(live, existing).get(field, "<absent>")
+
+    def test_an_empty_live_value_does_not_become_null(self):
+        """The reported bug, exactly: live "", repo "", written must stay ""."""
+        self.assertEqual(self._written("", {"model": ""}), "")
+
+    def test_a_null_repo_value_does_not_become_empty(self):
+        """The other direction, and the reason the naive fix is worse than the bug.
+
+        45 of 46 live agents report `thinking_level: ""` while their repo files hold
+        `null`. "A `""` read stays `""`" on its own would rewrite all 45 — trading one
+        spurious diff for forty-five, every one of them refused by the scope guard.
+        """
+        self.assertIsNone(self._written("", {"thinking_level": None}, "thinking_level"))
+
+    def test_a_real_value_still_wins(self):
+        """Equivalence is only between "" and null — a genuine change still lands."""
+        self.assertEqual(self._written("claude-opus-5", {"model": ""}), "claude-opus-5")
+        self.assertEqual(self._written("", {"model": "claude-opus-5"}), "")
+
+    def test_a_file_without_the_field_takes_the_live_form(self):
+        """Nothing to preserve: record what the read actually said."""
+        self.assertEqual(self._written("", {"name": "A"}), "")
+        self.assertIsNone(self._written(None, {"name": "A"}))
+
+    def test_the_write_is_a_no_op_when_nothing_changed(self):
+        """The property that matters: a pull of an unchanged agent leaves the file
+        byte-identical, so the commit-scope guard has nothing to refuse."""
+        existing = {
+            "name": "A", "runtime_id": "rt-1", "description": "d",
+            "model": "", "thinking_level": None, "skills": [],
+        }
+        live = {
+            "name": "A", "runtime_id": "rt-1", "description": "d",
+            "model": "", "thinking_level": "", "skills": [],
+        }
+        written = sync.multica_to_agent_json(live, existing)
+        for field in ("model", "thinking_level"):
+            self.assertEqual(written.get(field, "<absent>"), existing.get(field, "<absent>"),
+                             f"{field} was rewritten though nothing changed")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
