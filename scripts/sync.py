@@ -333,18 +333,13 @@ def multica_to_agent_json(
     existing: Optional[Dict[str, Any]],
 ) -> Dict[str, Any]:
     result: Dict[str, Any] = {}
-    # custom_env and mcp_config are secret-bearing: the repo holds #Item:Field#
-    # placeholders that are resolved ONLY when pushing repo→live. Never source
-    # them from `live` — the live values are the *resolved* secrets, and writing
-    # those into a repo file is the leak that put a raw NetBox token and a
-    # datafeeds Postgres DSN onto `main` (CHA-85, commit 15868d7). So on
-    # live→repo we only ever preserve the existing repo placeholders (mirrors the
-    # mcp_config handling from #78); the fail-closed guard in write_agent_json is
-    # the backstop if a resolved value ever reaches this path.
-    if existing:
-        for key in ("custom_env", "mcp_config"):
-            if key in existing:
-                result[key] = existing[key]
+    # Emitted in COMPARABLE_FIELDS order, every field in the same pass — including
+    # custom_env and mcp_config, which used to be copied from `existing` in a
+    # preamble and therefore came out FIRST. That put the writer's own output in a
+    # different key order from the 38 files it does not touch, so the first pull of
+    # any such agent reordered the whole file: a diff the reader never asked for, and
+    # one the commit-scope guard then refuses. Same rule as the ""/null coercion
+    # below — never write a change nobody made (CHA-1211).
     for field in COMPARABLE_FIELDS:
         if field == "skills":
             result["skills"] = _norm_agent_field("skills", live.get("skills"))
@@ -377,8 +372,24 @@ def multica_to_agent_json(
             else:
                 result[field] = val
         elif field in ("mcp_config", "custom_env"):
-            pass  # preserved from the existing repo file above; never from live
+            # Secret-bearing: the repo holds #Item:Field# placeholders that are
+            # resolved ONLY when pushing repo→live. Never source these from `live` —
+            # the live values are the *resolved* secrets, and writing those into a
+            # repo file is the leak that put a raw NetBox token and a datafeeds
+            # Postgres DSN onto `main` (CHA-85, commit 15868d7). So on live→repo we
+            # only ever carry the existing repo placeholders through; the fail-closed
+            # guard in write_agent_json is the backstop if a resolved value ever
+            # reaches this path.
+            if existing and field in existing:
+                result[field] = existing[field]
         else:
+            # K1: a field absent (or null) in the read is omitted rather than
+            # written, so it keeps whatever the repo file already had — the same
+            # "never write a change the reader cannot see" rule as the two branches
+            # above. Zero files are affected today: all 46 live agents report a real
+            # value for every field that reaches this branch. Recorded rather than
+            # coded, because a guard for a case that cannot occur is a guard nobody
+            # can test (CHA-1211 K1).
             val = live.get(field)
             if val is not None:
                 result[field] = val
