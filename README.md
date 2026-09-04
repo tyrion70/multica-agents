@@ -321,6 +321,32 @@ Two general rules came out of it:
   arrived where an answer was expected (`false` where a boolean was expected) and
   nobody checked it was an answer to the question being asked.
 
+## A break-on-purpose run is worth nothing if what you restored isn't what executes
+
+This repo checks a guard by breaking it on purpose and watching the named test
+fail. That check has its own failure mode: **clear `__pycache__` between the revert
+and the restore.**
+
+Reverting the denied-`env set` message meant swapping `DENIED` for `FAILED`. Both are
+six characters, so the file size never changed, and `cp` put the mtime back in the
+same second. Python validates a `.pyc` on source mtime **and size** — both matched,
+so the restored file was never recompiled and the *reverted* bytecode kept running.
+A test that should have passed failed, and the first read of that was "ordering
+dependence in the new tests".
+
+The restore was correct. The execution wasn't. Nothing in the source, the diff or
+`git status` could show it, because none of them is what ran:
+
+```bash
+find . -name __pycache__ -type d -not -path './.git/*' -exec rm -rf {} +
+rm -rf .pytest_cache
+```
+
+Same shape as everything else on CHA-1211 — the artifact you inspected was not the
+artifact that answered — with the twist that here the artifact was the *test
+harness*. A same-length edit is the dangerous case, so assume it whenever a
+break-on-purpose result surprises you.
+
 ## Rotating a secret: `--force` is the delivery path, because no diff can see it
 
 Both secret-bearing fields — `mcp_config` and `custom_env` — enter
@@ -342,11 +368,21 @@ Three properties it has to keep:
   Every agent that declares a `custom_env` today happens to declare an `mcp_config`
   too, so the gate let them through as a side effect and the gap was invisible — the
   first `custom_env`-only agent would have been unreachable by `--force` forever.
-- **It does not depend on reading the live value.** `agent env get` is audited and
-  restricted to the agent's owner or a workspace owner/admin; in practice it answers
-  only inside the sync autopilot's own run context. A force path that required it
-  would refuse to deliver in exactly the place a rotation has to be delivered from.
-  A rotation you cannot detect still has to be pushable.
+- **It does not depend on reading the live value.** An unreadable env must never
+  block a delivery, whatever the reason it could not be read — a rotation you cannot
+  detect still has to be pushable, and coupling a push to a diagnostic read makes
+  delivery fail for reasons that have nothing to do with the payload.
+
+  This was first justified by a stronger claim — that `agent env get` answers only
+  inside the sync autopilot's own run context — and that claim was wrong. It came
+  from a reproduction that unset `MULTICA_*` but left a
+  `.multica/daemon_task_context.json` in place on an ancestor path, which keeps the
+  CLI task-scoped and makes it reply *"You do not have permission to access this
+  resource."* **An incomplete neutralisation is indistinguishable from a denial.**
+  Under the full recipe the read succeeds from an ordinary runtime; the recipe is in
+  the `multica-sync` skill and the implementation is in `scripts/sync.sh`. The
+  decoupling was right for a reason that survives its own premise being false, which
+  is the only kind of reason worth writing down.
 - **It still fails closed.** An unresolvable placeholder is never pushed, and a
   denied `agent env set` is reported as *denied* — distinct from a generic failure,
   because "you may not" and "that did not work" call for different responses — with

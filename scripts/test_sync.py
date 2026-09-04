@@ -1756,9 +1756,9 @@ class CustomEnvWrapperTest(unittest.TestCase):
     The shape was already written down — `_assert_custom_env_placeholders` names this
     exact nesting as something to reject — so the repo knew what the wrapper looked
     like as a thing to GUARD against, never as a thing to PARSE. And it is the one
-    path nobody could test: `agent env get` is permission-gated and was denied from
-    every runtime tried, so this line had never executed until it ran on the sync
-    host. The fake below is built from the shape the host actually returned.
+    path nobody could test at the time: `agent env get` was denied from every
+    runtime tried -- for CLI-scoping reasons later understood, not privilege ones
+    -- so this line had never executed until it ran on the sync host. The fake below is built from the shape the host actually returned.
     """
 
     def _fetch(self, response):
@@ -1947,10 +1947,19 @@ class CustomEnvRotationTest(unittest.TestCase):
        them through as a side effect and the hole was invisible -- the first
        custom_env-only agent would have been unreachable by --force forever. The
        fixture here is exactly that agent: custom_env, no mcp_config.
-    2. The live env read is permission-gated and works only in the sync
-       autopilot's own context. A force path that depended on it would refuse to
-       deliver precisely where a rotation must be delivered from, so
-       `env_readable = False` is the default in these tests, not the exception.
+    2. The push was coupled to the live env read. An unreadable env must never
+       block a delivery, whatever the reason it could not be read, so
+       `env_readable = False` is the default in these tests rather than the
+       exception.
+
+       The original justification -- that the read is permission-gated outside
+       the sync autopilot's own run context -- was withdrawn: it came from a
+       reproduction that unset MULTICA_* but left a
+       `.multica/daemon_task_context.json` on an ancestor path, which keeps the
+       CLI task-scoped and makes it answer "You do not have permission". Under
+       the full recipe the read succeeds from an ordinary runtime. The tests
+       below are unchanged by that, which is the point: they assert the property
+       (an unreadable env does not stop the push) and never the reason.
     """
 
     Backend = CustomEnvOscillationTest.Backend
@@ -2069,10 +2078,10 @@ class CustomEnvRotationTest(unittest.TestCase):
         _, err = self._run("--force")
         self.assertTrue(
             self.backend.env_set_calls,
-            "--force must not depend on `agent env get`. That read is "
-            "permission-gated and works only in the sync autopilot's context, so "
-            "requiring it would refuse the push exactly where a rotation has to "
-            "be delivered from.\n" + err,
+            "--force must not depend on `agent env get`. Whatever makes that "
+            "read fail -- privilege, CLI scoping, a changed contract -- it is a "
+            "diagnostic, and a diagnostic must not decide whether a rotation can "
+            "be delivered.\n" + err,
         )
 
     def test_a_denied_read_is_never_recorded_as_an_emptied_env(self):
@@ -2100,8 +2109,12 @@ class CustomEnvRotationTest(unittest.TestCase):
         self.secret = "dsn-v2-rotated"
         code, err = self._run("--force")
         self.assertIn("CUSTOM_ENV SET DENIED", err,
-                      "a denial is a fact about the CONTEXT, not a generic failure -- "
-                      "it must say so, and say where the write can be done")
+                      "a denial is not a generic failure -- it must say so")
+        self.assertIn("daemon_task_context.json", err,
+                      "the message must point at the likeliest cause. A task-scoped "
+                      "CLI answers with this same denial, so a message that reads as "
+                      "a privilege verdict sends the operator to the wrong fix -- "
+                      "which is exactly how the retracted claim on CHA-1211 survived")
         self.assertNotEqual(code, 0, "a denied write must make the run fail")
         after = self._state()["agents"][f"{WS_NAME}~Datafeeds Health Monitor"]
         self.assertEqual(before, after,

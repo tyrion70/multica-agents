@@ -893,11 +893,19 @@ def _is_permission_denied(exc: Exception) -> bool:
 class CustomEnvUnreadable(RuntimeError):
     """`agent env get` could not be read — NOT the same as "the agent has none".
 
-    The endpoint is permission-gated to the agent's owner or a workspace
-    owner/admin, so from a runtime that is neither it returns "You do not have
-    permission to access this resource". Swallowing that as None recorded a
-    denied read as an emptied env, which is the same defect as the skill
-    deletion: a failed read treated as an intentional edit (CHA-1211)."""
+    The endpoint is restricted to the agent's owner or a workspace owner/admin
+    and returns "You do not have permission to access this resource" when the
+    caller is neither. Swallowing that as None recorded a denied read as an
+    emptied env, which is the same defect as the skill deletion: a failed read
+    treated as an intentional edit (CHA-1211).
+
+    Do not read that message as a privilege verdict. The commonest cause is
+    SCOPING: a `.multica/daemon_task_context.json` left in place on an ancestor
+    of the CWD keeps the CLI pointed at a task's workspace, and it answers with
+    this exact string. An incomplete neutralisation is indistinguishable from a
+    denial — which is how "the read only works inside the sync autopilot" became
+    a believed fact on CHA-1211 before the full recipe disproved it. The recipe
+    is in the `multica-sync` skill; the implementation is in sync.sh."""
 
 
 class CustomEnvContractError(RuntimeError):
@@ -924,9 +932,10 @@ def _fetch_agent_custom_env(agent_id: str) -> Optional[Dict[str, str]]:
     against, never as a thing to parse. A guard that recognises a bad shape is not
     the same as a reader that knows the good one.
 
-    And it is the one path nobody could test: `agent env get` is permission-gated,
-    denied from every runtime tried, so this line had never actually executed until
-    it ran on the sync host. Everything else on this issue was verified offline
+    And it is the one path nobody could test at the time: `agent env get` was
+    denied from every runtime tried — for scoping reasons later understood, not
+    privilege ones — so this line had never actually executed until it ran on the
+    sync host. Everything else on this issue was verified offline
     against fakes built from shapes we could observe; this shape could not be
     observed, so the fake was built from an assumption.
 
@@ -1617,11 +1626,22 @@ def sync_agents_workspace(
             # first custom_env-only agent would have been unreachable by --force
             # forever. Ask about each field instead of relying on the overlap.
             #
-            # Deliberately NOT conditional on the live custom_env read: that read
-            # is permission-gated and works only in the sync autopilot's own
-            # context, so a force path that needed it would refuse to deliver
-            # exactly where a rotation has to be delivered from. A rotation you
-            # cannot detect still has to be pushable.
+            # Deliberately NOT conditional on the live custom_env read. An
+            # unreadable env must never block a delivery, whatever the reason it
+            # could not be read: a rotation you cannot detect still has to be
+            # pushable, and coupling a push to a diagnostic read makes delivery
+            # fail for reasons that have nothing to do with the payload.
+            #
+            # This was first justified by a report that the read is
+            # permission-gated outside the sync autopilot's own run context. That
+            # was a reproduction artifact, not a boundary: unsetting MULTICA_*
+            # while leaving a .multica/daemon_task_context.json in place on an
+            # ancestor path leaves the CLI task-scoped, and it then answers "You
+            # do not have permission to access this resource". Under the full
+            # recipe the read succeeds from an ordinary runtime (CHA-1211 —
+            # procedure in the `multica-sync` skill, implementation in sync.sh).
+            # The decoupling stands on its own merits; the premise it arrived
+            # with did not.
             #
             # Fail-closed still applies inside the push, so a forced run can
             # never emit an unresolved placeholder either.
@@ -1737,9 +1757,13 @@ def sync_agents_workspace(
                                     f"    ✗ CUSTOM_ENV SET DENIED: this context may not write agent "
                                     f"env (owner/admin only, audited).", file=sys.stderr)
                                 print(
-                                    f"      The rest of the push landed; the custom_env half did NOT. "
-                                    f"Re-run from the sync autopilot's context, which is the only one "
-                                    f"the env endpoints are reachable from.", file=sys.stderr)
+                                    f"      The rest of the push landed; the custom_env half did NOT — "
+                                    f"the baseline is unchanged, so the next run retries.", file=sys.stderr)
+                                print(
+                                    f"      Before treating this as a privilege problem, look for a "
+                                    f".multica/daemon_task_context.json on an ANCESTOR of the CWD: a "
+                                    f"task-scoped CLI answers with exactly this message. Recipe in the "
+                                    f"`multica-sync` skill.", file=sys.stderr)
                             else:
                                 print(f"    ✗ CUSTOM_ENV SET FAILED: {e}", file=sys.stderr)
                             # No baseline write: `continue` skips it, so the agent
@@ -2457,8 +2481,8 @@ def main() -> None:
              "baseline as projections (key names, server names) so no resolved "
              "value is ever committed, and a rotation changes only the value. So "
              "this is the delivery path for rotations and full restores, not an "
-             "override of a diff that got it wrong. It does not depend on the "
-             "permission-gated live env read. Fail-closed still applies (never "
+             "override of a diff that got it wrong. It does not depend on "
+             "reading the live env at all. Fail-closed still applies (never "
              "pushes an unresolved placeholder).",
     )
     parser.add_argument(
