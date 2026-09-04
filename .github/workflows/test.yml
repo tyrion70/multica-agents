@@ -15,7 +15,12 @@ jobs:
           python-version: "3.11"
       - name: Install dependencies
         run: pip install jsonschema pytest
+      - name: Configure git identity for the shell-guard tests
+        run: |
+          git config --global user.email "ci@chainlayer.io"
+          git config --global user.name "CI"
       - name: Run sync regression tests
         # Encodes the AC1 identity invariant: a double-run never mints a fresh
         # UUID, plus rename-survival, no-silent-create, and the mass-mint guard.
-        run: python3 -m pytest scripts/test_sync.py -v
+        # test_shell_guards covers sync.sh / commit-sync-state.sh / update-checkout.sh.
+        run: python3 -m pytest scripts/test_sync.py scripts/test_shell_guards.py scripts/test_config_freshness.py -v
