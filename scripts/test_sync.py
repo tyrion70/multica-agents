@@ -93,7 +93,7 @@ class FakeMulticaBackend:
             self.created_calls += 1
             flags = self._parse_flags(args[2:])
             aid = self._mint()
-            agent = {"id": aid, "workspace_id": WS_ID}
+            agent = {"id": aid, "workspace_id": WS_ID, "mcp_config_redacted": False}
             for flag, field in (("--name", "name"), ("--description", "description"),
                                 ("--instructions", "instructions"), ("--runtime-id", "runtime_id"),
                                 ("--model", "model"), ("--visibility", "visibility")):
@@ -102,6 +102,7 @@ class FakeMulticaBackend:
             mcp = self._load_mcp(flags)
             if mcp is not None:
                 agent["mcp_config"] = mcp
+                agent["mcp_config_redacted"] = True
             self.agents[aid] = agent
             return agent
 
@@ -118,6 +119,7 @@ class FakeMulticaBackend:
             mcp = self._load_mcp(flags)
             if mcp is not None:
                 agent["mcp_config"] = mcp
+                agent["mcp_config_redacted"] = True
             return agent
 
         if args[:3] == ["agent", "env", "set"]:
@@ -1035,7 +1037,9 @@ class CustomEnvOscillationTest(unittest.TestCase):
                     "model": f.get("--model"), "thinking_level": f.get("--thinking-level"),
                     "visibility": f.get("--visibility"), "custom_args": None,
                     "runtime_config": None, "max_concurrent_tasks": None,
-                    "skills": [], "mcp_config": None,
+                    # As `agent list` really answers: the config is never served,
+                    # and this flag is the only thing that says whether one exists.
+                    "skills": [], "mcp_config": None, "mcp_config_redacted": False,
                 }
                 return self.agents[aid]
             if args[:2] == ["agent", "update"]:
@@ -1614,6 +1618,127 @@ class RuntimeDefaultSerialisationTest(unittest.TestCase):
         for field in ("model", "thinking_level"):
             self.assertEqual(written.get(field, "<absent>"), existing.get(field, "<absent>"),
                              f"{field} was rewritten though nothing changed")
+
+
+class McpConfigWithheldTest(unittest.TestCase):
+    """`agent list` returns `mcp_config: null` with the payload behind
+    `mcp_config_redacted` (CHA-1211).
+
+    Reading that null as "no MCP config" made every MCP-bearing agent report as
+    changed on the live side forever — which did far more than keep the nightly job
+    red. It made every repo-side edit "both sides changed", so a merged change to an
+    agent could not be delivered to the workspace at all: 44 of 46 Chainlayer agents,
+    silently, for about eight weeks.
+    """
+
+    STORED = json.dumps({"mcpServers": ["gdrive", "github", "slack"]}, sort_keys=True)
+
+    def _last(self, stored=None):
+        return {"multica_state": {"mcp_config": self.STORED if stored is None else stored}}
+
+    def test_a_withheld_config_carries_the_baseline_forward(self):
+        value, note = sync._live_mcp_config_for_state(
+            {"name": "A", "mcp_config": None, "mcp_config_redacted": True}, {}, self._last())
+        self.assertEqual(sorted(value["mcpServers"]), ["gdrive", "github", "slack"])
+        self.assertIsNone(note)
+
+    def test_the_carried_value_survives_re_sanitisation(self):
+        """The trap this fix had to avoid: the baseline stores the projection with
+        `mcpServers` as a LIST, and `_get_mcp_server_keys` returns an empty set for
+        that shape — so carrying the stored form back verbatim would silently
+        collapse every server list to `[]` and look like a change on the next run."""
+        value, _ = sync._live_mcp_config_for_state(
+            {"name": "A", "mcp_config": None, "mcp_config_redacted": True}, {}, self._last())
+        again = sync._sanitize_mcp_for_state(sync._norm_agent_field("mcp_config", value))
+        self.assertEqual(again, self.STORED)
+
+        # And the shape that would have been wrong, so the reason is pinned:
+        self.assertEqual(sync._get_mcp_server_keys(self.STORED), set())
+        self.assertEqual(sync._mcp_server_names(self.STORED),
+                         {"gdrive", "github", "slack"})
+
+    def test_redacted_false_means_genuinely_absent(self):
+        """The two agents that have no MCP config must not get one invented."""
+        value, note = sync._live_mcp_config_for_state(
+            {"name": "A", "mcp_config": None, "mcp_config_redacted": False}, {}, self._last())
+        self.assertIsNone(value)
+        self.assertIsNone(note)
+
+    def test_a_missing_flag_is_a_hard_error(self):
+        """`redacted: false` must never become a silent third case. Without the flag
+        there is no way to tell withheld from absent, and guessing "absent" is the
+        bug this function exists to remove — so it raises rather than falling
+        through, the same rule as the skill `content` key."""
+        with self.assertRaises(sync.McpConfigContractError):
+            sync._live_mcp_config_for_state({"name": "A", "mcp_config": None}, {}, None)
+
+    def test_a_served_config_is_used_as_read(self):
+        served = {"mcpServers": {"linear": {"command": "x"}}}
+        value, note = sync._live_mcp_config_for_state(
+            {"name": "A", "mcp_config": served, "mcp_config_redacted": True}, {}, self._last())
+        self.assertEqual(value, served)
+        self.assertIsNone(note)
+
+    def test_no_baseline_falls_back_to_the_repo(self):
+        """Unknown must not read as a change: with nothing to carry, use the repo's
+        own server set so the field contributes nothing to the diff."""
+        repo = {"mcp_config": json.dumps({"mcpServers": {"a": {}, "b": {}}})}
+        value, note = sync._live_mcp_config_for_state(
+            {"name": "A", "mcp_config": None, "mcp_config_redacted": True}, repo, None)
+        self.assertEqual(sorted(value["mcpServers"]), ["a", "b"])
+        self.assertIsNone(note)
+
+    def test_nothing_known_anywhere_says_so(self):
+        value, note = sync._live_mcp_config_for_state(
+            {"name": "A", "mcp_config": None, "mcp_config_redacted": True}, {}, None)
+        self.assertIsNone(value)
+        self.assertIn("neither the baseline nor", note)
+
+    def test_delivery_is_restored_not_just_the_conflict(self):
+        """The acceptance test: an ordinary repo edit must reach live as a PUSH.
+
+        Conflicts clearing is the symptom; delivery is the point. Modelled on the
+        real shape — an MCP-bearing agent, live withholding its config, the repo
+        edited on an ordinary field.
+        """
+        stored_repo = json.dumps({"mcpServers": {"gdrive": {}, "github": {}, "slack": {}}})
+        base = {"name": "A", "runtime_id": "rt-1", "description": "before",
+                "mcp_config": json.loads(stored_repo)}
+        live = {"name": "A", "runtime_id": "rt-1", "description": "before",
+                "mcp_config": None, "mcp_config_redacted": True}
+        last = {
+            "repo_state": sync._sanitize_agent_for_state(sync.normalize_agent(base)),
+            "multica_state": sync._sanitize_agent_for_state(sync.normalize_agent(base)),
+        }
+        edited = dict(base, description="after")
+        repo_n = sync.normalize_agent(edited)
+
+        # Without the resolver — the live side reads as changed, so it is a conflict.
+        naive = sync.normalize_agent(live)
+        self.assertEqual(sync._decide_action(repo_n, naive, last), "conflict")
+
+        # With it — the edit is delivered.
+        fixed = sync.normalize_agent(live)
+        value, _ = sync._live_mcp_config_for_state(live, repo_n, last)
+        fixed["mcp_config"] = sync._norm_agent_field("mcp_config", value)
+        self.assertEqual(sync._decide_action(repo_n, fixed, last), "push_to_multica")
+
+    def test_an_unedited_agent_stays_unchanged(self):
+        """The other half: restoring delivery must not invent a push either."""
+        stored_repo = json.dumps({"mcpServers": {"gdrive": {}}})
+        base = {"name": "A", "runtime_id": "rt-1", "description": "same",
+                "mcp_config": json.loads(stored_repo)}
+        live = {"name": "A", "runtime_id": "rt-1", "description": "same",
+                "mcp_config": None, "mcp_config_redacted": True}
+        last = {
+            "repo_state": sync._sanitize_agent_for_state(sync.normalize_agent(base)),
+            "multica_state": sync._sanitize_agent_for_state(sync.normalize_agent(base)),
+        }
+        repo_n = sync.normalize_agent(base)
+        fixed = sync.normalize_agent(live)
+        value, _ = sync._live_mcp_config_for_state(live, repo_n, last)
+        fixed["mcp_config"] = sync._norm_agent_field("mcp_config", value)
+        self.assertEqual(sync._decide_action(repo_n, fixed, last), "unchanged")
 
 
 if __name__ == "__main__":

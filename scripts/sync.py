@@ -986,6 +986,103 @@ def _live_custom_env_for_state(
     return {k: _REDACTED for k in env}, None
 
 
+def _mcp_server_names(value: Any) -> set:
+    """Server names from EITHER mcp_config shape — the live/repo form
+    (`mcpServers` a dict of name → config) or the baseline projection
+    (`mcpServers` a list of names).
+
+    `_get_mcp_server_keys` deliberately only understands the first: handed the
+    projection it returns an empty set, which is why the stored form cannot simply
+    be carried back into a snapshot. Kept separate rather than widening that
+    function, because `_sanitize_mcp_for_state` and the conflict reconciler both
+    depend on its current behaviour.
+    """
+    if isinstance(value, str):
+        try:
+            value = json.loads(value)
+        except (json.JSONDecodeError, TypeError):
+            return set()
+    if not isinstance(value, dict):
+        return set()
+    servers = value.get("mcpServers")
+    if isinstance(servers, dict):
+        return set(servers)
+    if isinstance(servers, list):
+        return {s for s in servers if isinstance(s, str)}
+    return set()
+
+
+class McpConfigContractError(RuntimeError):
+    """`agent list` returned neither an mcp_config nor an `mcp_config_redacted`
+    flag, so there is no way to tell a withheld config from an absent one.
+
+    Raised rather than guessed. Guessing "absent" is what made the repo
+    undeliverable to 44 of 46 agents in the first place (CHA-1211)."""
+
+
+def _live_mcp_config_for_state(
+    live_agent: Dict[str, Any],
+    repo_norm: Dict[str, Any],
+    last: Optional[Dict[str, Any]],
+) -> Tuple[Any, Optional[str]]:
+    """Resolve a live agent's mcp_config for change detection.
+
+    `agent list` stopped returning `mcp_config` — it comes back `null` for all 46
+    agents, with the real payload behind the boolean `mcp_config_redacted`.
+    `normalize_agent`'s bare `data.get()` read that null as "the live agent has no
+    MCP config", so every MCP-bearing agent reported as changed on the live side,
+    every run, against a baseline holding the real server list.
+
+    That did more than keep the nightly job red. `_decide_action` saw "live changed"
+    on 44 of 46 agents permanently, so ANY repo-side edit became "both sides
+    changed" — a conflict rather than a push. **The repo has been undeliverable to
+    the workspace for those agents**: instructions, skills, model, description, all
+    merged to `main` and never sent. Silently, because a conflict is reported as a
+    conflict rather than as a failure to deliver (CHA-1211).
+
+    Returns (value_for_the_snapshot, optional_warning). In order:
+
+    1. `mcp_config` present and non-null — a real read, use it.
+    2. No `mcp_config_redacted` key at all — HARD ERROR. The flag is the only thing
+       distinguishing withheld from absent; without it we are back to guessing, and
+       a fallthrough here would silently restore the bug this function removes.
+    3. `mcp_config_redacted` false — the read positively says there is none.
+    4. `mcp_config_redacted` true — present but withheld. Carry the baseline's
+       server set forward, so the field contributes nothing to the diff. With no
+       baseline, carry the repo's, for the same reason: unknown must not read as a
+       change. The names are rehydrated into `{"mcpServers": {name: {}}}` because
+       the baseline stores the projection with `mcpServers` as a LIST, and
+       `_get_mcp_server_keys` returns an empty set for that shape — carrying the
+       stored form back verbatim would silently collapse every server list to `[]`.
+    """
+    raw = live_agent.get("mcp_config")
+    if raw is not None:
+        return raw, None
+
+    if "mcp_config_redacted" not in live_agent:
+        raise McpConfigContractError(
+            f"'{live_agent.get('name', '?')}': the response carries neither an "
+            f"mcp_config nor an mcp_config_redacted flag, so a withheld config "
+            f"cannot be told from an absent one. Refusing to guess."
+        )
+
+    if not live_agent["mcp_config_redacted"]:
+        return None, None
+
+    stored = ((last or {}).get("multica_state") or {}).get("mcp_config")
+    names = _mcp_server_names(stored)
+    if not names:
+        # No baseline to carry: fall back to the repo's own server set so the
+        # field compares equal and lets the other fields decide.
+        names = _mcp_server_names(repo_norm.get("mcp_config"))
+    if not names:
+        return None, (
+            "live mcp_config is present but withheld, and neither the baseline nor "
+            "the repo names its servers — recording no MCP config for it this run"
+        )
+    return {"mcpServers": {name: {} for name in sorted(names)}}, None
+
+
 def _carry_forward_unread_fields(
     multica_norm: Dict[str, Any],
     live_agent: Dict[str, Any],
@@ -1015,10 +1112,11 @@ def _carry_forward_unread_fields(
     baseline = last.get("multica_state") or {}
     carried: List[str] = []
     for field in COMPARABLE_FIELDS:
-        # custom_env is handled by _live_custom_env_for_state, which can see
-        # more than the baseline. Both it and mcp_config are stored in the
-        # baseline as a *projection* rather than the normalized value, so
-        # copying one back into a normalized snapshot would not round-trip.
+        # Both are handled by their own resolvers, which can see more than the
+        # baseline: _live_custom_env_for_state and _live_mcp_config_for_state.
+        # They also need the rehydration those resolvers do — the baseline stores
+        # a *projection* rather than the normalized value, so copying one back
+        # into a normalized snapshot here would not round-trip.
         if field in ("custom_env", "mcp_config"):
             continue
         if field not in live_agent and field in baseline:
@@ -1399,6 +1497,10 @@ def sync_agents_workspace(
                 multica_norm["custom_env"] = _norm_agent_field("custom_env", env_value)
                 if env_note:
                     print(f"    ⚠ {env_note}", file=sys.stderr)
+                mcp_value, mcp_note = _live_mcp_config_for_state(live_agent, repo_norm, last)
+                multica_norm["mcp_config"] = _norm_agent_field("mcp_config", mcp_value)
+                if mcp_note:
+                    print(f"    ⚠ {mcp_note}", file=sys.stderr)
 
             action = _decide_action(repo_norm, multica_norm, last)
             agent_id: Optional[str] = live_agent["id"] if live_agent else None
@@ -1665,6 +1767,10 @@ def sync_agents_workspace(
                 multica_norm["custom_env"] = _norm_agent_field("custom_env", env_value)
                 if env_note:
                     print(f"    ⚠ {live_name}: {env_note}", file=sys.stderr)
+                mcp_value, mcp_note = _live_mcp_config_for_state(live_agent, repo_norm, last)
+                multica_norm["mcp_config"] = _norm_agent_field("mcp_config", mcp_value)
+                if mcp_note:
+                    print(f"    ⚠ {live_name}: {mcp_note}", file=sys.stderr)
             action = _decide_action(repo_norm, multica_norm, last)
 
         agent_id = live_agent.get("id", "")
