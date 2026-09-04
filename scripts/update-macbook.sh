@@ -19,8 +19,12 @@ npm install -g opencode-ai@latest || echo "[opencode] update failed"
 
 echo ""
 echo "=== Updating multica ==="
+# lint:fail-open-ok deliberate best-effort tool update in an interactive script:
+# these two are multica MUTATIONS, not state reads, nothing is captured and no
+# later decision depends on them — one failing updater must not abort the rest.
 sudo multica update || echo "[multica] update failed"
 
 echo ""
 echo "=== Restarting multica daemon ==="
+# lint:fail-open-ok best-effort restart, same reasoning as the update above
 multica daemon restart || echo "[multica] daemon restart failed"

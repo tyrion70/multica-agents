@@ -19,6 +19,7 @@ import pathlib
 import shutil
 import subprocess
 import tempfile
+import time
 import unittest
 
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -50,6 +51,29 @@ exec {git} "$@"
 """
 
 
+# A `git` whose `fetch` never returns, to exercise the wall-clock cap.
+GIT_HANG_SHIM = """#!/usr/bin/env bash
+for a in "$@"; do
+  if [ "$a" = "fetch" ]; then
+    sleep 30
+    exit 0
+  fi
+done
+exec {git} "$@"
+"""
+
+# A `multica` stand-in for sync.sh's workspace pre-flight guard. MODE picks the
+# failure being modelled; nothing else in sync.sh calls multica before the guard.
+MULTICA_SHIM = """#!/usr/bin/env bash
+case "{mode}" in
+  fail)      echo "You do not have permission to access this resource." >&2; exit 3 ;;
+  garbage)   echo "not json at all" ;;
+  mismatch)  echo '{{"name": "Private"}}' ;;
+  match)     echo '{{"name": "Chainlayer"}}' ;;
+esac
+"""
+
+
 def _git(*args, cwd, check=True):
     return subprocess.run(
         ["git", *args], cwd=cwd, check=check, capture_output=True, text=True,
@@ -73,7 +97,8 @@ class ShellGuardTestCase(unittest.TestCase):
         # Copy what exists rather than asserting the set: run against an older
         # tree (a counterfactual check) and the missing script should make its
         # own tests skip, not blow up every class's setUp.
-        for name in ("sync.sh", "commit-sync-state.sh", "update-checkout.sh", "sync.py"):
+        for name in ("sync.sh", "commit-sync-state.sh", "update-checkout.sh",
+                     "autopilot-step1.sh", "sync.py"):
             if (SCRIPTS / name).is_file():
                 shutil.copy2(SCRIPTS / name, self.work / "scripts" / name)
         (self.work / "skills" / "demo").mkdir(parents=True)
@@ -112,6 +137,15 @@ class ShellGuardTestCase(unittest.TestCase):
             ["bash", str(self.work / "scripts" / name), *args],
             cwd=str(cwd or self.work), capture_output=True, text=True, env=env,
         )
+
+    def _shim(self, name, body):
+        """Put a single executable on a PATH prefix and return that PATH."""
+        d = self.tmp / f"shim-{name}"
+        d.mkdir(exist_ok=True)
+        exe = d / name
+        exe.write_text(body, encoding="utf-8")
+        exe.chmod(0o755)
+        return f"{d}:{os.environ['PATH']}"
 
     def run_sync_sh(self, path=None):
         """sync.sh with an argument sync.py rejects, so it exits fast and the
@@ -165,6 +199,177 @@ class SyncShScopeGuardTest(ShellGuardTestCase):
         r = self.run_sync_sh(path=self.shim_path)
         self.assertEqual(r.returncode, 5, r.stdout + r.stderr)
         self.assertIn("cannot verify the commit scope", r.stderr)
+
+
+class AutopilotStep1Test(ShellGuardTestCase):
+    """Step 1 must be able to bootstrap itself (CHA-1211).
+
+    On 2026-09-03 both hosts' checkouts predated `scripts/update-checkout.sh`, so
+    step 1 called a file that was not there, exited 127, and could never recover on
+    its own — the thing that pulls was the thing that was missing. These tests put a
+    checkout in exactly that state and require step 1 to come out at origin/main.
+    """
+
+    def setUp(self):
+        if not (SCRIPTS / "autopilot-step1.sh").is_file():
+            self.skipTest("scripts/autopilot-step1.sh not present in this tree")
+        super().setUp()
+        # A second commit on the remote carrying the verifier, so the fixture's
+        # checkout can be rewound to a commit that predates it.
+        self.pre_scripts = _git("rev-parse", "HEAD", cwd=self.work).stdout.strip()
+        (self.work / "later.txt").write_text("added after the checkout\n", encoding="utf-8")
+        _git("add", "-A", cwd=self.work)
+        _git("commit", "-q", "-m", "later work", cwd=self.work)
+        _git("push", "-q", "origin", "main", cwd=self.work)
+        self.current = _git("rev-parse", "HEAD", cwd=self.work).stdout.strip()
+
+    def _step1(self, repo=None, remote=None, path=None):
+        return self.run_script(
+            "autopilot-step1.sh",
+            "--repo", str(repo or self.work),
+            "--remote", str(remote or self.remote),
+            path=path, cwd=self.tmp)
+
+    def _strip_verifier(self):
+        """Put the checkout in the state both hosts were actually in: the remote
+        carries update-checkout.sh, the local checkout sits at an earlier commit that
+        does not, and that commit is a strict ancestor so a fast-forward can fix it."""
+        _git("rm", "-q", "scripts/update-checkout.sh", cwd=self.work)
+        _git("commit", "-q", "-m", "a commit that predates the script", cwd=self.work)
+        _git("push", "-q", "origin", "main", cwd=self.work)
+        without = _git("rev-parse", "HEAD", cwd=self.work).stdout.strip()
+
+        shutil.copy2(SCRIPTS / "update-checkout.sh",
+                     self.work / "scripts" / "update-checkout.sh")
+        _git("add", "-A", cwd=self.work)
+        _git("commit", "-q", "-m", "the commit that adds the script", cwd=self.work)
+        _git("push", "-q", "origin", "main", cwd=self.work)
+        self.current = _git("rev-parse", "HEAD", cwd=self.work).stdout.strip()
+
+        _git("reset", "-q", "--hard", without, cwd=self.work)
+        assert not (self.work / "scripts" / "update-checkout.sh").is_file(), \
+            "fixture invalid: the checkout still has the verifier"
+
+    def test_it_self_heals_a_checkout_that_predates_the_verifier(self):
+        self._strip_verifier()
+        r = self._step1()
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertTrue((self.work / "scripts" / "update-checkout.sh").is_file(),
+                        "step 1 did not bring the verifier into the checkout")
+        self.assertIn("✓", r.stdout)
+        self.assertEqual(
+            _git("rev-parse", "HEAD", cwd=self.work).stdout,
+            _git("rev-parse", "origin/main", cwd=self.work).stdout)
+
+    def test_a_stale_checkout_is_brought_forward(self):
+        _git("reset", "-q", "--hard", self.pre_scripts, cwd=self.work)
+        r = self._step1()
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertEqual(
+            _git("rev-parse", "HEAD", cwd=self.work).stdout.strip(), self.current)
+
+    def test_it_is_idempotent(self):
+        first = self._step1()
+        self.assertEqual(first.returncode, 0, first.stdout + first.stderr)
+        second = self._step1()
+        self.assertEqual(second.returncode, 0, second.stdout + second.stderr)
+        self.assertIn("Already up to date", second.stdout)
+
+    def test_it_clones_a_host_with_no_checkout(self):
+        fresh = self.tmp / "fresh"
+        r = self._step1(repo=fresh)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertTrue((fresh / "scripts" / "update-checkout.sh").is_file())
+
+    def test_a_divergent_history_is_not_forced_through(self):
+        (self.work / "local.txt").write_text("local\n", encoding="utf-8")
+        _git("add", "-A", cwd=self.work)
+        _git("commit", "-q", "-m", "local only", cwd=self.work)
+        # Move the remote on too, so the histories genuinely diverge.
+        other = self.tmp / "other"
+        _git("clone", "-q", str(self.remote), str(other), cwd=self.tmp)
+        (other / "remote.txt").write_text("remote\n", encoding="utf-8")
+        _git("add", "-A", cwd=other)
+        _git("commit", "-q", "-m", "remote only", cwd=other)
+        _git("push", "-q", "origin", "main", cwd=other)
+
+        r = self._step1()
+        self.assertEqual(r.returncode, 6, r.stdout + r.stderr)
+        self.assertIn("cannot fast-forward", r.stderr)
+        # And it left the checkout alone rather than resetting it.
+        self.assertIn("local only",
+                      _git("log", "-1", "--format=%s", cwd=self.work).stdout)
+
+    def test_an_unreachable_remote_fails_six(self):
+        shutil.rmtree(self.remote)
+        r = self._step1()
+        self.assertEqual(r.returncode, 6, r.stdout + r.stderr)
+        self.assertIn("CHECKOUT NOT UPDATED", r.stderr)
+
+    def test_a_branch_without_the_verifier_says_so(self):
+        """The one shape stage 1 cannot repair: advancing worked, and the branch
+        still does not carry the verifier. That is a wrong-repo/wrong-branch
+        misconfiguration, not a stale checkout, and it must not be papered over by
+        falling back to a copy from somewhere else."""
+        _git("rm", "-q", "scripts/update-checkout.sh", cwd=self.work)
+        _git("commit", "-q", "-m", "branch never carries the verifier", cwd=self.work)
+        _git("push", "-q", "origin", "main", cwd=self.work)
+        r = self._step1()
+        self.assertEqual(r.returncode, 6, r.stdout + r.stderr)
+        self.assertIn("is missing even after fast-forwarding", r.stderr)
+        self.assertNotIn("✓", r.stdout)
+
+    def test_it_cannot_wait_for_a_human_either(self):
+        body = (SCRIPTS / "autopilot-step1.sh").read_text(encoding="utf-8")
+        self.assertIn("GIT_TERMINAL_PROMPT=0", body)
+        self.assertIn("BatchMode=yes", body)
+        self.assertIn("GIT_NET_TIMEOUT", body)
+
+
+class WorkspacePreflightTest(ShellGuardTestCase):
+    """sync.sh's workspace pre-flight guard — the eighth instance (CHA-1211).
+
+    It fired only when `$active` was non-empty, so a FAILING `multica workspace get`
+    left it empty, short-circuited the test, and the guard passed. It could not tell
+    "matches" from "couldn't check". These four cases are the four outcomes it now
+    distinguishes.
+    """
+
+    def _run_with_multica(self, mode):
+        return self.run_script(
+            "sync.sh", "--workspace", "Chainlayer",
+            path=self._shim("multica", MULTICA_SHIM.format(mode=mode)))
+
+    def test_fails_closed_when_the_check_itself_fails(self):
+        r = self._run_with_multica("fail")
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("cannot", r.stderr)
+        self.assertIn("a guard that cannot check must not pass", r.stderr)
+        # It must stop here, not fall through to sync.py.
+        self.assertNotIn("Loading schema", r.stderr)
+
+    def test_fails_closed_on_output_it_cannot_parse(self):
+        r = self._run_with_multica("garbage")
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("could not parse", r.stderr)
+        self.assertNotIn("Loading schema", r.stderr)
+
+    def test_still_catches_a_real_mismatch(self):
+        r = self._run_with_multica("mismatch")
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("active workspace is 'Private'", r.stderr)
+        self.assertNotIn("Loading schema", r.stderr)
+
+    def test_a_matching_workspace_is_allowed_through(self):
+        """The guard must not become a blanket stop: a match proceeds to sync.py."""
+        r = self._run_with_multica("match")
+        # Reaching sync.py at all is the proof: it prints this before anything else,
+        # and it only runs if the guard let the run through. sync.py then fails on
+        # its own terms in this fixture (no schemas/ dir), which is not the guard's
+        # business — so assert on the guard's silence, not on sync.py's outcome.
+        self.assertIn("Loading schema", r.stderr, r.stdout + r.stderr)
+        self.assertNotIn("--workspace is", r.stderr)
+        self.assertNotIn("cannot be verified", r.stderr)
 
 
 class CommitSyncStateTest(ShellGuardTestCase):
@@ -362,6 +567,73 @@ class UpdateCheckoutTest(ShellGuardTestCase):
         body = (SCRIPTS / "update-checkout.sh").read_text(encoding="utf-8")
         self.assertIn("GIT_TERMINAL_PROMPT=0", body)
         self.assertIn("BatchMode=yes", body)
+
+    def test_an_unreadable_directory_is_not_treated_as_empty(self):
+        """`[ -n "$(ls -A … 2>/dev/null)" ]` read an unreadable dir as an empty one
+        and fell through to the clone, which then failed for the wrong reason."""
+        if os.geteuid() == 0:
+            self.skipTest("running as root: mode 0000 does not deny access")
+        blocked = self.tmp / "blocked"
+        blocked.mkdir()
+        (blocked / "something").write_text("x", encoding="utf-8")
+        blocked.chmod(0o000)
+        try:
+            r = self._update(blocked)
+        finally:
+            blocked.chmod(0o755)
+        self.assertEqual(r.returncode, 6, r.stdout + r.stderr)
+        self.assertIn("cannot be read", r.stderr)
+
+    def test_an_empty_directory_is_still_safe_to_clone_into(self):
+        """The other side of that fix: readable and empty must still clone."""
+        empty = self.tmp / "empty"
+        empty.mkdir()
+        r = self._update(empty)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertTrue((empty / ".git").is_dir())
+
+    def test_an_ambiguous_origin_main_does_not_garble_the_verdict(self):
+        """I1's other half: git warns on SUCCESS, and `2>&1` folded the warning into
+        $remote_head, so the comparison failed and a healthy checkout exited 6 with
+        an unreadable message. Fails closed either way — this is the diagnosis half.
+
+        The clone already carries refs/remotes/origin/main, so adding the local
+        branch is what makes `origin/main` ambiguous.
+        """
+        _git("update-ref", "refs/heads/origin/main", "HEAD", cwd=self.work)
+        probe = _git("rev-parse", "origin/main", cwd=self.work, check=False)
+        self.assertIn("ambiguous", probe.stderr,
+                      "fixture invalid: git did not warn, so nothing is being tested")
+
+        r = self._update(self.work)
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+        self.assertIn("✓", r.stdout)
+        # The warning is surfaced rather than discarded — it is a real problem with
+        # the checkout, just not this script's problem.
+        self.assertIn("git warned while resolving", r.stderr)
+
+    def test_a_hung_network_call_is_capped(self):
+        """A wedged connection becomes a failed run, not a job that looks alive.
+
+        GIT_TERMINAL_PROMPT/BatchMode stop git waiting for a human; this is the
+        wall-clock cap that stops it waiting for a host (300s in production).
+        """
+        env_before = os.environ.get("GIT_NET_TIMEOUT")
+        os.environ["GIT_NET_TIMEOUT"] = "1"
+        try:
+            started = time.monotonic()
+            r = self._update(
+                self.work,
+                path=self._shim("git", GIT_HANG_SHIM.format(git=shutil.which("git"))))
+            elapsed = time.monotonic() - started
+        finally:
+            if env_before is None:
+                os.environ.pop("GIT_NET_TIMEOUT", None)
+            else:
+                os.environ["GIT_NET_TIMEOUT"] = env_before
+        self.assertEqual(r.returncode, 6, r.stdout + r.stderr)
+        self.assertLess(elapsed, 20, "the cap did not fire — git ran to completion")
+        self.assertIn("CHECKOUT NOT UPDATED", r.stderr)
 
     def test_a_dirty_tree_is_reported_but_not_fatal(self):
         (self.work / ".sync-state.json").write_text("{}\n", encoding="utf-8")

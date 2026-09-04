@@ -78,6 +78,16 @@ fi
 SRC="claude-config/$PROFILE/CLAUDE.md"
 
 # --- authoritative copy from origin/main ------------------------------------
+if [ -f "$REPO/.git" ]; then
+  # A worktree-style checkout: `.git` is a FILE holding a gitdir: pointer, so the
+  # `-d` test below reads it as "no repo here" and the clone that follows cannot
+  # succeed. That is fail-closed (exit 3, nothing reported), but the message used to
+  # be "clone failed" and sent the reader after the wrong hypothesis (CHA-1211 I6).
+  echo "$REPO is a worktree-style checkout (.git is a file, not a directory)." >&2
+  echo "  This script needs a normal clone. Point it at one:" >&2
+  echo "    CONFIG_FRESHNESS_REPO=<path-to-clone> $0 …   (or --repo <path>)" >&2
+  exit 3
+fi
 if [ ! -d "$REPO/.git" ]; then
   git clone git@github.com:tyrion70/multica-agents.git "$REPO" \
     >/dev/null 2>&1 || { echo "clone failed: $REPO" >&2; exit 3; }
@@ -91,8 +101,51 @@ MAIN_HASH="$(git -C "$REPO" show "origin/main:$SRC" | sha256sum | cut -d' ' -f1)
 # --- sync-state baseline lag (CHA-1087) -------------------------------------
 # Commit timestamps, not content: if a skill or agent definition landed AFTER the
 # last .sync-state.json commit, the committed baseline predates it by construction.
-STATE_TS="$(git -C "$REPO" log -1 --format=%ct origin/main -- .sync-state.json 2>/dev/null || true)"
-DEFS_TS="$(git -C "$REPO" log -1 --format=%ct origin/main -- skills '*/agent.json' 2>/dev/null || true)"
+#
+# Fail closed on the READ, but keep "no such commit yet" as a legitimate answer —
+# `git log -1 -- <path>` exits 0 with empty output when nothing has touched that
+# path, which is different from git failing. Swallowing both as `|| true` meant a
+# broken `git log` reported BASELINE_LAG_SEC=0, i.e. "the baseline is current", from
+# the very script whose job is to notice that it is not (CHA-1211, found by the
+# scripts/*.sh sweep that the fail-open lint test in test_sync.py now automates).
+# The stderr goes to its own file, NOT into the captured value (CHA-1211 I1). The
+# first version of this fix used `2>&1`, and git writes warnings to stderr on
+# SUCCESS: with both a `refs/heads/origin/main` and a `refs/remotes/origin/main` in
+# the checkout, `origin/main` is ambiguous and rc=0 comes back as
+#   "warning: refname 'origin/main' is ambiguous.\n1788442689"
+# so STATE_TS stops being an integer, `[ … -gt … ]` errors with "integer expression
+# expected", the if takes the else branch, and the watchdog reports
+# `state=FRESH baseline_lag_sec=0` — the exact wrong answer this whole fix exists to
+# remove, reached through a new door the fix itself opened. Same reasoning as
+# sync.sh:150: never let a command's diagnostics share a channel with its payload.
+git_err="$(mktemp)"
+trap 'rm -f "$git_err"' EXIT
+# `return 3` and an explicit `|| exit 3` at the call site, not `exit 3` in here: this
+# runs inside a command substitution, so `exit` would end the SUBSHELL and the script
+# would only stop because `set -e` happens to be on. Depending on that is the kind of
+# implicitness this whole issue is about.
+_read_ts() { # <label> <path…> → echoes the timestamp, or returns 3
+  local label="$1"; shift
+  local ts
+  if ! ts="$(git -C "$REPO" log -1 --format=%ct origin/main -- "$@" 2>"$git_err")"; then
+    echo "git log failed for $label in $REPO:" >&2
+    sed 's/^/  /' "$git_err" >&2
+    return 3
+  fi
+  # Empty is legitimate ("no commit touches that path"); anything that is neither
+  # empty nor a plain integer means the value has been contaminated, and guessing
+  # what it meant is how the else branch got reached in the first place.
+  if [ -n "$ts" ] && ! [[ "$ts" =~ ^[0-9]+$ ]]; then
+    echo "git log returned a non-numeric timestamp for $label in $REPO:" >&2
+    printf '  %s\n' "$ts" >&2
+    sed 's/^/  /' "$git_err" >&2
+    return 3
+  fi
+  printf '%s' "$ts"
+}
+STATE_TS="$(_read_ts '.sync-state.json' .sync-state.json)" || exit 3
+DEFS_TS="$(_read_ts 'the skill/agent definitions' skills '*/agent.json')" || exit 3
+# Empty means "no commit touches that path", which really is timestamp zero.
 STATE_TS="${STATE_TS:-0}"
 DEFS_TS="${DEFS_TS:-0}"
 if [ "$DEFS_TS" -gt "$STATE_TS" ]; then

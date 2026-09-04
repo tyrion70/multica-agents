@@ -16,6 +16,7 @@ import io
 import json
 import os
 import pathlib
+import re
 import sys
 import unittest
 from unittest import mock
@@ -1322,6 +1323,243 @@ class CustomEnvOscillationTest(unittest.TestCase):
         out = sync._carry_forward_unread_fields(norm, live, last)
         self.assertEqual(out["instructions"], "the real instructions")
         self.assertEqual(out["description"], "live")
+
+
+class ShellFailOpenLintTest(unittest.TestCase):
+    """The mechanical rule for the defect this repo kept re-introducing (CHA-1211).
+
+    Nine instances, each found and fixed individually: the skill bodies, `custom_env`,
+    `mcp_config`, the checkout, `sync.sh`'s scope guard, `commit-sync-state.sh`,
+    `update-checkout.sh`'s fetch, `sync.sh`'s workspace pre-flight, and
+    `check-config-freshness.sh`'s own baseline read. Every one was the same shape: a
+    command that reads state, whose FAILURE is absorbed, feeding a decision that then
+    cannot tell "nothing found" from "could not look".
+
+    It lives in test_sync.py rather than in a linter or a skill because this is the one
+    file CI actually runs — so the rule is enforced tonight, without the `workflow`
+    token scope no agent in this fleet has.
+
+    Deliberate exceptions are declared in the script, on or just above the line, as
+    `# lint:fail-open-ok <reason>`. The waiver is the point as much as the rule: it
+    turns "I meant that" into something a reviewer sees in the diff.
+    """
+
+    SCRIPTS = pathlib.Path(sync.__file__).resolve().parent
+    # Commands that READ state. A swallowed failure here is a swallowed answer.
+    # `find`, `realpath`, `gh`, `op`, `kubectl`, `curl` and `nb` were missing and
+    # `find` had a live in-tree instance the lint scanned and passed (CHA-1211 I3).
+    READER = re.compile(
+        r"(?:\b(?:git|multica|bw|jq|sha256sum|stat|find|realpath|gh|op|kubectl|curl|nb)\b"
+        r"|python3 -c|\bls -A\b)"
+    )
+    # Handlers that discard the failure. `|| :` is one character from `|| true` and
+    # identical in effect; `|| echo …` and `|| return 0` report and carry on
+    # (CHA-1211 I2). A handler is only "absorbing" if nothing in the same logical
+    # line actually stops — see HANDLED.
+    ABSORBED = re.compile(
+        r"\|\|\s*(?:true\b|:(?=\s|;|\)|$)|echo\b|printf\b|return\s+0\b)"
+    )
+    HANDLED = re.compile(r"\b(?:exit|fail|die)\b|\breturn\s+[1-9]")
+    EMPTY_TEST = re.compile(r"\[\s*-[nz]\s+\"\$\(")
+    ARITHMETIC = re.compile(r"\(\(")
+    # An echo/printf line, or a heredoc body, may legitimately CONTAIN an example of
+    # the bad shape — this rule's own documentation does (CHA-1211 I4). A lint that
+    # punishes documenting the trap gets waived reflexively, and a reflexively waived
+    # rule is not a rule.
+    OUTPUT_LINE = re.compile(r"^\s*(?:echo|printf)\b")
+    HEREDOC = re.compile(r"<<-?\s*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\1")
+    WAIVER = re.compile(r"#\s*lint:fail-open-ok\s+(\S+(?:\s+\S+){2,})")
+
+    RULE = (
+        "\n"
+        "  RULE (CHA-1211, nine instances of one defect): in scripts/*.sh, a command\n"
+        "  that reads state — git, multica, bw, jq, stat, a python3 -c parse — must\n"
+        "  have its FAILURE checked, not absorbed. Concretely, do not write:\n"
+        "\n"
+        "      value=\"$(git … 2>/dev/null || true)\"      # failure becomes empty\n"
+        "      value=\"$(git … || :)\"                       # …and so does `|| :`\n"
+        "      value=\"$(git …)\" || echo \"oh well\"         # …and reporting without stopping\n"
+        "      if [ -n \"$(git … 2>/dev/null)\" ]; then     # empty == failed == 'fine'\n"
+        "\n"
+        "  Write one of:\n"
+        "\n"
+        "      if ! value=\"$(git … 2>&1)\"; then …handle it…; fi\n"
+        "      value=\"$(git …)\" || { echo \"…\" >&2; exit N; }\n"
+        "      # …or ask the question of a status you already captured and checked\n"
+        "\n"
+        "  Why: every instance in this incident let a failed read report a successful\n"
+        "  state. That is how 22 skill bodies were deleted, how the nightly baseline\n"
+        "  oscillated, and how a sync that could not even pull reported a clean run for\n"
+        "  three weeks.\n"
+        "\n"
+        "  If a case really is deliberate — a best-effort teardown, an exit code that\n"
+        "  carries no information — declare it on or above the line:\n"
+        "\n"
+        "      # lint:fail-open-ok <reason, at least three words>\n"
+    )
+
+    @classmethod
+    def _heredoc_body_lines(cls, lines):
+        """1-based line numbers inside a heredoc body (CHA-1211 I4).
+
+        A heredoc body is data, not code: it may quote the bad shape as an example.
+        The introducing line is still code and stays in scope.
+        """
+        inside, delim, body = set(), None, False
+        for lineno, line in enumerate(lines, 1):
+            if body:
+                if line.strip() == delim:
+                    body, delim = False, None
+                else:
+                    inside.add(lineno)
+                continue
+            stripped = line.split("#", 1)[0]
+            if "<<<" in stripped:
+                continue  # a herestring, not a heredoc
+            m = cls.HEREDOC.search(stripped)
+            if m:
+                delim, body = m.group(2), True
+        return inside
+
+    @classmethod
+    def _logical_lines(cls, text):
+        """Join backslash continuations, so a multi-line command is judged whole.
+
+        Heredoc bodies are dropped: a body line cannot be a continuation of the
+        introducing command, so removing it cannot split a real command in two.
+        """
+        lines = text.splitlines()
+        skip = cls._heredoc_body_lines(lines)
+        out, buf, start = [], "", None
+        for lineno, line in enumerate(lines, 1):
+            if lineno in skip:
+                continue
+            if start is None:
+                start = lineno
+            buf += line
+            if line.rstrip().endswith("\\"):
+                buf = buf.rstrip()[:-1] + " "
+                continue
+            out.append((start, buf))
+            buf, start = "", None
+        if buf:
+            out.append((start, buf))
+        return out
+
+    def _offenders(self, path):
+        raw = path.read_text(encoding="utf-8").splitlines()
+        found = []
+        for lineno, logical in self._logical_lines(path.read_text(encoding="utf-8")):
+            stripped = logical.strip()
+            if stripped.startswith("#") or not self.READER.search(stripped):
+                continue
+            if self.OUTPUT_LINE.match(stripped):
+                continue  # printing an example of the shape is not doing it
+            reasons = []
+            absorbed = self.ABSORBED.search(stripped)
+            if (
+                absorbed
+                and not self.ARITHMETIC.search(stripped)
+                # `|| { echo …; exit 5; }` reports AND stops: that is the correct
+                # form, and it contains `echo`. Only a handler with nothing that
+                # stops after it is absorbing.
+                and not self.HANDLED.search(stripped[absorbed.start():])
+            ):
+                reasons.append(f"failure absorbed by `{absorbed.group(0).strip()}`")
+            if self.EMPTY_TEST.search(stripped):
+                reasons.append("`[ -n/-z \"$(…)\" ]` cannot tell empty from failed")
+            if not reasons:
+                continue
+            # A waiver on the line itself, or on any comment line directly above it.
+            if self.WAIVER.search(logical):
+                continue
+            above, i = False, lineno - 2
+            while i >= 0 and raw[i].strip().startswith("#"):
+                if self.WAIVER.search(raw[i]):
+                    above = True
+                    break
+                i -= 1
+            if above:
+                continue
+            found.append((lineno, "; ".join(reasons), stripped[:120]))
+        return found
+
+    def test_no_shell_script_swallows_a_state_read(self):
+        # rglob: a future scripts/sub/ is in scope too. glob("*.sh") was top-level
+        # only, which is how a rule quietly stops covering the code (CHA-1211).
+        scripts = sorted(self.SCRIPTS.rglob("*.sh"))
+        self.assertTrue(scripts, f"no shell scripts found under {self.SCRIPTS}")
+        report = []
+        for path in scripts:
+            for lineno, why, text in self._offenders(path):
+                report.append(f"  {path.name}:{lineno}: {why}\n      {text}")
+        if report:
+            self.fail(
+                f"{len(report)} fail-open state read(s) in scripts/*.sh:\n"
+                + "\n".join(report)
+                + self.RULE
+            )
+
+    def test_the_lint_catches_the_shapes_it_claims_to(self):
+        """The lint's own regression test: the nine instances' two shapes, and the
+        forms that replaced them, so a later 'simplification' cannot quietly stop
+        matching. A linter nobody tests is the thing it is warning about."""
+        tmp = pathlib.Path(__import__("tempfile").mkdtemp())
+        try:
+            cases = {
+                # (body, should_be_flagged)
+                "absorbed": ('active="$(multica workspace get --output json || true)"\n', True),
+                "empty_test": ('if [ -n "$(git status --porcelain)" ]; then :; fi\n', True),
+                "continuation": ('x="$(git log \\\n  --oneline || true)"\n', True),
+                "checked_if": ('if ! v="$(git rev-parse HEAD 2>&1)"; then exit 1; fi\n', False),
+                "checked_brace": ('v="$(git status)" || { echo no >&2; exit 5; }\n', False),
+                "arithmetic": ('((COUNT++)) || true\n', False),
+                "comment_only": ('# NOT `2>/dev/null || true`: git errors are fatal here\n', False),
+                "no_reader": ('unset BW_SESSION || true\n', False),
+                # I2 — handlers one character or one word from `|| true`.
+                "colon": ('v="$(git log --oneline || :)"\n', True),
+                "colon_semicolon": ('v="$(git log || :); echo done\n', True),
+                "echo_handler": ('v="$(git status)" || echo "oh well"\n', True),
+                "return_zero": ('f() { v="$(git status)" || return 0; }\n', True),
+                "return_nonzero": ('f() { v="$(git status)" || return 3; }\n', False),
+                "exit_handler": ('v="$(git status)" || exit 3\n', False),
+                "fail_handler": ('v="$(git status)" || fail "cannot read"\n', False),
+                "echo_then_exit": ('v="$(git status)" || { echo bad >&2; exit 5; }\n', False),
+                # I3 — readers that were missing, one with a live in-tree instance.
+                "find_reader": ('done < <(find "$R" -name x 2>/dev/null || true)\n', True),
+                "realpath_reader": ('p="$(realpath "$f" || true)"\n', True),
+                # I4 — printing or documenting the shape is not doing it.
+                "echo_line": ('echo "  v=\\"$(git log || true)\\"  # never do this"\n', False),
+                "printf_line": ('printf \'%s\\n\' \'v="$(git log || true)"\'\n', False),
+                "heredoc_body": (
+                    "cat <<'USAGE'\n"
+                    'v="$(git log || true)"   # the bad shape, as documentation\n'
+                    "USAGE\n", False),
+                "heredoc_intro_still_code": (
+                    'cat <<EOF2 >"$(git rev-parse --show-toplevel || true)/f"\n'
+                    "text\n"
+                    "EOF2\n", True),
+                "herestring_is_not_a_heredoc": ('while read -r l; do :; done <<< "$(git log || true)"\n', True),
+                "waived_same_line": (
+                    'bw logout >/dev/null 2>&1 || true  # lint:fail-open-ok teardown only, nothing reads it\n',
+                    False),
+                "waived_above": (
+                    "# lint:fail-open-ok deliberate best-effort probe here\n"
+                    'bw logout >/dev/null 2>&1 || true\n', False),
+                "bare_waiver_is_not_enough": (
+                    "# lint:fail-open-ok\n"
+                    'v="$(git status || true)"\n', True),
+            }
+            for name, (body, should_flag) in cases.items():
+                path = tmp / f"{name}.sh"
+                path.write_text("#!/usr/bin/env bash\n" + body, encoding="utf-8")
+                flagged = bool(self._offenders(path))
+                self.assertEqual(
+                    flagged, should_flag,
+                    f"case '{name}': expected flagged={should_flag}, got {flagged}",
+                )
+        finally:
+            __import__("shutil").rmtree(tmp, ignore_errors=True)
 
 
 if __name__ == "__main__":

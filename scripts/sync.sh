@@ -37,6 +37,9 @@ done
 DAEMON_CTXS=(); DAEMON_CTX_BAKS=(); BW_DATADIR=""
 _cleanup() {
   if [ -n "$BW_DATADIR" ]; then
+    # lint:fail-open-ok best-effort teardown, not a state read: the isolated
+    # data-dir is deleted on the next line either way, so a failed logout cannot
+    # leave anything behind or change a decision.
     bw logout >/dev/null 2>&1 || true
     rm -rf "$BW_DATADIR"
   fi
@@ -146,9 +149,43 @@ done
 
 # Pre-flight guard: verify the host's active workspace matches --workspace.
 # After the unset above, multica workspace get reflects the local config.
+#
+# Fail closed (CHA-1211, eighth instance of this defect). It used to read:
+#   active="$(multica workspace get … 2>/dev/null | python3 … 2>/dev/null || true)"
+#   if [ -n "$active" ] && [ "$active" != "$workspace" ]; then … exit 1
+# so a FAILING `workspace get` left $active empty, short-circuited the test on the
+# first condition, and the guard PASSED. It could not tell "matches" from "couldn't
+# check" — it declined to object rather than verifying, while its own comment said
+# "verify". The read, the parse and the comparison are now three separate outcomes
+# with three separate messages, and only a successful read that MATCHES continues.
 if [ -n "$workspace" ]; then
-  active="$(multica workspace get --output json 2>/dev/null | python3 -c "import sys,json; print(json.load(sys.stdin).get('name',''))" 2>/dev/null || true)"
-  if [ -n "$active" ] && [ "$active" != "$workspace" ]; then
+  # Stdout only: `--output json` puts JSON on stdout and warnings on stderr, so
+  # merging them (2>&1) would feed the parser something that is not JSON.
+  ws_err="$(mktemp)"
+  if ! ws_json="$(multica workspace get --output json 2>"$ws_err")"; then
+    echo "ERROR: 'multica workspace get' failed, so the host's active workspace cannot" >&2
+    echo "       be verified against --workspace '$workspace'. multica reported:" >&2
+    sed 's/^/         /' "$ws_err" >&2
+    echo "       Refusing to sync: a guard that cannot check must not pass." >&2
+    rm -f "$ws_err"
+    exit 1
+  fi
+  rm -f "$ws_err"
+
+  if ! active="$(printf '%s' "$ws_json" | python3 -c "import sys,json; print(json.load(sys.stdin).get('name',''))" 2>&1)"; then
+    echo "ERROR: could not parse 'multica workspace get' output — cannot verify the" >&2
+    echo "       active workspace against --workspace '$workspace'. python reported:" >&2
+    echo "$active" | sed 's/^/         /' >&2
+    exit 1
+  fi
+
+  if [ -z "$active" ]; then
+    echo "ERROR: 'multica workspace get' returned no workspace name, so --workspace" >&2
+    echo "       '$workspace' cannot be verified. Refusing to sync." >&2
+    exit 1
+  fi
+
+  if [ "$active" != "$workspace" ]; then
     echo "ERROR: --workspace is '$workspace' but the host's active workspace is '$active'." >&2
     echo "       Run 'multica workspace switch $workspace' first, or set your" >&2
     echo "       MULTICA_WORKSPACE_ID (not recommended — the unset block drops it)." >&2
@@ -181,11 +218,16 @@ git_status="$(git -C "$REPO_ROOT" status --porcelain --untracked-files=all)" || 
   echo "    Refusing to continue: an unverifiable tree is treated as out of scope." >&2
   exit 5
 }
-out_of_scope="$(
+# One parse of $git_status, two questions asked of it: what is out of scope, and
+# whether the state file itself is dirty. Both used to re-read git; the second read
+# swallowed its error, so the "commit your state file" reminder simply vanished if
+# git failed (CHA-1211). Deriving both from the status that was already captured AND
+# already checked above removes the second read rather than guarding it.
+dirty_paths="$(
   printf '%s\n' "$git_status" \
-    | sed -e 's/^...//' -e 's/^.* -> //' -e 's/^"\(.*\)"$/\1/' \
-    | grep -v '^\.sync-state\.json$' || true
+    | sed -e 's/^...//' -e 's/^.* -> //' -e 's/^"\(.*\)"$/\1/'
 )"
+out_of_scope="$(printf '%s\n' "$dirty_paths" | grep -v '^\.sync-state\.json$' || true)"
 if [ -n "$out_of_scope" ]; then
   echo
   echo "==> COMMIT SCOPE VIOLATION: this run changed repo files other than .sync-state.json."
@@ -250,7 +292,7 @@ fi
 # the live workspaces, so the NEXT unrelated change reads as "both sides changed" and a
 # later run exits 2 on a conflict that is not one. That is exactly how the Private/ssh
 # conflict happened. Say so here, at the moment the person who can fix it is watching.
-if [ -n "$(git -C "$REPO_ROOT" status --porcelain -- .sync-state.json 2>/dev/null)" ]; then
+if printf '%s\n' "$dirty_paths" | grep -qxF '.sync-state.json'; then
   echo
   echo "==> ACTION REQUIRED: .sync-state.json is uncommitted."
   echo "    It records what this run pushed. Uncommitted, the baseline lags the live"
