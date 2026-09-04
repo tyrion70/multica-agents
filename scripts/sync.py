@@ -855,20 +855,68 @@ class CustomEnvUnreadable(RuntimeError):
     deletion: a failed read treated as an intentional edit (CHA-1211)."""
 
 
+class CustomEnvContractError(RuntimeError):
+    """`agent env get` answered in a shape this code does not recognise.
+
+    Raised rather than parsed optimistically. The previous version returned the
+    response dict verbatim, so the WRAPPER's keys became the env variable names:
+    every agent reported `["agent_id", "custom_env"]` instead of its real keys,
+    and all seven custom_env agents conflicted instead of being delivered
+    (CHA-1211 / CHA-1220)."""
+
+
 def _fetch_agent_custom_env(agent_id: str) -> Optional[Dict[str, str]]:
     """Fetch the current custom_env for an agent via 'agent env get'.
 
-    Returns the env dict, or None when the agent genuinely has none. Raises
-    CustomEnvUnreadable when the call fails — callers must decide what an
-    unreadable env means for them, rather than inheriting a silent None.
+    The response is a WRAPPER — `{"agent_id": …, "custom_env": {…}}` — not the env
+    map itself. Returning it verbatim made the wrapper's own keys look like the
+    variable names, which is the same defect as every other one on this issue: a
+    response that nests the payload, read as though it were the payload.
+
+    It is worth saying where that shape was already written down.
+    `_assert_custom_env_placeholders` names this exact nesting as something to
+    reject, so the repo knew what the wrapper looked like — as a thing to guard
+    against, never as a thing to parse. A guard that recognises a bad shape is not
+    the same as a reader that knows the good one.
+
+    And it is the one path nobody could test: `agent env get` is permission-gated,
+    denied from every runtime tried, so this line had never actually executed until
+    it ran on the sync host. Everything else on this issue was verified offline
+    against fakes built from shapes we could observe; this shape could not be
+    observed, so the fake was built from an assumption.
+
+    Returns the env map, or None when the agent genuinely has none. Raises
+    CustomEnvUnreadable if the call fails, and CustomEnvContractError if it
+    succeeds in a shape that cannot be read — never a guess.
     """
     try:
         result = _multica(["agent", "env", "get", agent_id], dry_run=False)
     except Exception as e:
         raise CustomEnvUnreadable(str(e).strip()) from e
-    if isinstance(result, dict):
-        return result
-    return None
+
+    if result is None:
+        return None
+    if not isinstance(result, dict):
+        raise CustomEnvContractError(
+            f"agent {agent_id}: 'agent env get' returned {type(result).__name__}, "
+            f"not an object — refusing to read variable names out of it."
+        )
+    if "custom_env" not in result:
+        raise CustomEnvContractError(
+            f"agent {agent_id}: 'agent env get' returned an object with no "
+            f"'custom_env' key (top-level keys: {sorted(result)}). Reading those "
+            f"keys as variable names is what CHA-1220 was."
+        )
+
+    env = result["custom_env"]
+    if env is None:
+        return None
+    if not isinstance(env, dict):
+        raise CustomEnvContractError(
+            f"agent {agent_id}: 'agent env get' returned a 'custom_env' of "
+            f"{type(env).__name__} rather than an object."
+        )
+    return env
 
 
 # Placeholder stored in place of a resolved secret value. Only the KEY SET of a
