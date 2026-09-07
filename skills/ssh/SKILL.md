@@ -139,16 +139,53 @@ not a broken system.** For an agent, `TARGET-OUT-OF-SCOPE` means the host is
 reachable in principle but not in scope for your ticket — a different answer
 again, and neither is JIT failing.
 
-**Chain-node and other fleet hosts (`*.chosts.io`) are not agent-requestable.**
-An agent that needs a node's `journalctl` has to ask a human; there is no agent
-path to those boxes. Note what that does *not* mean: the node being unreachable
-**from you** is not evidence about the node.
+**Chain-node fleet hosts CAN be agent-requestable — this section said the
+opposite until 2026-09-07, and that was wrong.** It read "*Chain-node and other
+fleet hosts (`*.chosts.io`) are not agent-requestable... there is no agent path
+to those boxes*". Measured from the `multica-02` runtime (`tag:peter-agent`) on
+CHA-1244, against a live mainnet RPC node:
 
-**Test, don't infer — and never escalate from reading this section.** One
-`POST /agent/grant` answers "can I reach it" in a second, and the refusal names
-the current list for free. Concluding a host is unreachable from a document
-cost a wrong escalation on **CHA-1108**: the nodes were healthy the whole time
-and the agent reported them dead rather than fetching the journal.
+```bash
+POST /agent/grant {"target":"lens-main-rpc-1a-nl2v","reason":"<ticket + scope>","seconds":300}
+→ 200 {"ok": true, "principal": "peter-agent", "ssh_user": "peter", "capped": false}
+
+ssh peter@lens-main-rpc-1a-nl2v.java-moth.ts.net    # connects; session is recorded
+sudo -n docker ps                                    # works
+```
+
+No human in the loop, no approval step. So do **not** plan around needing a
+human for a node's `journalctl`, and do not design a CI job, pipeline or
+credential whose only purpose is to hold an SSH key you were told you could not
+have.
+
+**What is still true is the shape, not the verdict:** the agent target set is an
+explicit list plus tag selection, it is configuration, and it moves. One node
+being requestable today is not a promise about every host or about next month —
+that inference is the same mistake in the other direction. Ask the service.
+
+**Two failures, opposite directions, same root cause — believing this document
+instead of the API:**
+
+- **CHA-1108** — concluded from this section that nodes were unreachable and
+  reported them dead. They were healthy the whole time; one grant would have
+  fetched the journal.
+- **CHA-1244** — accepted the "no agent path" line, and so specified a GitLab CI
+  job to run a read-only diagnostic capture on a node an agent could simply SSH
+  into. It reached a coded, QA-passed MR before the owner asked why the pipeline
+  existed at all. It also meant a QA blocker ("unbounded write into `/` on a
+  live box, real headroom unmeasurable") went two review rounds unresolved, when
+  30 seconds of the access above showed `/tmp` was a dedicated 4 GB volume and
+  journald held 369 MB.
+
+**So: test, don't infer, and never escalate or design from reading this
+section.** One `POST /agent/grant` answers "can I reach it" in a second, and a
+refusal names the current list for free.
+
+**Release the grant when you are done** — `POST /agent/release {"target": ...}`.
+Both examples above were released (`still_open: []`).
+
+**Note what a refusal does *not* mean:** the node being unreachable **from you**
+is not evidence about the node.
 
 ### Read the status code: 400 is the wrong target, 403 is an insufficient reason
 
@@ -203,9 +240,10 @@ a local key and that is the intended arrangement:
   installed it still works, but it is **not the access path** and must not be
   planned around, re-installed, or copied to a new host. Mind the non-standard
   port if you meet one that has not been migrated yet.
-- Agents have no standing-key path to these hosts at all, and no agent JIT
-  target either (see *What is requestable*) — an agent that needs one asks a
-  human.
+- Agents have no standing-key path to these hosts at all — JIT is the whole
+  access story for them. This line used to add "and no agent JIT target either",
+  which was **wrong**: see *What is requestable*, where a grant against a live
+  chain node is shown succeeding with no human involved.
 
 ## The keys
 
