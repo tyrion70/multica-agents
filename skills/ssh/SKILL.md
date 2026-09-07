@@ -63,25 +63,41 @@ The caller must be a tagged agent device (one of the agent identity tags) and
 must send a real `reason` — the criteria service decides based on it. A missing
 `reason` is refused before any criteria call.
 
-**Then connect over the tailnet FQDN — not the bare hostname.** The grant
-authorises; it does not connect, and the two failures look identical. On an
-agent runtime `/etc/resolv.conf` reads `search tyrion.eu java-moth.ts.net`, so
-bare `monitoring` resolves to `monitoring.tyrion.eu` (the LAN address), reaches
-the host's **own `sshd`**, and returns `Permission denied (publickey)` even
-though the grant succeeded:
+**Then connect over the tailnet FQDN.** The grant authorises; it does not
+connect, and the two failures look identical.
+
+**Whether the bare hostname works depends on the host, so don't rely on it —
+and don't assert it as the cause of a failure.** On an agent runtime
+`/etc/resolv.conf` reads `search tyrion.eu java-moth.ts.net`, and **`tyrion.eu`
+is searched first**. So a host with a LAN twin resolves to the LAN, and a host
+without one falls through to the tailnet. Both measured on `multica-02`,
+2026-09-07:
 
 ```bash
-ssh peter@monitoring.java-moth.ts.net         # USE THIS — works from every client
-tailscale ssh peter@monitoring                # fine where the subcommand exists
-ssh peter@monitoring                          # WRONG HOST: 192.168.18.232, plain sshd
+getent hosts monitoring              # 192.168.18.232  monitoring.tyrion.eu      ← LAN twin wins
+getent hosts lens-main-rpc-1a-nl2v   # 100.94.41.60    …java-moth.ts.net         ← no twin, tailnet
 ```
 
-Only the tailnet address is answered by `tailscaled`, and only `tailscaled`
-enforces the ACL the grant writes. **`Permission denied (publickey)` right after
-a successful grant is a routing symptom, not an authorisation one** — check the
-address in `ssh -v` before re-requesting. Do not go hunting for the right key;
-no key fixes it (this cost real time on CHA-1088, where `id_ed25519_peter` is
-not even present on `multica-02`).
+```bash
+ssh peter@monitoring.java-moth.ts.net         # USE THIS — unambiguous from every client
+tailscale ssh peter@monitoring                # fine where the subcommand exists
+ssh peter@monitoring                          # WRONG HOST: 192.168.18.232, plain sshd
+ssh peter@lens-main-rpc-1a-nl2v               # happens to be right — no LAN twin to lose to
+```
+
+Use the FQDN because it is unambiguous, not because the bare name is always
+wrong. Only the tailnet address is answered by `tailscaled`, and only
+`tailscaled` enforces the ACL the grant writes.
+
+**`Permission denied (publickey)` right after a successful grant CAN be a
+routing symptom rather than an authorisation one** — check the address in
+`ssh -v` before re-requesting, and do not go hunting for the right key on the
+assumption that it is (no key fixes the routing case; this cost real time on
+CHA-1088, where `id_ed25519_peter` is not even present on `multica-02`). But
+**verify the address rather than asserting misrouting**: on a host with no LAN
+twin the bare name already resolved correctly, so a denial there is something
+else and the routing explanation will send you past it. The JIT service removed
+this same misdirection from its own error text for exactly that reason.
 
 **Give the FQDN, not `tailscale ssh`, when telling a human how to connect.**
 `tailscale ssh` can't misroute, so it is a fine habit on a runtime that has it —
