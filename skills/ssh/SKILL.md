@@ -49,8 +49,19 @@ attributable to a specific security key, and grants expire on their own.
 ### Agents — POST /agent/grant
 
 **Agents cannot use the web UI.** `tailscale serve` does not inject identity
-headers for **tagged** devices, so a tagged agent gets **403 on the UI — that is
-expected, not a fault.** An agent reaches a host through the agent path:
+headers for **tagged** devices. Be precise about what that does and does not
+do, because the imprecise version has now propagated into a repo README: the
+**entry page still loads** — it is the identity-gated endpoints behind it that
+refuse. Measured from `multica-02` (`tag:peter-agent`), 2026-09-07:
+
+```
+GET /             → 200      # the page serves
+GET /targets      → 403      # the actions behind it do not
+GET /grants       → 403
+```
+
+**A 403 on those is expected, not a fault**, and a 200 on `/` is not evidence
+that the UI will work for you. An agent reaches a host through the agent path:
 
 ```
 POST /agent/grant
