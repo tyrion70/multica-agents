@@ -25,6 +25,8 @@ The skill is the source of truth — don't restate its rules here:
 - `ssh`        — keys + signing config (universal)
 - `bitwarden`  — secret lookup/storage (universal)
 - `1password`  — 1Password secret lookup (universal; the GitLab PAT lives here)
+- `chainlayer-knowledge` — durable cross-cutting facts and decisions, **including
+  the AI-managed host list** the rule below points at
 - `chainlink-ops`, `company-k8s`, `company-proxmox`, `haproxy`, `grafana-monitoring`,
   `deploy-app`, `fortigate`, `new-repo` — their domains
 
@@ -43,6 +45,32 @@ imported copy.
 If anything is off, surprising, or ambiguous — a command fails, output looks
 wrong, a decision isn't clear-cut — **stop and ask Peter**. Don't make a
 judgment call and proceed. (Set after an autonomous Proxmox action went wrong.)
+
+## AI-managed hosts (list in `chainlayer-knowledge`): act, don't ask
+This is a **carve-out from the rule above, and the only one** — off the list,
+STOP-and-ask applies unchanged.
+
+On a host in the AI-managed tier you do not need human approval for an
+operational action you judge necessary — including a destructive one (reboot,
+restart, drain, disk reclaim) — provided both of these hold:
+
+1. **Redundancy preserved.** One node of a pair at a time, with the other
+   verified serving **from the load balancer's own view**, not inferred from a
+   health probe on the peer.
+2. **Blast radius confined to that host.** Anything that changes shared
+   infrastructure — the shared HAProxy config, DNS, the Proxmox host, a shared
+   CI template — is outside the tier *even when done for an AI-managed node*.
+
+Then: **no pre-approval, mandatory post-report** — what you did, when, and the
+measured outcome, on the issue. And **stop and report on the first anomaly**:
+the licence covers *starting*, never *continuing past a surprise*. Repairing in
+place after an unexpected result is a new decision and needs a human.
+
+**Which hosts is a list, not a judgement.** The `chainlayer-knowledge` skill
+holds it, with the exclusions written down as explicitly as the inclusions. A
+host is in the tier by appearing on that list and no other way — "it looks
+AI-managed" is not membership. If either condition fails, or the host is not on
+the list, you are back under STOP-and-ask.
 
 ## Security guardrails (universal)
 Never read, copy, upload, log, or reference:

@@ -1,6 +1,6 @@
 ---
 name: chainlayer-knowledge
-description: Durable cross-cutting knowledge about ChainLayer's live infra projects — the chainlink-tools platform, the Optimism/Postgres/Proxmox migrations, the Filecoin voter node, and QuickNode RPC URLs. Read this for background/state and key decisions when working any ChainLayer infra issue; it points you at the domain skill for HOW-TO. Keep it updated (PR) when a durable fact or decision changes. ALSO the rule for posting to Slack: agent messages go out as the dedicated `peter_agent` bot (field SLACK_BOT_TOKEN_PETER_AGENT, xoxb, from Bitwarden at point of use), NEVER through the `slack` MCP server, which carries Peter's personal xoxp token and would make every AI message look like he wrote it — read this before posting anything to Slack.
+description: Durable cross-cutting knowledge about ChainLayer's live infra projects — the chainlink-tools platform, the Optimism/Postgres/Proxmox migrations, the Filecoin voter node, and QuickNode RPC URLs. Read this for background/state and key decisions when working any ChainLayer infra issue; it points you at the domain skill for HOW-TO. Keep it updated (PR) when a durable fact or decision changes. ALSO the authoritative list of **AI-managed hosts** — the hosts on which an agent acts without human pre-approval (the rule itself is in the company `CLAUDE.md`) — read this before deciding whether a host is in that tier; membership is the list, never a judgement call. ALSO the rule for posting to Slack: agent messages go out as the dedicated `peter_agent` bot (field SLACK_BOT_TOKEN_PETER_AGENT, xoxb, from Bitwarden at point of use), NEVER through the `slack` MCP server, which carries Peter's personal xoxp token and would make every AI message look like he wrote it — read this before posting anything to Slack.
 ---
 
 # ChainLayer knowledge
@@ -12,6 +12,64 @@ stuff worth carrying between issues. **HOW-TO lives in the domain skills**
 runbook, and not day-to-day status (don't put "N of M done as of <date>" here —
 that rots). When something durable changes, update this file via a PR against
 `tyrion70/multica-agents` and tell the user.
+
+## AI-managed host tier — the list of hosts agents operate without asking
+
+The **AI-managed tier** is a named set of hosts on which an agent takes an
+operational action it judges necessary without human pre-approval. The authority
+rule — the two conditions, the mandatory post-report, and the stop-on-anomaly
+limit — is in the company `CLAUDE.md` ("AI-managed hosts: act, don't ask").
+**This section is the list that rule points at, and the list is the whole
+definition of the tier.**
+
+**A host is in the tier because it appears below, never because it looks
+AI-managed.** "AI-managed" is also a phrase in some repo descriptions and the
+name of the `ai-maintained` deploy key; neither puts a host in the tier. If you
+find yourself arguing that a host qualifies, it does not — it is out until this
+list says otherwise, and extending the list is a PR against
+`tyrion70/multica-agents`, not a call made inside a run.
+
+**In the tier — the seven CCIP node networks, and every VM belonging to them:**
+
+| network | repo |
+|---|---|
+| lens    | `chainlayer/nodes/lens-infra` |
+| morph   | `chainlayer/nodes/morph-infra` |
+| wemix   | `chainlayer/nodes/wemix-infra` |
+| cronos  | `chainlayer/nodes/cronos-infra` |
+| stable  | `chainlayer/nodes/stable-infra` |
+| tac     | `chainlayer/nodes/tac-infra` |
+| pharos  | `chainlayer/nodes/pharos-infra` |
+
+Extended as networks join — by adding a row here.
+
+**Out of the tier — explicitly, and as binding as the list above:**
+
+- the `chainlink-*` oracle namespaces — live revenue-earning nodes; the
+  strictest-ask-first rules in the `chainlink-ops` skill stand unchanged,
+- the shared HAProxy fleet,
+- the Proxmox hosts themselves (as distinct from a tier VM running on one),
+- GitLab and GCP IAM,
+- the monitoring2 Alertmanager mesh,
+- **everything not named in the table above**, including every other node
+  network. In particular the twelve node repos in the CHA-1251 "AI-maintained
+  rollout" are *not* this list and do not inherit the tier.
+
+Two consequences worth stating on their own, because each has been got wrong:
+
+- **A shared-infrastructure change stays out of the tier even when it is done
+  for a tier node.** Changing the shared HAProxy config, DNS, the Proxmox host
+  or a shared CI template on behalf of lens is a shared-infrastructure change,
+  not a lens change. This is not new: it is why the drain/undrain work was
+  dropped on CHA-1230 — it needed a shared HAProxy change and would have
+  silently downgraded the health gate.
+- **The tier is about authority, not access.** It widens nothing the JIT grant
+  model gates: the `GRANT_CAP` of 2 on the shared `peter-agent` principal is a
+  coordination constraint, unaffected by this.
+
+Origin: CHA-1258 → CHA-1259. A deliberate reboot of the lens standby node
+bounced because no agent held a rule saying a lower-risk class of host exists,
+so every agent correctly fell back to the strictest rule it had.
 
 ## chainlink-tools platform (dynamic node registry)
 Three apps under `chainlink-tools/`, all deploying to the `chainlink` namespace in
