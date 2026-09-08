@@ -136,12 +136,16 @@ if [ -f "$BOOTSTRAP" ]; then
   rm -f "$bw_err"
 fi
 
-# Parse --workspace without consuming positional args (sync.py needs them all).
+# Parse --workspace and --dry-run without consuming positional args (sync.py
+# needs them all). --dry-run is read here because the host-side deploy at the end
+# of this script is ours, not sync.py's, and has to honour it too.
 workspace=""
+dry_run=""
 prev=""
 for arg in "$@"; do
   case "$arg" in
     --workspace=*) workspace="${arg#*=}" ;;
+    --dry-run)     dry_run=1 ;;
     *) if [ "$prev" = "--workspace" ]; then workspace="$arg"; fi ;;
   esac
   prev="$arg"
@@ -263,6 +267,12 @@ if [ -z "$deploy_profile" ]; then
   esac
 fi
 
+# --dry-run has to reach this block too (CHA-1259). sync.py honours the flag for
+# everything IT does, but the two host-side side effects below are this script's
+# own and used to run unconditionally — so `sync.sh --dry-run` overwrote the
+# host's always-on rule file and installed a CLI, while announcing itself as a
+# preview. A preview that deploys is worse than no preview: it is trusted
+# precisely because it claims not to write.
 if [ $rc -eq 0 ] && [ -n "$deploy_profile" ]; then
     case "$deploy_profile" in
       Chainlayer) md="claude-config/chainlayer/CLAUDE.md" ;;
@@ -270,20 +280,29 @@ if [ $rc -eq 0 ] && [ -n "$deploy_profile" ]; then
       *)          md="" ;;
     esac
     if [ -n "$md" ] && [ -f "$REPO_ROOT/$md" ]; then
-      mkdir -p "$HOME/.claude"
-      # Copy, don't symlink: the repo checkout lives in an ephemeral Multica
-      # workdir, so a symlink into it dangles once that workdir is reaped.
-      # rm -f first so we replace any pre-existing symlink (from older runs)
-      # with a regular file — otherwise cp would follow it and write through to
-      # the symlink's (now-stale) target instead. Last sync wins.
-      rm -f "$HOME/.claude/CLAUDE.md"
-      cp "$REPO_ROOT/$md" "$HOME/.claude/CLAUDE.md"
-      echo "  → copied ~/.claude/CLAUDE.md ← $REPO_ROOT/$md"
+      if [ -n "$dry_run" ]; then
+        echo "  → [DRY-RUN] would copy ~/.claude/CLAUDE.md ← $REPO_ROOT/$md"
+      else
+        mkdir -p "$HOME/.claude"
+        # Copy, don't symlink: the repo checkout lives in an ephemeral Multica
+        # workdir, so a symlink into it dangles once that workdir is reaped.
+        # rm -f first so we replace any pre-existing symlink (from older runs)
+        # with a regular file — otherwise cp would follow it and write through to
+        # the symlink's (now-stale) target instead. Last sync wins.
+        rm -f "$HOME/.claude/CLAUDE.md"
+        cp "$REPO_ROOT/$md" "$HOME/.claude/CLAUDE.md"
+        echo "  → copied ~/.claude/CLAUDE.md ← $REPO_ROOT/$md"
+      fi
     fi
     # Install nb NetBox CLI (script and install step — survives re-provisioning
-    # when the sync autopilot runs after container rebuild).
+    # when the sync autopilot runs after container rebuild). Gated on dry-run for
+    # the same reason as the copy: installing software is not a preview either.
     if [ -x "$REPO_ROOT/scripts/install-nb.sh" ]; then
-      "$REPO_ROOT/scripts/install-nb.sh"
+      if [ -n "$dry_run" ]; then
+        echo "  → [DRY-RUN] would run scripts/install-nb.sh"
+      else
+        "$REPO_ROOT/scripts/install-nb.sh"
+      fi
     fi
 fi
 

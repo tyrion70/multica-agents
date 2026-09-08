@@ -64,6 +64,18 @@ exec {git} "$@"
 
 # A `multica` stand-in for sync.sh's workspace pre-flight guard. MODE picks the
 # failure being modelled; nothing else in sync.sh calls multica before the guard.
+# A `python3` that stands in for sync.py alone — it exits 0 for that one script,
+# so sync.sh's `rc` is 0 and the host-side deploy block at the end is reached, and
+# delegates every other call (the pre-flight guard parses JSON with python3 too).
+# sync.py's real behaviour is test_sync.py's job; these tests are about what
+# sync.sh does around it.
+PYTHON_SYNCPY_OK_SHIM = """#!/usr/bin/env bash
+for a in "$@"; do
+  case "$a" in *sync.py) exit 0 ;; esac
+done
+exec {python3} "$@"
+"""
+
 MULTICA_SHIM = """#!/usr/bin/env bash
 case "{mode}" in
   fail)      echo "You do not have permission to access this resource." >&2; exit 3 ;;
@@ -370,6 +382,68 @@ class WorkspacePreflightTest(ShellGuardTestCase):
         self.assertIn("Loading schema", r.stderr, r.stdout + r.stderr)
         self.assertNotIn("--workspace is", r.stderr)
         self.assertNotIn("cannot be verified", r.stderr)
+
+
+class SyncShDryRunDeployTest(ShellGuardTestCase):
+    """`--dry-run` has to reach sync.sh's own host-side deploy, not just sync.py's.
+
+    The copy block was gated on `rc -eq 0` and a deploy profile and nothing else
+    (CHA-1259), so a preview overwrote the host's always-on rule file.
+    """
+
+    def setUp(self):
+        super().setUp()
+        (self.work / "claude-config" / "chainlayer").mkdir(parents=True)
+        (self.work / "claude-config" / "chainlayer" / "CLAUDE.md").write_text(
+            "# deployed rules\n", encoding="utf-8")
+        # Committed, or the commit-scope guard stops the run at exit 5 before the
+        # deploy block these tests are about.
+        _git("add", "-A", cwd=self.work)
+        _git("commit", "-q", "-m", "add profile", cwd=self.work)
+        self.home = self.tmp / "home"
+        self.home.mkdir()
+        self.deployed = self.home / ".claude" / "CLAUDE.md"
+
+    def _run(self, *args):
+        """A python3 that exits 0 stands in for sync.py, so rc=0 and the deploy
+        block is reached; HOME is redirected so the real one is never written."""
+        d = self.tmp / "shim-both"
+        d.mkdir(exist_ok=True)
+        for name, body in (("multica", MULTICA_SHIM.format(mode="match")),
+                           ("python3", PYTHON_SYNCPY_OK_SHIM.format(
+                               python3=shutil.which("python3")))):
+            exe = d / name
+            exe.write_text(body, encoding="utf-8")
+            exe.chmod(0o755)
+        return subprocess.run(
+            ["bash", str(self.work / "scripts" / "sync.sh"), "--workspace", "Chainlayer", *args],
+            cwd=str(self.work), capture_output=True, text=True,
+            env={**os.environ,
+                 "BW_BOOTSTRAP": str(self.tmp / "no-such-bootstrap"),
+                 "HOME": str(self.home),
+                 "PATH": f"{d}:{os.environ['PATH']}"},
+        )
+
+    def test_dry_run_writes_nothing_to_the_host(self):
+        r = self._run("--dry-run")
+        self.assertFalse(self.deployed.exists(),
+                         "--dry-run deployed the host's always-on rule file")
+        self.assertIn("[DRY-RUN] would copy ~/.claude/CLAUDE.md", r.stdout)
+
+    def test_a_real_run_still_deploys(self):
+        """The gate must not become a blanket stop — the deploy is the point."""
+        r = self._run()
+        self.assertTrue(self.deployed.is_file(), r.stdout + r.stderr)
+        self.assertEqual(self.deployed.read_text(encoding="utf-8"), "# deployed rules\n")
+        self.assertIn("copied ~/.claude/CLAUDE.md", r.stdout)
+        self.assertNotIn("[DRY-RUN]", r.stdout)
+
+    def test_dry_run_leaves_an_existing_deployment_alone(self):
+        """Not just 'creates nothing' — it must not overwrite what is already there."""
+        self.deployed.parent.mkdir(parents=True)
+        self.deployed.write_text("# the live rules\n", encoding="utf-8")
+        self._run("--dry-run")
+        self.assertEqual(self.deployed.read_text(encoding="utf-8"), "# the live rules\n")
 
 
 class CommitSyncStateTest(ShellGuardTestCase):
