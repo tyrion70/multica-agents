@@ -54,9 +54,13 @@ On a host in the AI-managed tier you do not need human approval for an
 operational action you judge necessary — including a destructive one (reboot,
 restart, drain, disk reclaim) — provided both of these hold:
 
-1. **Redundancy preserved.** One node of a pair at a time, with the other
-   verified serving **from the load balancer's own view**, not inferred from a
-   health probe on the peer.
+1. **Redundancy preserved.** One node of a pair at a time — and establish from
+   the load balancer's own view **how the pair absorbs the loss**, not merely
+   that the peer is up. The CCIP pairs are active/active (`act=1 bck=0` both,
+   no `backup` server, nothing drains); what carries an undrained reboot is
+   HAProxy's `option redispatch` + `retries 3` +
+   `on-marked-down shutdown-sessions`. If a pair has no such absorption
+   configured, it is **not** a free reboot and the licence does not cover it.
 2. **Blast radius confined to that host.** Anything that changes shared
    infrastructure — the shared HAProxy config, DNS, the Proxmox host, a shared
    CI template — is outside the tier *even when done for an AI-managed node*.
