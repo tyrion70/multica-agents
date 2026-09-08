@@ -1,6 +1,6 @@
 ---
 name: ssh
-description: SSH keys and access — two policies, not one. COMPANY hosts (*.chosts.io, company runtimes, the company tailnet) are reached through JIT + Tailscale with no standing key on disk: humans use the web UI (https://jit.java-moth.ts.net/) with a YubiKey touch, agents use POST /agent/grant, and a 400 (wrong target) is a different answer from a 403 (insufficient reason). PRIVATE/LAN machines of Peter's own are reached with a local key on multica-01, which is supported rather than legacy. Also covers git auth to GitHub and GitLab from a host — where the url.insteadOf rewrite, not the key, decides whether your token is used — SSH-format commit signing, and what to do when a key needs recreating (the keys are NOT in the vault). Use whenever SSHing to a machine, cloning/pushing over SSH, hitting "Permission denied (publickey)", configuring git auth or commit signing, or wiring keys onto a new host.
+description: SSH keys and access — two policies, not one. COMPANY hosts (*.chosts.io, company runtimes, the company tailnet) are reached through JIT + Tailscale with no standing key on disk: humans use the web UI (https://jit.java-moth.ts.net/) with a YubiKey touch, agents use POST /agent/grant, and a 400 (wrong target) is a different answer from a 403 — which may be an insufficient reason, or one of two grant caps (both default 2, neither daily, both escalatable). PRIVATE/LAN machines of Peter's own are reached with a local key on multica-01, which is supported rather than legacy. Also covers git auth to GitHub and GitLab from a host — where the url.insteadOf rewrite, not the key, decides whether your token is used — SSH-format commit signing, and what to do when a key needs recreating (the keys are NOT in the vault). Use whenever SSHing to a machine, cloning/pushing over SSH, hitting "Permission denied (publickey)", configuring git auth or commit signing, or wiring keys onto a new host.
 ---
 
 # SSH keys & access
@@ -129,7 +129,21 @@ Content-Type: application/json
 `target` is **required** — releasing every grant at once is deliberately not
 implicit, so an agent holding several does not lose the rest to an omitted
 field. There is no criteria call on this route: giving up privilege is not
-privileged. The response reports what is `still_open`.
+privileged.
+
+**What the response hands back is your whole footprint** — `hosts`, `units`,
+`live_grants`, `grant_cap`, `at_cap` — the same fields `POST /agent/status`
+returns, from the same builder so the two cannot disagree. Read it: it is how
+you know whether you are clear of the concurrency cap (below), and releasing a
+target you do not hold is **not** an error, because expired, already released
+and never held are the same state.
+
+Older approvers answer with `still_open` instead. **Its entries are Tailscale
+device ids, not hostnames** (`nRboNNbsT221CNTRL`-shaped — a grant records the id
+it was opened against). A device id you do not recognise in that list is
+therefore *not* evidence of some foreign grant on your principal; it is a
+target of yours in a vocabulary no other route uses. `POST /agent/status`
+resolves it.
 
 This skill previously said the endpoint was a 404 and that a grant runs for its
 full window. **That was wrong**, and it is why grants sit unreleased. Size
@@ -162,9 +176,13 @@ what it actually loaded, and
 (*SSH targets: discovery for humans, a list for agents*) explains the split.
 
 What to *do* about a refusal: **"not a JIT-eligible target" is correct behaviour,
-not a broken system.** For an agent, `TARGET-OUT-OF-SCOPE` means the host is
-reachable in principle but not in scope for your ticket — a different answer
-again, and neither is JIT failing.
+not a broken system** — it is a 400, and no `reason` will change it.
+
+**There is no longer a "not in scope for your ticket" answer.** This paragraph
+used to describe `TARGET-OUT-OF-SCOPE` as a third outcome; that rule was
+**deleted** by decision 17, along with `NO-NETWORK-SCOPE` and
+`AMBIGUOUS-NETWORK` — a resolving ticket is now sufficient on its own, with no
+network label to match against a target. Do not craft a reason around it.
 
 **Chain-node fleet hosts CAN be agent-requestable — this section said the
 opposite until 2026-09-07, and that was wrong.** It read "*Chain-node and other
@@ -214,7 +232,7 @@ Both examples above were released (`still_open: []`).
 **Note what a refusal does *not* mean:** the node being unreachable **from you**
 is not evidence about the node.
 
-### Read the status code: 400 is the wrong target, 403 is an insufficient reason
+### Read the status code: 400 is the wrong target, 403 is a criteria refusal
 
 Being on the agent list is necessary, not sufficient — and the two refusals look
 alike in a terminal while meaning completely different things:
@@ -222,27 +240,85 @@ alike in a terminal while meaning completely different things:
 | Status | Meaning | What to change |
 |---|---|---|
 | **400** | wrong target — the host is not agent-requestable | nothing about your reason will help; ask a human, or pick a target that is in scope |
-| **403** | right target, **insufficient reason** — the criteria service declined | rewrite the `reason`; the target is fine |
+| **403** | right target — the **criteria service** declined. Not necessarily your reason: it is also how both grant caps refuse | read the code in the body; the target is fine |
 
-The criteria codes are terse. Both of these came back for `monitoring` on
-2026-09-01:
+The criteria codes are terse, and the 403 is **not always a bad reason** — it
+can equally be a cap you are sitting on, or a request now parked for a human.
+Read the code, not the status:
 
-| Response | Meaning |
-|---|---|
-| `criteria not met: NOK: NO-TICKET-ID` | the `reason` carried no ticket id the service recognised |
-| `criteria not met: NOK: NO-NETWORK-SCOPE` | the reason had a ticket id but no accepted network scope |
+| `criteria not met: NOK: …` | Meaning | What to do |
+|---|---|---|
+| `NO-TICKET-ID` | the `reason` carried no ticket id the service recognised | cite one — **or don't**: this refusal *escalates*, and it is the commonest one, so working a host with no ticket costs one human touch rather than being a wall |
+| `MALFORMED-TICKET-ID`, `AMBIGUOUS-TICKET` | there is an id but it is unusable, or you cited two | **terminal** — fix it yourself; nobody is woken for a typo |
+| `CONCURRENCY-CAP` | you hold too many live grants — see below | release one, or let the escalation be approved |
+| `TICKET-BUDGET` | this ticket has already reached distinct targets — see below | new ticket, or let the escalation be approved |
+| `ALWAYS-ESCALATE` | the name is on the deny list (`jit`, revenue-critical hosts) | wait for the touch; deny wins and outranks a perfect ticket |
+| `TICKET-NOT-FOUND`, `TICKET-CLOSED`, `TICKET-LOOKUP-*` | the resolver's own verdict | **terminal** — an outage is not a decision, and parking it would bury the real requests |
 
-So **a bare prose `reason` is not enough** — give it the ticket and the network
-scope you actually need.
+**`NO-NETWORK-SCOPE` is not a rule any more.** It used to be the commonest
+refusal, and the previous version of this section told you to supply "the
+network scope you actually need". There is no such field to supply — see the
+paragraph under *What is requestable*.
 
-> **The criteria service is being changed as this is written** (CHA-1074: it
-> approved everything up to now, and is gaining real per-agent network scoping).
-> Treat the two codes above as *examples of the shape of a 403*, not a complete
-> list, and read the response body rather than matching on remembered strings.
-> The 400-vs-403 distinction is structural and will hold; the code names are the
-> service's to change, and
+> **The code names are the service's to change** — read the response body rather
+> than matching on remembered strings. The 400-vs-403 distinction is structural
+> and will hold. The authoritative list is
 > [`jit-ssh/README.md`](https://gitlab.com/chainlayer/infrastructure/jit-ssh/-/blob/main/README.md)
-> is where they live.
+> (*Escalation — a refusal a human can say yes to*) and `jit_criteria.py`'s
+> `ESCALATABLE` set, which is the only copy of it.
+
+### Two caps, both defaulting to 2, and **neither of them daily**
+
+A 403 is often not about your reason at all. Two counts bound how many systems
+one agent can reach in sequence, they are checked **before** every way of saying
+yes, and three of us guessed their semantics wrong from the error strings before
+anyone read the source:
+
+| | default | counts | refusal |
+|---|---|---|---|
+| `JITSSH_AGENT_GRANT_CAP` | **2** | live grants for one **person**, across both flows | `CONCURRENCY-CAP` |
+| `JITSSH_AGENT_TICKET_BUDGET` | **2** | **distinct targets** granted against one ticket id, keyed `(ticket, target)` | `TICKET-BUDGET` |
+
+**There is no daily term anywhere in the criteria path.** Nothing resets at
+midnight, and waiting for tomorrow is not the fix for either code.
+
+**Both escalate; neither is terminal.** Each refusal returns an `approve_url`
+and a poll handle, deduplicated on `(principal, kind, target, ticket)` so a
+retry loop does not mint a request per attempt. A cap refusing into a dead end
+would be worse than no cap, because the safe action and the impossible action
+would look identical to you.
+
+Four things that decide whether you act correctly on one:
+
+- **The counts are "after this grant"** — the comparison is
+  `live_grants + 1 > cap`. Holding two is refused; a caller at the cap is **one
+  release away**, not guessing.
+- **`GRANT_CAP` groups on `ssh_user`, not principal** — deliberately "across all
+  their agents". Two of your agents working at once share one allowance of two,
+  and a grant another agent opened counts against you.
+- **Re-asking for a target this ticket already used does not count twice** —
+  extending a window you hold is not reaching further. `TICKET-BUDGET` means
+  *distinct* targets: two hosts on one ticket is the ceiling, and the third host
+  needs a different ticket.
+- **A cap of `0` disables it.** Absence of a limit is not a limit of zero.
+
+**When you hit `CONCURRENCY-CAP`, enumerate before you guess:**
+
+```
+POST /agent/status        # your own grants and nothing else, both flows
+→ {"hosts": [...], "units": [...], "live_grants": 2, "grant_cap": 2, "at_cap": true}
+```
+
+Enumerate → release → retry is the loop. `hosts` reports **device ids**, not
+hostnames, so match on the ids the grants were opened against.
+
+**Recorded because they were all plausible and all wrong** — the three guesses
+this fleet made from 403s alone, before reading `jit-ssh`'s README and
+`jit_criteria.py`: *"same network only"*, *"one grant at a time, full stop"*
+(the documented cap is two — a second live grant, possibly another agent's, is
+what makes it feel like one), and *"a fleet-wide daily budget on the
+principal"*. Two caps, both `2`, neither daily. **Read the source, not the
+error string.**
 
 ### `jit` itself is never requestable
 
