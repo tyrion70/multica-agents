@@ -10,6 +10,7 @@
   "visibility": "workspace",
   "max_concurrent_tasks": 6,
   "skills": [
+    "1password",
     "bitwarden",
     "chainlayer-knowledge",
     "chainlink-ops",
