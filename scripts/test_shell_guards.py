@@ -64,6 +64,16 @@ exec {git} "$@"
 
 # A `multica` stand-in for sync.sh's workspace pre-flight guard. MODE picks the
 # failure being modelled; nothing else in sync.sh calls multica before the guard.
+MULTICA_SHIM = """#!/usr/bin/env bash
+[ -n "${{CWD_RECORD:-}}" ] && pwd > "$CWD_RECORD"
+case "{mode}" in
+  fail)      echo "You do not have permission to access this resource." >&2; exit 3 ;;
+  garbage)   echo "not json at all" ;;
+  mismatch)  echo '{{"name": "Private"}}' ;;
+  match)     echo '{{"name": "Chainlayer"}}' ;;
+esac
+"""
+
 # A `python3` that stands in for sync.py alone — it exits 0 for that one script,
 # so sync.sh's `rc` is 0 and the host-side deploy block at the end is reached, and
 # delegates every other call (the pre-flight guard parses JSON with python3 too).
@@ -76,13 +86,18 @@ done
 exec {python3} "$@"
 """
 
-MULTICA_SHIM = """#!/usr/bin/env bash
-case "{mode}" in
-  fail)      echo "You do not have permission to access this resource." >&2; exit 3 ;;
-  garbage)   echo "not json at all" ;;
-  mismatch)  echo '{{"name": "Private"}}' ;;
-  match)     echo '{{"name": "Chainlayer"}}' ;;
-esac
+# A `mktemp` whose -d lands inside a directory that has a task-context marker
+# above it, to drive sync.sh's fail-closed check on its own scratch CWD.
+MKTEMP_SHADOWED_SHIM = """#!/usr/bin/env bash
+for a in "$@"; do
+  if [ "$a" = "-d" ]; then
+    d="{shadowed}/scratch.$$"
+    mkdir -p "$d"
+    echo "$d"
+    exit 0
+  fi
+done
+exec {mktemp} "$@"
 """
 
 
@@ -382,6 +397,71 @@ class WorkspacePreflightTest(ShellGuardTestCase):
         self.assertIn("Loading schema", r.stderr, r.stdout + r.stderr)
         self.assertNotIn("--workspace is", r.stderr)
         self.assertNotIn("cannot be verified", r.stderr)
+
+
+class SyncShNeutralCwdTest(ShellGuardTestCase):
+    """sync.sh must step out of the daemon's way, not move the daemon's files.
+
+    Two earlier revisions moved every `.multica/daemon_task_context.json` on the
+    ancestor path aside and restored them on exit (CHA-873, then CHA-874). The
+    daemon rewrites those files while the run is in flight, so the marker could be
+    back before a later `multica` call read it — two runs in three failed that way
+    on 2026-09-08 (CHA-1259). The fix is a scratch CWD under /tmp, which has no
+    marker above it and cannot acquire one.
+    """
+
+    def _marker(self, at):
+        (at / ".multica").mkdir(parents=True, exist_ok=True)
+        f = at / ".multica" / "daemon_task_context.json"
+        f.write_text('{"task_id": "t", "workspace_id": "w"}', encoding="utf-8")
+        return f
+
+    def test_a_marker_above_the_caller_is_left_untouched(self):
+        """The daemon's file is not moved, not restored, not touched at all."""
+        marker = self._marker(self.work)
+        before = marker.read_text(encoding="utf-8")
+        r = self.run_sync_sh()
+        self.assertTrue(marker.is_file(), "the daemon's context file went missing")
+        self.assertEqual(marker.read_text(encoding="utf-8"), before)
+        self.assertNotIn("moved aside", r.stderr)
+
+    def test_the_cli_is_invoked_from_a_cwd_with_no_marker_above_it(self):
+        """The invariant itself: nothing on the CWD's ancestor path re-scopes us."""
+        self._marker(self.work)
+        record = self.tmp / "cwd.txt"
+        r = self.run_script(
+            "sync.sh", "--workspace", "Chainlayer",
+            path=self._shim("multica", MULTICA_SHIM.format(mode="match")))
+        # The shim records its CWD only when asked; re-run with the recorder on.
+        r = subprocess.run(
+            ["bash", str(self.work / "scripts" / "sync.sh"), "--workspace", "Chainlayer"],
+            cwd=str(self.work), capture_output=True, text=True,
+            env={**os.environ,
+                 "BW_BOOTSTRAP": str(self.tmp / "no-such-bootstrap"),
+                 "CWD_RECORD": str(record),
+                 "PATH": self._shim("multica", MULTICA_SHIM.format(mode="match"))},
+        )
+        self.assertTrue(record.is_file(), r.stdout + r.stderr)
+        d = pathlib.Path(record.read_text(encoding="utf-8").strip())
+        self.assertNotEqual(d, self.work, "still running from the caller's directory")
+        seen = []
+        while True:
+            if (d / ".multica" / "daemon_task_context.json").is_file():
+                seen.append(str(d))
+            if d == d.parent:
+                break
+            d = d.parent
+        self.assertEqual(seen, [], f"marker(s) above the scratch CWD: {seen}")
+
+    def test_it_refuses_when_its_own_scratch_cwd_is_shadowed(self):
+        """Fail closed rather than race: the premise is checked, not assumed."""
+        shadowed = self.tmp / "shadowed"
+        self._marker(shadowed)
+        path = self._shim("mktemp", MKTEMP_SHADOWED_SHIM.format(
+            shadowed=shadowed, mktemp=shutil.which("mktemp")))
+        r = self.run_script("sync.sh", "--workspace", "Chainlayer", path=path)
+        self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+        self.assertIn("task-context marker sits above the scratch CWD", r.stderr)
 
 
 class SyncShDryRunDeployTest(ShellGuardTestCase):

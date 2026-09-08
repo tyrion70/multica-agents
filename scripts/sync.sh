@@ -28,13 +28,11 @@ for var in MULTICA_AGENT_ID MULTICA_AGENT_NAME MULTICA_DAEMON_PORT \
   unset "$var"
 done
 
-# Single EXIT cleanup for everything below (daemon-ctx restore + bw teardown).
-# Both steps are opt-in: the arrays/vars stay empty until their block populates
-# them, so this is a no-op if neither runs. bw teardown goes first, then the ctx
-# restore, so the isolated vault is logged out and removed before we hand the
-# workdir back. DAEMON_CTXS / DAEMON_CTX_BAKS are parallel arrays — one entry per
-# ancestor marker we moved aside (see the walk-all-ancestors block below).
-DAEMON_CTXS=(); DAEMON_CTX_BAKS=(); BW_DATADIR=""
+# Single EXIT cleanup for everything below (bw teardown + neutral CWD). Both
+# steps are opt-in: the vars stay empty until their block populates them, so this
+# is a no-op if neither runs. Nothing here restores state belonging to another
+# process — see the neutral-CWD block below for why that matters.
+NEUTRAL_CWD=""; BW_DATADIR=""
 _cleanup() {
   if [ -n "$BW_DATADIR" ]; then
     # lint:fail-open-ok best-effort teardown, not a state read: the isolated
@@ -43,36 +41,53 @@ _cleanup() {
     bw logout >/dev/null 2>&1 || true
     rm -rf "$BW_DATADIR"
   fi
-  if [ "${#DAEMON_CTXS[@]}" -gt 0 ]; then
-    for _i in "${!DAEMON_CTXS[@]}"; do
-      mv -f "${DAEMON_CTX_BAKS[$_i]}" "${DAEMON_CTXS[$_i]}"
-    done
-  fi
+  # lint:fail-open-ok an empty scratch dir we created; failing to remove it
+  # leaves litter in /tmp and nothing else.
+  [ -n "$NEUTRAL_CWD" ] && rmdir "$NEUTRAL_CWD" 2>/dev/null
+  return 0
 }
 trap _cleanup EXIT
 
 # The multica CLI also reads a file-based task context from
 # .multica/daemon_task_context.json, which it discovers by walking UP from the
 # CWD through ancestor dirs (not just the CWD). It is the on-disk twin of the
-# MULTICA_* vars we just unset, so a leftover one from a prior task re-scopes the
-# CLI (or makes it reject calls) and defeats the host-login fallback.
+# MULTICA_* vars we just unset, so one on our ancestor path re-scopes the CLI to
+# some task's workspace (or makes it reject the call outright) and defeats the
+# host-login fallback.
 #
-# The CLI stops at the FIRST marker it finds, but a nested task workdir can carry
-# MORE than one on its ancestor path — e.g. the task's own marker plus a stale
-# one higher up under .../multica_workspaces/. Neutralising only the nearest
-# leaves the higher one still re-scoping the CLI (CHA-874, surfaced during
-# CHA-873's deploy where sync had to be run from /home/peter to dodge it). So
-# walk ALL ancestors and move every marker aside for the duration of this
-# script, restoring them all on exit (_cleanup above).
+# We MOVE OUT OF ITS WAY rather than move it out of ours (CHA-1259). Two earlier
+# revisions moved every ancestor marker aside for the duration of the run and
+# restored them in the EXIT trap — first the nearest one (CHA-873), then all of
+# them (CHA-874). Both were still a race: those files belong to a live daemon
+# that rewrites them while we run, so a marker can be back in place by the time a
+# later `multica` call reads it. Measured on 2026-09-08, two runs in three died
+# that way — one at the workspace pre-flight ("workspace ID is required"), one
+# mid-run in the skills phase ("agent execution context requires MULTICA_TOKEN to
+# be a task-scoped mat_ token") — while the same command from /home/peter
+# succeeded every time. A third hardening attempt would be the same shape as the
+# two that failed.
+#
+# Discovery is ancestors-of-CWD only, so an empty scratch dir directly under /tmp
+# has no marker above it and no way to acquire one: /tmp and / are its only
+# ancestors. Nothing to move, nothing to restore, and — unlike the move-aside —
+# a SIGKILL mid-run can no longer strand another task's context file in /tmp.
+#
+# Everything downstream is path-independent: SCRIPT_DIR and REPO_ROOT are
+# absolute and resolved above, git runs as `git -C "$REPO_ROOT"`, and sync.py
+# derives its own root from __file__.
+NEUTRAL_CWD="$(mktemp -d /tmp/sync-cwd.XXXXXXXX)"
+cd "$NEUTRAL_CWD"
+
+# Fail closed on the one premise the above rests on. If a marker somehow sits
+# above the scratch dir, we are back in the race and would rather stop than
+# discover it as a confusing mid-run CLI error.
 _d="$PWD"
 while [ -n "$_d" ]; do
   if [ -f "$_d/.multica/daemon_task_context.json" ]; then
-    _ctx="$_d/.multica/daemon_task_context.json"
-    _bak="$(mktemp)"
-    mv "$_ctx" "$_bak"
-    DAEMON_CTXS+=("$_ctx")
-    DAEMON_CTX_BAKS+=("$_bak")
-    echo "  → moved aside stale $_ctx (restored on exit) so CLI falls back to host login" >&2
+    echo "ERROR: a multica task-context marker sits above the scratch CWD:" >&2
+    echo "         $_d/.multica/daemon_task_context.json" >&2
+    echo "       The CLI would be re-scoped to that task's workspace. Refusing to sync." >&2
+    exit 1
   fi
   [ "$_d" = "/" ] && break
   _d="$(dirname "$_d")"
