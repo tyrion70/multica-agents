@@ -539,10 +539,19 @@ repo, past and future.
 
 `git log --show-signature` should report `Good "git" signature for` the email
 listed in `allowed_signers` on that host. Note that `allowed_signers` matches on
-**principal**: a signature made with the right key but attributed to the *other*
-host's email still fails verification, so the email and the key have to come
-from the same row of the table. Add the signing key to GitHub/GitLab as a
-**signing** key (separate from the auth key) for the green "Verified" badge.
+**principal**: a signature made with the right key but attributed to a different
+email still fails local verification, even though the signature itself is
+perfectly valid.
+
+Usually that means the email and the key should come from the same row of the
+table above. **One deliberate exception:** private `github.com/tyrion70/*` repos
+pair the *human* email with the *agent* key on purpose, and accept both the
+local verification miss and GitHub's "Unverified" badge — settled in CHA-1263,
+recorded in `git-pr` Step 2. Don't "fix" that one.
+
+Add the signing key to GitHub/GitLab as a **signing** key (separate from the
+auth key) for the green "Verified" badge — except for those private repos, where
+registering it is deliberately not done.
 
 ## The keys are NOT in the vault — corrected 2026-09-03
 
