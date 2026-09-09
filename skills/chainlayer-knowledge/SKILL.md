@@ -29,19 +29,46 @@ find yourself arguing that a host qualifies, it does not — it is out until thi
 list says otherwise, and extending the list is a PR against
 `tyrion70/multica-agents`, not a call made inside a run.
 
-**In the tier — the seven CCIP node networks, and every VM belonging to them:**
+**In the tier — the nineteen AI-maintained node networks, and every VM belonging
+to them.** One flat list: for membership all nineteen are equal, and how or when
+a network arrived here decides nothing.
 
 | network | repo |
 |---|---|
-| lens    | `chainlayer/nodes/lens-infra` |
-| morph   | `chainlayer/nodes/morph-infra` |
-| wemix   | `chainlayer/nodes/wemix-infra` |
-| cronos  | `chainlayer/nodes/cronos-infra` |
-| stable  | `chainlayer/nodes/stable-infra` |
-| tac     | `chainlayer/nodes/tac-infra` |
-| pharos  | `chainlayer/nodes/pharos-infra` |
+| ab        | `chainlayer/nodes/ab-infra` |
+| abstract  | `chainlayer/nodes/abstract-infra` |
+| adi       | `chainlayer/nodes/adi-infra` |
+| apechain  | `chainlayer/nodes/apechain-infra` |
+| astar-l1  | `chainlayer/nodes/astar-l1-infra` |
+| bitlayer  | `chainlayer/nodes/bitlayer-infra` |
+| bittensor | `chainlayer/nodes/bittensor-infra` |
+| cronos    | `chainlayer/nodes/cronos-infra` |
+| etherlink | `chainlayer/nodes/etherlink-infra` |
+| hemi      | `chainlayer/nodes/hemi-infra` |
+| katana    | `chainlayer/nodes/katana-infra` |
+| lens      | `chainlayer/nodes/lens-infra` |
+| morph     | `chainlayer/nodes/morph-infra` |
+| pharos    | `chainlayer/nodes/pharos-infra` |
+| rootstock | `chainlayer/nodes/rootstock-infra` |
+| stable    | `chainlayer/nodes/stable-infra` |
+| tac       | `chainlayer/nodes/tac-infra` |
+| wemix     | `chainlayer/nodes/wemix-infra` |
+| xdc       | `chainlayer/nodes/xdc-infra` |
 
-Extended as networks join — by adding a row here.
+**The invariant: this list is the `tag:ai-maintained` set on the
+`java-moth.ts.net` tailnet.** Nineteen networks, thirty-eight hosts, one to one —
+checked in both directions on CHA-1251 (38 = 19 × 2; no tagged host missing from
+this table and no row without its tagged hosts). The tag string is exactly
+`tag:ai-maintained`, and a Tailscale tag write is replace-only, so a near-miss
+name cannot be granted by accident.
+
+Write the invariant down so drift is detectable rather than silent: if the
+`tag:ai-maintained` host count ever stops being twice the number of rows here,
+one of the two moved and it is worth finding out which. It is a **detector, not
+a second definition** — the row is the membership. A network carrying the tag but
+no row here is *not* in the tier, and a row here whose hosts are untagged is a
+tagging job, not a demotion. Extending the tier is both: add the row, tag the
+hosts.
 
 **Out of the tier — explicitly, and as binding as the list above:**
 
@@ -52,24 +79,28 @@ Extended as networks join — by adding a row here.
 - GitLab and GCP IAM,
 - the monitoring2 Alertmanager mesh,
 - **everything not named in the table above**, including every other node
-  network. In particular the twelve node repos in the CHA-1251 "AI-maintained
-  rollout" are *not* this list and do not inherit the tier.
+  network. The tier is those nineteen, not "node networks" as a category — a
+  twentieth network is out until it has a row.
 
 Two consequences worth stating on their own, because each has been got wrong:
 
 - **A shared-infrastructure change stays out of the tier even when it is done
-  for a tier node.** Changing the shared HAProxy config, DNS, the Proxmox host
-  or a shared CI template on behalf of lens is a shared-infrastructure change,
-  not a lens change. This is not new: it is why the drain/undrain work was
-  dropped on CHA-1230 — it needed a shared HAProxy change and would have
-  silently downgraded the health gate.
+  for a tier node.** Changing the shared HAProxy config, DNS, the Proxmox host,
+  a shared CI template or the `gitlab-iac` consumer lists on behalf of lens is a
+  shared-infrastructure change, not a lens change. Nineteen `-infra` repos being
+  in the tier puts **nothing shared** in it, however many tier networks a change
+  is for — "it's for all of them" makes a change more shared, not less. This is
+  not new: it is why the drain/undrain work was dropped on CHA-1230 — it needed
+  a shared HAProxy change and would have silently downgraded the health gate.
 - **The tier is about authority, not access.** It widens nothing the JIT grant
   model gates: the `GRANT_CAP` of 2 on the shared `peter-agent` principal is a
   coordination constraint, unaffected by this.
 
 Origin: CHA-1258 → CHA-1259. A deliberate reboot of the lens standby node
 bounced because no agent held a rule saying a lower-risk class of host exists,
-so every agent correctly fell back to the strictest rule it had.
+so every agent correctly fell back to the strictest rule it had. Widened from
+seven networks to nineteen on 2026-09-09, taking the set and the tailnet-tag
+invariant from CHA-1251.
 
 ## chainlink-tools platform (dynamic node registry)
 Three apps under `chainlink-tools/`, all deploying to the `chainlink` namespace in
