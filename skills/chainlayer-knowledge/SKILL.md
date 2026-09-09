@@ -33,27 +33,44 @@ list says otherwise, and extending the list is a PR against
 to them.** One flat list: for membership all nineteen are equal, and how or when
 a network arrived here decides nothing.
 
-| network | repo |
-|---|---|
-| ab        | `chainlayer/nodes/ab-infra` |
-| abstract  | `chainlayer/nodes/abstract-infra` |
-| adi       | `chainlayer/nodes/adi-infra` |
-| apechain  | `chainlayer/nodes/apechain-infra` |
-| astar-l1  | `chainlayer/nodes/astar-l1-infra` |
-| bitlayer  | `chainlayer/nodes/bitlayer-infra` |
-| bittensor | `chainlayer/nodes/bittensor-infra` |
-| cronos    | `chainlayer/nodes/cronos-infra` |
-| etherlink | `chainlayer/nodes/etherlink-infra` |
-| hemi      | `chainlayer/nodes/hemi-infra` |
-| katana    | `chainlayer/nodes/katana-infra` |
-| lens      | `chainlayer/nodes/lens-infra` |
-| morph     | `chainlayer/nodes/morph-infra` |
-| pharos    | `chainlayer/nodes/pharos-infra` |
-| rootstock | `chainlayer/nodes/rootstock-infra` |
-| stable    | `chainlayer/nodes/stable-infra` |
-| tac       | `chainlayer/nodes/tac-infra` |
-| wemix     | `chainlayer/nodes/wemix-infra` |
-| xdc       | `chainlayer/nodes/xdc-infra` |
+| network | repo | metrics label (`chainlayer_network`) |
+|---|---|---|
+| ab        | `chainlayer/nodes/ab-infra` | `ab` |
+| abstract  | `chainlayer/nodes/abstract-infra` | `abstract` |
+| adi       | `chainlayer/nodes/adi-infra` | `adi` |
+| apechain  | `chainlayer/nodes/apechain-infra` | `apechain` |
+| astar-l1  | `chainlayer/nodes/astar-l1-infra` | `astar` |
+| bitlayer  | `chainlayer/nodes/bitlayer-infra` | `bitlayer` |
+| bittensor | `chainlayer/nodes/bittensor-infra` | `bittensor` |
+| cronos    | `chainlayer/nodes/cronos-infra` | `cronos` |
+| etherlink | `chainlayer/nodes/etherlink-infra` | `etherlink` |
+| hemi      | `chainlayer/nodes/hemi-infra` | `hemi` |
+| katana    | `chainlayer/nodes/katana-infra` | `katana` |
+| lens      | `chainlayer/nodes/lens-infra` | `lens` |
+| morph     | `chainlayer/nodes/morph-infra` | `morph` |
+| pharos    | `chainlayer/nodes/pharos-infra` | `pharos` |
+| rootstock | `chainlayer/nodes/rootstock-infra` | `rootstock` |
+| stable    | `chainlayer/nodes/stable-infra` | `stable` |
+| tac       | `chainlayer/nodes/tac-infra` | `tac` |
+| wemix     | `chainlayer/nodes/wemix-infra` | `wemix` |
+| xdc       | `chainlayer/nodes/xdc-infra` | `xdc` |
+
+**A row is three strings, not one, and one row's differ.** The row name is the
+repo/inventory string: repo `chainlayer/nodes/<row>-infra`, ansible inventory
+group `<row>`, hosts `<row>-main-rpc-{1a,2a}-nl2v.chosts.io`. The **metrics**
+string is the third column — the `chainlayer_network` label Prometheus and
+Alertmanager carry — and it is the same word on eighteen rows and **not** on
+`astar-l1`, whose label is `astar`. Checked all nineteen on 2026-09-09 against
+the label index on `prometheus-node-1a-nl2v`, in both directions: every other
+row's label is byte-identical to its row name, and each label resolves to that
+row's two hosts.
+
+So pick the column by what the consumer keys on, and never translate between
+them by hand: an alert filter, a Grafana query or the **Networks health sweep**'s
+VM set keys on the **label**; the **Networks renovate + LCM sweep**, `gitlab-iac`
+consumer lists and CI paths key on the **repo**. Writing `astar-l1` where a label
+is wanted matches nothing and fails silently — the config reads as correct and
+covers nothing, which is exactly how the network went unwatched (CHA-1267).
 
 **The invariant: this list is the `tag:ai-maintained` set on the
 `java-moth.ts.net` tailnet.** Nineteen networks, thirty-eight hosts, one to one —
