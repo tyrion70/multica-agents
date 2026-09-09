@@ -501,20 +501,48 @@ on multica-02, and it cost most of a day here.
 
 ## Git commit signing
 
-SSH-format signing with the dedicated signing key:
+SSH-format signing with the dedicated signing key. **Which key and which
+identity is host-dependent** — the same split `git-mr` Step 2 documents, and
+getting it wrong is not cosmetic:
+
+| Host | `user.name` / `user.email` | `user.signingkey` |
+|---|---|---|
+| **Multica agent runtime** (multica-01/02) | `peter-agent` / `peter+agent@chainlayer.io` | `~/.ssh/peter_agent_signing.pub` |
+| **Peter's own machines** | `Peter van Mourik` / `peter@chainlayer.io` | `~/.ssh/id_ed25519_signing.pub` |
+
+`id_ed25519_signing` is **not installed on an agent runtime** — the same point
+the GitLab-auth section above makes about the key table. Prescribing it there
+pins signing to a path that does not exist, and every signed commit hard-fails.
+
+On an agent runtime the global config is **already correct**. Check before you
+write anything:
+
+```bash
+git config --global --get-regexp '^(user\.|gpg\.|commit\.gpgsign)'
+```
+
+Only if it is genuinely absent, and matching the host from the table above:
 
 ```bash
 git config --global gpg.format ssh
-git config --global user.signingkey ~/.ssh/id_ed25519_signing.pub
+git config --global user.signingkey ~/.ssh/peter_agent_signing.pub   # agent runtime
 git config --global commit.gpgsign true
-# verify locally: add your pubkey to an allowed-signers file
+# verify locally: add the pubkey to an allowed-signers file
 git config --global gpg.ssh.allowedSignersFile ~/.ssh/allowed_signers
-#   ~/.ssh/allowed_signers:  peter@chainlayer.io <contents of id_ed25519_signing.pub>
+#   ~/.ssh/allowed_signers:  peter+agent@chainlayer.io <contents of the .pub>
 ```
 
-`git log --show-signature` should report `Good "git" signature for
-peter@chainlayer.io`. Add the signing key to GitHub/GitLab as a **signing**
-key (separate from the auth key) for the green "Verified" badge.
+⚠️ **`--global`, never repo-local** — see the warning in `git-mr` / `git-pr`
+Step 2. A Multica checkout is a git *worktree* sharing one bare-repo config, so
+a repo-local write here overrides the identity for every other worktree of that
+repo, past and future.
+
+`git log --show-signature` should report `Good "git" signature for` the email
+listed in `allowed_signers` on that host. Note that `allowed_signers` matches on
+**principal**: a signature made with the right key but attributed to the *other*
+host's email still fails verification, so the email and the key have to come
+from the same row of the table. Add the signing key to GitHub/GitLab as a
+**signing** key (separate from the auth key) for the green "Verified" badge.
 
 ## The keys are NOT in the vault — corrected 2026-09-03
 

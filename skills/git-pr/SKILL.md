@@ -32,7 +32,35 @@ git remote get-url origin   # must be github.com/tyrion70/*
 ## Step 2 — pre-flight (mandatory, every push)
 
 1. **Git identity**: `git config user.email` must be `peter@chainlayer.io`.
-   Fix repo-locally if wrong — never commit as a hostname email.
+   **Do not "fix" it repo-locally.** Never run `git config` without
+   `--global` in a Multica checkout: those checkouts are git *worktrees* against
+   one long-lived shared bare repo, and no cache sets
+   `extensions.worktreeConfig`, so `--local` means **the whole repo cache**. A
+   repo-local write therefore overrides the identity for every other worktree of
+   that repo — including other tasks running right now, and every future
+   checkout — and there is no history to trace it by, because `git config`
+   rewrites the file atomically.
+
+   **Rely on the global** and inspect rather than write: `git config --local
+   --list --show-origin` — the origin path tells you immediately whether you are
+   looking at a shared cache config. If an override is genuinely wrong,
+   `git config --local --unset` it (one unset from any worktree clears it
+   everywhere) rather than writing a new one over the top. Never commit as a
+   hostname email.
+
+   ⚠️ **Open question, do not resolve it with a repo-local write.** On an agent
+   runtime the global identity is `peter-agent` /
+   `peter+agent@chainlayer.io` — i.e. it does **not** match the email this step
+   mandates, and `~/.ssh/allowed_signers` lists only the agent principal, so a
+   commit attributed to `peter@chainlayer.io` fails local signature
+   verification even when signing succeeds. Whether the human email is actually
+   intended on agent-authored commits in these private repos is awaiting
+   Peter's answer (CHA-1263). Until it lands: commit with the global identity
+   and say so, rather than pinning either value into a shared cache config.
+
+   (CHA-1263: this is how the `haproxy` and `quickimage` caches ended up pinned
+   to `~/.ssh/id_ed25519_signing.pub`, a path absent on the runtime — every
+   signed commit in those repos hard-failed, in every workdir.)
 2. **Fetch**: `git fetch origin main`.
 3. **Existing PR state** for the branch:
    - `gh pr list --head <branch>`
