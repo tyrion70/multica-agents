@@ -43,7 +43,25 @@ git remote get-url origin   # must be gitlab.com/chainlayer/*
 1. **Git identity**: the commit identity is host-dependent. On an agent
    runtime `git config user.email` must be `peter+agent@chainlayer.io` and
    `user.name` `peter-agent`; on Peter's own machines it is `peter@chainlayer.io`.
-   Fix repo-locally if wrong — never commit as a hostname email.
+   **Do not "fix" it repo-locally.** Never run `git config` without
+   `--global` in a Multica checkout: those checkouts are git *worktrees* against
+   one long-lived shared bare repo, and no cache sets
+   `extensions.worktreeConfig`, so `--local` means **the whole repo cache**. A
+   repo-local write therefore overrides the identity for every other worktree of
+   that repo — including other tasks running right now, and every future
+   checkout — and there is no history to trace it by, because `git config`
+   rewrites the file atomically.
+
+   Normally there is nothing to fix: the runtime global is already correct, so
+   **rely on it**. Verify with `git config --local --list --show-origin` — the
+   origin path tells you immediately whether you are looking at a shared cache
+   config. If an override is genuinely wrong, `git config --local --unset` it
+   (one unset from any worktree clears it everywhere) rather than writing a new
+   one over the top. Never commit as a hostname email.
+
+   (CHA-1263: this is how the `haproxy` and `quickimage` caches ended up pinned
+   to `~/.ssh/id_ed25519_signing.pub`, a path absent on the runtime — every
+   signed commit in those repos hard-failed, in every workdir.)
 2. **Fetch**: `git fetch origin main`.
 3. **Existing MR state** for the branch:
    - `glab mr list --source-branch <branch>`
