@@ -48,15 +48,42 @@ git remote get-url origin   # must be github.com/tyrion70/*
    everywhere) rather than writing a new one over the top. Never commit as a
    hostname email.
 
-   ⚠️ **Open question, do not resolve it with a repo-local write.** On an agent
-   runtime the global identity is `peter-agent` /
-   `peter+agent@chainlayer.io` — i.e. it does **not** match the email this step
-   mandates, and `~/.ssh/allowed_signers` lists only the agent principal, so a
-   commit attributed to `peter@chainlayer.io` fails local signature
-   verification even when signing succeeds. Whether the human email is actually
-   intended on agent-authored commits in these private repos is awaiting
-   Peter's answer (CHA-1263). Until it lands: commit with the global identity
-   and say so, rather than pinning either value into a shared cache config.
+   ⚠️ **Settled — do not re-raise it, and do not "correct" it.** (CHA-1263,
+   answered by Peter 2026-09-09.) The identity in these private repos is
+   deliberately **mixed**:
+
+   - `user.email` → `peter@chainlayer.io` — the human email, as mandated above
+   - `user.name` → `peter-agent`
+   - signing key → the **agent** key, `~/.ssh/peter_agent_signing.pub`
+
+   That combination is intentional, not a mistake to fix. Two consequences
+   follow, both **expected and accepted**:
+
+   - `~/.ssh/allowed_signers` lists only `peter+agent@chainlayer.io`, so local
+     `git log --show-signature` finds no matching principal.
+   - GitHub renders these commits **"Unverified"** (`verification.reason =
+     no_user`), because the agent signing key is deliberately *not* registered
+     as a signing identity on Peter's account. Nothing is unsigned — the
+     signature is valid, it simply has no principal to match against, and every
+     agent commit in these repos has looked like this for months.
+
+   Company `gitlab.com/chainlayer/*` repos are the other case:
+   `peter+agent@chainlayer.io` throughout — see `git-mr`.
+
+   **How to get the private-repo email without writing config.** The runtime
+   global is `peter+agent@chainlayer.io`, so this step does need an override —
+   but per the paragraph above, never a config write. Use a per-command
+   environment override, which persists nothing:
+
+   ```bash
+   GIT_AUTHOR_NAME=peter-agent GIT_COMMITTER_NAME=peter-agent \
+   GIT_AUTHOR_EMAIL=peter@chainlayer.io GIT_COMMITTER_EMAIL=peter@chainlayer.io \
+     git commit -m "..."
+   ```
+
+   `git -c user.email=peter@chainlayer.io -c user.name=peter-agent commit` does
+   the same thing. Either is safe in a shared-cache worktree; `git config` is
+   not.
 
    (CHA-1263: this is how the `haproxy` and `quickimage` caches ended up pinned
    to `~/.ssh/id_ed25519_signing.pub`, a path absent on the runtime — every
