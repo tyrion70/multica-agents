@@ -23,6 +23,7 @@ multica-agents/
   scripts/
     sync.sh                   # sync agents + skills (thin wrapper around sync.py)
     sync.py                   # bidirectional sync engine
+    install-cliproxy.sh       # CLIProxyAPI + claude-cliproxy wrapper on a runtime host
   .sync-state.json            # last-synced snapshot — committed after each run
 ```
 
@@ -120,6 +121,31 @@ git clone git@github.com:tyrion70/multica-agents.git multica-agents
 ### Updating agent configuration
 
 When an agent's configuration changes in Multica, the next autopilot run detects the Multica-side change and writes it back automatically (unless the repo also changed, in which case a conflict issue is filed).
+
+## `scripts/install-cliproxy.sh` — Claude via CLIProxyAPI on a runtime host
+
+Installs and starts [CLIProxyAPI](https://github.com/router-for-me/CLIProxyAPI) as a
+user service, plus the `claude-cliproxy` wrapper that points Claude Code at it. This is
+what the `Claude via CLIProxy (multica-02)` Multica runtime executes, and the ~14 Claude
+agents on that runtime all depend on it — it existed on exactly one machine, hand-built,
+until CHA-1149.
+
+```bash
+scripts/install-cliproxy.sh                  # install + start + verify (idempotent)
+scripts/install-cliproxy.sh --no-service     # skip the systemd unit
+scripts/install-cliproxy.sh --force-config   # back up config.yaml and mint a NEW API key
+CLIPROXY_PORT=8318 scripts/install-cliproxy.sh   # non-default listen port
+```
+
+Pinned version + per-arch sha256 live at the top of the script; the tarball is verified
+**before** extraction. It never logs in and never touches `~/.cli-proxy-api/claude-*.json`
+credentials, so re-running it on a live host cannot cost you the auth pool. Logging in is
+a human step (a browser is required) — the script prints the runbook when the pool is
+empty.
+
+Verification is an assertion, not a ping: `/v1/models` must answer **with** the key and
+must return `401` **without** one. Note that Multica marks a runtime online on any HTTP
+response at all, so an empty or expired auth pool still reads healthy on the runtime list.
 
 ## Shell script rules (`scripts/*.sh`)
 
