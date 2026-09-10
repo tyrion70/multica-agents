@@ -242,6 +242,50 @@ When both sides change independently, the script exits 2 and prints a JSON confl
 3. For Private: assign to Peter (`997b06ce-c4e1-4ca9-b5e8-bcc0325749c9`)
 4. Leave both sides unchanged — do not pick a winner
 
+### Three fields that always look like drift and never are
+
+**Before comparing a repo `agent.json` against live by hand, know that
+`skills`, `mcp_config` and `thinking_level` differ on EVERY agent for
+representation reasons alone.** They are not drift, and a naive field-by-field
+diff files one bogus conflict per agent — on CHA-1248 that would have been
+fourteen, on top of the one real `model` change the audit was actually for.
+
+| field | repo holds | the API returns | why they differ |
+|---|---|---|---|
+| `skills` | list of slug **strings** — `["ssh", "git-mr"]` | list of **objects** — `{id, name, description, enabled}` | different representation of the same set; compare `name`s |
+| `mcp_config` | the real block, with `#…#` secret placeholders | `null`, alongside `mcp_config_redacted: true` | **withheld, not absent** — see below |
+| `thinking_level` | `null` | `""` | both mean "runtime default"; `schemas/agent.json` says so for both |
+
+**This is the API's shape, not one endpoint's quirk.** Both `multica agent
+list` and `multica agent get <id>` behave identically on all three, so
+switching to the detail endpoint does not resolve it — verified on Chainlayer
+2026-09-10.
+
+**`mcp_config: null` never means the agent has no MCP config.** It means the
+server withheld it, which `mcp_config_redacted: true` states explicitly. Read
+`null` as "unknown", never as "empty" — and never write a live value back into
+a repo file: the live values are the **resolved secrets**, which is the leak
+that put a raw NetBox token on `main` (CHA-85). On live→repo the placeholders
+are carried through from the existing repo file, deliberately.
+
+**The safe comparison — don't hand-roll it.** `_norm_agent_field()` in
+`scripts/sync.py` is the canonical normalizer for exactly these fields (plus
+`custom_env`); call it, or replicate it, before diffing anything. If you only
+need a quick audit, restrict the diff to the fields with one unambiguous form
+— `name`, `model`, `runtime_id`, `description`, `visibility`,
+`max_concurrent_tasks` — and leave the three above out of it entirely.
+
+**`sync.py` itself is not fooled by any of this** — it normalizes before
+comparing, and `_try_reconcile_agent_conflict` reduces the secret-bearing
+fields to structure (MCP server-name set, `custom_env` key list) so a
+placeholder-bearing repo read and a resolved live read diff like-for-like
+(CHA-1092). So a conflict report from the script is real; it is the **ad-hoc**
+comparison, run by a person or an agent outside the script, that produces the
+false positives. Nothing here is a bug to fix in `sync.py`.
+
+(Found during the CHA-1248 model audit, PR #157, 2026-09-10: 14 agents on one
+runtime, all 14 showing the same three fields as "changed", none of it real.)
+
 ## Adding a new skill
 
 1. Create `skills/<name>/SKILL.md` with YAML frontmatter (`name:`, `description:`) and body.
