@@ -248,6 +248,14 @@ export ANTHROPIC_AUTH_TOKEN="\$KEY"
 # Would take precedence over ANTHROPIC_AUTH_TOKEN and send the wrong credential.
 unset ANTHROPIC_API_KEY
 
+# Claude Code only defers MCP tool definitions behind its ToolSearch tool when
+# it recognises a first-party Anthropic host. Behind this proxy it does not, so
+# it inlines every schema instead -- 323 tools is ~246k tokens of prompt before
+# the first user message, and every run dies "Prompt is too long". Its own log
+# line names the fix, conditional on the proxy forwarding tool_reference blocks;
+# CLIProxyAPI does (tool_search_tool_bm25 round-trips through it end to end).
+export ENABLE_TOOL_SEARCH=true
+
 exec claude "\$@"
 WRAP
 chmod 0755 "$WRAPPER"
