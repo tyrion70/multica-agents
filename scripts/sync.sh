@@ -259,7 +259,12 @@ if [ -n "$out_of_scope" ]; then
   echo
   echo "    Inspect the diff before you keep any of it:"
   echo "      git -C $REPO_ROOT diff"
-  echo "    Then either open a PR for the ones that are genuine, or 'git checkout --' them."
+  echo "    Then either open a PR for the ones that are genuine and merge it, or discard"
+  echo "    them. Either way the discard is 'git checkout -- .' — EVERYTHING, including"
+  echo "    .sync-state.json. Reverting the paths above on their own is the dangerous"
+  echo "    move: this run already baselined the new values, so a repo-only revert makes"
+  echo "    the next run read 'the repo changed' and push the OLD state to the live"
+  echo "    workspace, silently undoing what the guard just caught (CHA-1273)."
   echo "    .sync-state.json is intentionally NOT committed by this failed run: baselining"
   echo "    an unreviewed write is what makes the damage look synced."
   exit 5
