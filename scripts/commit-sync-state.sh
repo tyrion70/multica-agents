@@ -48,8 +48,18 @@ if [ -n "$out_of_scope" ]; then
   echo "ERROR: refusing to commit — the tree holds changes outside $STATE_FILE:" >&2
   echo "$out_of_scope" | sed 's/^/         /' >&2
   echo "       A 'chore: sync state' commit may touch $STATE_FILE and nothing else." >&2
-  echo "       Those paths are reviewable content: open a PR for the ones that are" >&2
-  echo "       genuine, or 'git checkout --' them, then re-run this script." >&2
+  echo "       Those paths are reviewable content. Two safe ways out:" >&2
+  echo "         KEEP them  - open a PR for them and merge it, then bring this" >&2
+  echo "                      checkout to the merged main and re-run:" >&2
+  echo "                        git checkout -- . && git pull --ff-only" >&2
+  echo "         DROP them  - 'git checkout -- .' and re-run." >&2
+  echo "       Either way the checkout discards EVERYTHING, $STATE_FILE included." >&2
+  echo "       Do NOT revert the paths above on their own: this run already wrote" >&2
+  echo "       the new values into $STATE_FILE, so a repo-only revert leaves the" >&2
+  echo "       baseline ahead of the repo, and the next run reads that as" >&2
+  echo "       'the repo changed' and pushes the OLD state to the live workspace." >&2
+  echo "       A partial cleanup is the dangerous one — it silently reverts the" >&2
+  echo "       change this guard just stopped you committing (CHA-1273)." >&2
   exit 5
 fi
 

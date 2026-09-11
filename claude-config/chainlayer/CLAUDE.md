@@ -99,9 +99,19 @@ When you need to change an always-on rule or skill wiring:
    SSH-signed, no `Co-Authored-By`.
 3. **Tell the user**: post a Multica comment / message saying what you changed
    and link the PR, so they can review and merge.
-4. Once merged, **run `sync.sh` on each host** (or wait for the nightly sync
-   autopilot) to redeploy the file — the nightly sync is the backstop, not the
-   primary deploy path, so don't treat merge as deploy.
+   **You may click merge yourself once a human has approved that PR's content**
+   — in their own words, on the issue or the PR, about *this* change. A standing
+   preference, an approval of a different PR, or your own judgement that the diff
+   is obviously fine are none of them; without that approval the click stays
+   theirs, and nothing breaks by waiting. This does **not** loosen step 2: pushing
+   to `main` and merging a reviewed PR are different acts, and step 2's *never
+   commit to `main` directly* is unchanged — the branch, the diff and the human
+   review all still happen. The `.sync-state.json` exemption below is also
+   unchanged and stays scoped to that one path.
+   (Ruled by Peter on CHA-1273, 2026-09-10, after an agent merged #157.)
+4. Once merged — by them or by you — **run `sync.sh` on each host** (or wait for
+   the nightly sync autopilot) to redeploy the file — the nightly sync is the
+   backstop, not the primary deploy path, so don't treat merge as deploy.
 
 **`.sync-state.json` is not covered by step 2.** It is generated bookkeeping — the
 record of what `sync.sh` last pushed to each workspace — with no reviewable content,
